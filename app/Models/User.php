@@ -83,4 +83,39 @@ class User extends Authenticatable
             ->where('last_activity', '>=', now()->subMinutes(5)->timestamp)
             ->exists();
     }
+
+    public function checkModuloAcceso(string $modulo, string $accion) {
+    
+      if ($this->id_rol === 1) {
+        return true;
+      }
+
+      // si no recivo modulo 
+      if ($modulo=='all') return true;
+      
+      
+      // query 
+
+      $usuarioModulo = DB::table('permisos as p')
+      ->join('modulos as m', 'm.id_modulo', '=', 'p.id_modulo')
+      ->select('p.id_permiso', 'p.eliminar', 'p.actualizar', 'p.guardar')
+      ->where('p.id_usuario', $this->id)
+      ->where('m.nombre_modulo', $modulo)
+      ->get()->first();
+
+      if(!$usuarioModulo){
+        // Auth::logout();
+        return false;
+      }
+
+      if($accion == 'all') return true;
+      
+      $acces = false;
+      
+      if($accion === 'eliminar') $acces = !!$usuarioModulo->eliminar;
+      else if ($accion === 'actualizar') $acces = !!$usuarioModulo->actualizar;
+      else if ($accion === 'guardar') $acces = !!$usuarioModulo->guardar;
+
+      return $acces;
+    }
 }

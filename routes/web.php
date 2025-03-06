@@ -34,7 +34,7 @@ Route::get('sin-permisos', function () {
 })->name('sin-permisos');
 
 // Rutas protegidas por autenticación
-Route::middleware('auth', 'check.permissions')->group(function () {
+Route::middleware('auth')->group(function () {
     // Home
     Route::get('home', [HomeController::class, 'index'])->name('home.index');
 
@@ -47,15 +47,15 @@ Route::middleware('auth', 'check.permissions')->group(function () {
 
     // Clients
     Route::controller(ClientController::class)->group(function () {
-        Route::get('clients', 'index')->name('clients.index');
-        Route::get('clients.create', 'create')->name('clients.create');
-        Route::post('clients', 'store')->name('clients.store');
+        Route::get('clients', 'index')->middleware('check.permissions:clients,all')->name('clients.index');
+        Route::get('clients.create', 'create')->middleware('check.permissions:clients,guardar')->name('clients.create');
+        Route::post('clients', 'store')->middleware('check.permissions:clients,guardar')->name('clients.store');
         Route::get('clients.assign-service', 'assignService')->name('clients.assign_service');
         // Ruta para mostrar el formulario de edición
-        Route::get('clients/{id}/edit', 'edit')->name('clients.edit');
+        Route::get('clients/{id}/edit', 'edit')->middleware('check.permissions:clients,actualizar')->name('clients.edit');
 
         // Ruta para procesar la actualización del cliente
-        Route::put('clients/{id}', 'update')->name('clients.update');
+        Route::put('clients/{id}', 'update')->middleware('check.permissions:clients,actualizar')->name('clients.update');
     });
 
     // Calendar
@@ -81,22 +81,22 @@ Route::middleware('auth', 'check.permissions')->group(function () {
 
     // Services
     Route::controller(ServiceController::class)->group(function () {
-        Route::get('services', 'index')->name('services.index');
-        Route::post('services', 'store')->name('services.store');
-        Route::post('services.store-plan', 'storePlan')->name('services.storePlan');
-        Route::delete('services/{servicio}', 'destroy')->name('services.destroy');
+        Route::get('services', 'index')->middleware('check.permissions:manage,all')->name('services.index');
+        Route::post('services', 'store')->middleware('check.permissions:manage,guardar')->name('services.store');
+        Route::post('services.store-plan', 'storePlan')->middleware('check.permissions:manage,guardar')->name('services.storePlan');
+        Route::delete('services/{servicio}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('services.destroy');
     });
 
     // Contracts
     Route::controller(ContractController::class)->group(function () {
-        Route::get('contracts', 'index')->name('contracts.index');
+        Route::get('contracts', 'index')->middleware('check.permissions:manage,all')->name('contracts.index');
         Route::post('contracts', 'store')->name('contracts.store');
         Route::delete('contratos/{id}', 'destroy')->name('contratos.destroy');
     });
 
     // Months
     Route::controller(MesController::class)->group(function () {
-        Route::get('months', 'index')->name('months.index');
+        Route::get('months', 'index')->middleware('check.permissions:manage,all')->name('months.index');
         Route::post('months/store', 'store')->name('months.store');
     });
 

@@ -4,7 +4,7 @@
 @section('content')
     <div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-100 to-gray-300">
         <div class="text-center">
-            <h1 class="mb-4 text-6xl font-semibold text-red-500">404</h1>
+            <h1 class="mb-4 text-6xl font-semibold text-red-500">403</h1>
             <p class="mb-4 text-lg text-gray-600">¡Ups! No tienes permisos para acceder a esta página</p>
             <div class="animate-bounce">
               <svg class="mx-auto h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -22,6 +22,9 @@
                 </button>
             </div>
             <!-- Modal body -->
+            @if(!auth()->user()->checkModuloAcceso('manage', 'guardar'))
+              No tiene los permisos para realizar esta accion!
+            @else
             <form action="{{ route('services.store') }}" method="POST" class="p-4 md:p-5">
                 @csrf
                 <div class="grid gap-4 mb-4 grid-cols-2">
@@ -74,9 +77,10 @@
                 <button type="submit"
                 class="text-white flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                 <i class="fas fa-check text-sm"></i>
-                Registrar
-            </button>
+                  Registrar
+                </button>
             </form>
+            @endif
         </div>
     </div>
 </div>

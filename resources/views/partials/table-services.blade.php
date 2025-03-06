@@ -9,12 +9,13 @@
             <!-- Botones -->
             <div class="flex w-full justify-center md:justify-end mt-4 md:mt-0">
                 <div class="flex flex-row space-x-4 md:space-x-7 w-full md:w-auto">
-                    <button data-modal-target="service-modal" data-modal-toggle="service-modal"
+                  <button 
+                        data-modal-target="service-modal" data-modal-toggle="service-modal"
                         class="flex items-center justify-center px-8 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-slate-600 border border-transparent rounded-md active:bg-slate-600 hover:bg-slate-700 focus:outline-none focus:shadow-outline-slate w-1/2 md:w-auto">
                         <i class="fas fa-plus mr-2"></i>
                         Servicios
-                    </button>
-                    <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
+                  </button>
+                  <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
                         class="flex items-center justify-center px-8 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-slate-600 border border-transparent rounded-md active:bg-slate-600 hover:bg-slate-700 focus:outline-none focus:shadow-outline-slate w-1/2 md:w-auto">
                         <i class="fas fa-plus mr-2"></i>
                         Planes
