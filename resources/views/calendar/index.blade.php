@@ -4,6 +4,7 @@
 @section('content')
 
     <!-- ===== Main Content Start ===== -->
+    <!-- ===== Main Content Start ===== -->
     <main>
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
             <div class="mx-auto max-w-full">
@@ -25,6 +26,35 @@
                 <!-- Breadcrumb End -->
 
                 <!-- ====== Calendar Section Start -->
+                @include('partials.calendar-event-modal')
+
+                <!-- Encabezado con botones -->
+                <div class="flex items-center justify-between p-4 border-b border-stroke dark:border-strokedark">
+                    <!-- Botón "Add Event +" -->
+                    <button onclick="openModal(new Date().toISOString().split('T')[0])"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+                        Add Event +
+                    </button>
+
+                    <!-- Título del mes y año -->
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Marzo 2025</h2>
+
+                    <!-- Botones de vista (mes, semana, día) -->
+                    <div class="flex gap-2">
+                        <button
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            Mes
+                        </button>
+                        <button
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            Semana
+                        </button>
+                        <button
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            Día
+                        </button>
+                    </div>
+                </div>
                 <div
                     class="w-full max-w-full rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                     <table class="w-full">
@@ -263,5 +293,23 @@
             </div>
         </div>
     </main>
+    <!-- ===== Main Content End ===== -->
+    <!-- Script para manejar el modal -->
+<script>
+    // Función para abrir el modal
+    function openModal(date) {
+        const modal = document.getElementById('eventModal');
+        modal.classList.remove('hidden');
+        document.getElementById('event-start-date').value = date;
+    }
+
+    // Función para cerrar el modal
+    document.querySelectorAll('.modal-close-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = document.getElementById('eventModal');
+            modal.classList.add('hidden');
+        });
+    });
+</script>
     <!-- ===== Main Content End ===== -->
 @endsection

@@ -32,12 +32,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
             <!-- ===== Header End ===== -->
             <section>
                 @yield('content')
-                @if (session('errorDetails'))
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-                        role="alert">
-                        <span class="block sm:inline">{{ session('errorDetails') }}</span>
-                    </div>
-                @endif
+                
                 <!-- ===== Restore Start ===== -->
                 @include('partials.modal-restore')
                 <!-- ===== Restore End ===== -->

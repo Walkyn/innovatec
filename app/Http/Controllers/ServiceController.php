@@ -19,31 +19,6 @@ class ServiceController extends Controller
         return view('services.index', compact('servicios', 'categorias', 'user'));
     }
 
-public function verificarPermisosEliminar($id)
-{
-    $user = Auth::user();
-
-    // Verificar si el usuario tiene acceso al módulo 'manage' o al módulo 'services'
-    $moduloServices = $user->modulos->where('nombre_modulo', 'services')->first();
-    $moduloManage = $user->modulos->where('nombre_modulo', 'manage')->first();
-
-    if ($moduloManage) {
-        // Si tiene acceso al módulo 'manage', verificar permisos de eliminación para 'manage'
-        $permiso = $user->permisos->where('id_modulo', $moduloManage->id_modulo)->first();
-        if ($permiso && $permiso->eliminar) {
-            return response()->json(['permiso' => true]);
-        }
-    } elseif ($moduloServices) {
-        // Si tiene acceso al módulo 'services', verificar permisos de eliminación para 'services'
-        $permiso = $user->permisos->where('id_modulo', $moduloServices->id_modulo)->first();
-        if ($permiso && $permiso->eliminar) {
-            return response()->json(['permiso' => true]);
-        }
-    }
-
-    return response()->json(['permiso' => false]);
-}
-
     public function storePlan(Request $request)
     {
         $request->validate([

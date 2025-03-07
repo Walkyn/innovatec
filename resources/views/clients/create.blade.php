@@ -185,7 +185,7 @@
                                         <label
                                             class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
                                             for="pueblo">
-                                            Pueblo
+                                            Zona
                                         </label>
                                         <div class="relative">
                                             <input list="pueblos_list"

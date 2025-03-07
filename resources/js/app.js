@@ -5,6 +5,7 @@ import '../css/satoshi.css';
 import "../css/app.css";
 import 'flowbite';
 
+
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
 import flatpickr from "flatpickr";
