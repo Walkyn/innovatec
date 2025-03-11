@@ -1,15 +1,14 @@
 @extends('layouts.app')
-@section('title', 'Business Manager - Registrar')
+@section('title', 'Business Manager - Editar Usuario')
 
 @section('content')
-
     <!-- ===== Main Content Start ===== -->
     <main>
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
             <!-- Breadcrumb Start -->
             <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 class="text-title-md2 font-bold text-black dark:text-white">
-                    Registrar
+                    Editar Usuario
                 </h2>
 
                 <nav>
@@ -17,17 +16,17 @@
                         <li>
                             <a class="font-medium" href="index.html">Panel /</a>
                         </li>
-                        <li class="font-medium text-primary">Registrar</li>
+                        <li class="font-medium text-primary">Editar Usuario</li>
                     </ol>
                 </nav>
             </div>
             <!-- Breadcrumb End -->
 
-            <!-- ====== Alerts Start -->
+            <!-- ====== Alerts Start ====== -->
             @include('partials.alerts')
             <!-- ====== Alerts End -->
 
-            <!-- ====== Forms Section Start -->
+            <!-- ====== Forms Section Start ====== -->
             <div class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                 <div class="flex flex-wrap items-center">
                     <div class="hidden w-full xl:block xl:w-1/2">
@@ -37,32 +36,30 @@
                                 <span class="text-xl font-bold text-gray-900 dark:text-white">Business Manager</span>
                             </a>
 
-
                             <p class="font-medium 2xl:px-20">
-                                Crea tu cuenta para registrar, gestionar pagos, y administrar tus servicios de manera
-                                eficiente.
+                                Edita la información del usuario para actualizar sus datos, roles y permisos.
                             </p>
 
                             <span class="mt-15 inline-block">
                                 <img src="{{ asset('images/illustration/illustration-03.svg') }}" alt="illustration" />
                             </span>
-
                         </div>
                     </div>
                     <div class="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
                         <div class="w-full p-4 sm:p-12.5 xl:p-17.5">
                             <h2 class="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                                Registrar usuario
+                                Editar Usuario
                             </h2>
 
-                            <form action="{{ route('users.store') }}" method="POST">
+                            <form action="{{ route('users.update', $user->id) }}" method="POST">
                                 @csrf
+                                @method('PUT')
                                 <div class="flex flex-col md:flex-row gap-4 mb-4">
                                     <div class="w-full md:w-1/2">
                                         <label class="mb-2.5 block font-medium text-black dark:text-white">Nombre</label>
                                         <div class="relative">
                                             <input type="text" name="name" placeholder="Nombres completos"
-                                                value="{{ old('name') }}"
+                                                value="{{ old('name', $user->name) }}"
                                                 class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
                                             <span class="absolute right-4 top-4">
                                                 <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22"
@@ -86,7 +83,7 @@
                                         <label class="mb-2.5 block font-medium text-black dark:text-white">Teléfono</label>
                                         <div class="relative">
                                             <input type="tel" name="phone" placeholder="Introduce tu número"
-                                                value="{{ old('phone') }}"
+                                                value="{{ old('phone', $user->phone) }}"
                                                 class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
                                             <span class="absolute right-4 top-4">
                                                 <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22"
@@ -110,7 +107,7 @@
                                     <label class="mb-2.5 block font-medium text-black dark:text-white">Email</label>
                                     <div class="relative">
                                         <input type="email" name="email" placeholder="Introduce tu correo electrónico"
-                                            value="{{ old('email') }}"
+                                            value="{{ old('email', $user->email) }}"
                                             class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
                                         <span class="absolute right-4 top-4">
                                             <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22"
@@ -180,7 +177,6 @@
                                     </div>
                                 </div>
 
-
                                 <!-- Selección de Rol -->
                                 <div x-data="app">
                                     <div
@@ -199,7 +195,8 @@
                                                     <div class="relative">
                                                         <input type="radio" name="role" value="admin"
                                                             class="sr-only" @click="selectedRole = 'admin'"
-                                                            :checked="selectedRole === 'admin'" />
+                                                            :checked="selectedRole === 'admin' ||
+                                                                {{ $user->id_rol === 1 ? 'true' : 'false' }}" />
                                                         <div
                                                             class="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]">
                                                         </div>
@@ -227,7 +224,8 @@
                                                     <div class="relative">
                                                         <input type="radio" name="role" value="empleado"
                                                             class="sr-only" @click="selectedRole = 'empleado'"
-                                                            :checked="selectedRole === 'empleado'" />
+                                                            :checked="selectedRole === 'empleado' ||
+                                                                {{ $user->id_rol === 2 ? 'true' : 'false' }}" />
                                                         <div
                                                             class="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]">
                                                         </div>
@@ -267,8 +265,8 @@
                                         <div
                                             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-5.5 p-6.5">
                                             <!-- Módulos Dinámicos -->
-                                            <template x-for="(module, index) in modules" :key="module.id">
-                                                <div x-data="{ moduleToggle: false, actions: { eliminar: false, actualizar: false, guardar: false } }"
+                                            <template x-for="module in modules" :key="module.id">
+                                                <div x-data="{ moduleToggle: module.active, actions: module.actions }"
                                                     x-transition:enter="transition ease-out duration-300"
                                                     x-transition:enter-start="opacity-0 translate-y-4"
                                                     x-transition:enter-end="opacity-100 translate-y-0"
@@ -281,8 +279,8 @@
                                                         <div class="relative">
                                                             <input type="checkbox" :id="'checkbox' + module.id"
                                                                 class="sr-only" @change="moduleToggle = !moduleToggle"
-                                                                :name="'modules[' + index + '][id]'"
-                                                                :value="module.id" />
+                                                                :name="'modules[' + module.id + '][id]'"
+                                                                :value="module.id" x-model="moduleToggle" />
                                                             <div :class="moduleToggle && 'border-primary bg-gray dark:bg-transparent'"
                                                                 class="mr-4 flex h-5 w-5 items-center justify-center rounded border">
                                                                 <span :class="moduleToggle && '!opacity-100'"
@@ -308,8 +306,8 @@
                                                                 <div class="relative">
                                                                     <input type="checkbox" :id="action.id + module.id"
                                                                         class="sr-only" x-model="actions[action.id]"
-                                                                        :name="'modules[' + index + '][actions][' + action.id +
-                                                                            ']'"
+                                                                        :name="'modules[' + module.id + '][actions][' + action
+                                                                            .id + ']'"
                                                                         :value="action.id" />
                                                                     <div :class="actions[action.id] &&
                                                                         'border-primary bg-gray dark:bg-transparent'"
@@ -333,73 +331,10 @@
 
                                 <!-- Botón -->
                                 <div class="flex gap-4">
-                                    <input type="submit" value="Crear cuenta"
+                                    <input type="submit" value="Actualizar Usuario"
                                         class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90" />
                                 </div>
                             </form>
-
-                            <script>
-                                document.addEventListener('alpine:init', () => {
-                                    Alpine.data('app', () => ({
-                                        selectedRole: null,
-                                        modules: [{
-                                                id: 1,
-                                                name: 'Inicio'
-                                            },
-                                            {
-                                                id: 2,
-                                                name: 'Clientes'
-                                            },
-                                            {
-                                                id: 3,
-                                                name: 'Administrar'
-                                            },
-                                            {
-                                                id: 4,
-                                                name: 'Cobranzas'
-                                            },
-                                            {
-                                                id: 5,
-                                                name: 'Calendario'
-                                            },
-                                            {
-                                                id: 6,
-                                                name: 'Perfil'
-                                            },
-                                            {
-                                                id: 7,
-                                                name: 'Configuración'
-                                            },
-                                            {
-                                                id: 8,
-                                                name: 'Gráficos'
-                                            },
-                                            {
-                                                id: 9,
-                                                name: 'Database'
-                                            },
-                                            {
-                                                id: 10,
-                                                name: 'Autenticación'
-                                            }
-                                        ],
-                                        actionsList: [{
-                                                id: 'eliminar',
-                                                name: 'Eliminar'
-                                            },
-                                            {
-                                                id: 'actualizar',
-                                                name: 'Actualizar'
-                                            },
-                                            {
-                                                id: 'guardar',
-                                                name: 'Guardar'
-                                            }
-                                        ]
-                                    }));
-                                });
-                            </script>
-
                         </div>
                     </div>
                 </div>
@@ -408,8 +343,45 @@
         </div>
     </main>
     <!-- ===== Main Content End ===== -->
+@endsection
 
-    <!-- ===== Scritps ===== -->
+<!-- ===== Scritps ===== -->
+@section('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('app', () => ({
+                selectedRole: '{{ $user->id_rol === 1 ? 'admin' : 'empleado' }}',
+                modules: {!! json_encode(
+                    $allModulos->map(function ($modulo) use ($userModulos, $userPermisos) {
+                        return [
+                            'id' => $modulo->id_modulo,
+                            'name' => $modulo->nombre_modulo,
+                            'active' => in_array($modulo->id_modulo, $userModulos),
+                            'actions' => $userPermisos[$modulo->id_modulo] ?? [
+                                'eliminar' => false,
+                                'actualizar' => false,
+                                'guardar' => false,
+                            ],
+                        ];
+                    }),
+                ) !!},
+                actionsList: [{
+                        id: 'eliminar',
+                        name: 'Eliminar'
+                    },
+                    {
+                        id: 'actualizar',
+                        name: 'Actualizar'
+                    },
+                    {
+                        id: 'guardar',
+                        name: 'Guardar'
+                    }
+                ]
+            }));
+        });
+    </script>
+
     <script>
         const password = document.getElementById('password');
         const passwordConfirmation = document.getElementById('password_confirmation');
@@ -456,6 +428,4 @@
         password.addEventListener('input', validatePasswords);
         passwordConfirmation.addEventListener('input', validatePasswords);
     </script>
-
-
 @endsection

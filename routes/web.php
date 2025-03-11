@@ -63,8 +63,8 @@ Route::middleware('auth')->group(function () {
         Route::get('clients.create', 'create')->middleware('check.permissions:clients,guardar')->name('clients.create');
         Route::post('clients', 'store')->middleware('check.permissions:clients,guardar')->name('clients.store');
         Route::get('clients.assign-service', 'assignService')->name('clients.assign_service');
-        Route::get('clients/{id}/edit', 'edit')->middleware('check.permissions:clients,actualizar')->name('clients.edit');
-        Route::put('clients/{id}', 'update')->middleware('check.permissions:clients,actualizar')->name('clients.update');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     });
 
     // Calendar

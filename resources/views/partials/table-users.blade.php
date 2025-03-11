@@ -82,7 +82,7 @@
                         </td>
                         <td class="px-6 py-4 flex items-center">
                             <img class="w-10 h-10 rounded-full"
-                                src="{{ $user->profile_picture ?? '/ruta/por_defecto.jpg' }}" alt="{{ $user->name }}">
+                                src="{{ auth()->user()->profile_photo ? asset('storage/profiles/' . auth()->user()->profile_photo) : './images/user/profile.png' }}">
                             <div class="ps-3">
                                 <div class="text-base font-semibold">{{ $user->name }}</div>
                                 <div class="font-normal text-gray-500">{{ $user->email }}</div>

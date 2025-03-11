@@ -33,66 +33,64 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        // Obtener el usuario a editar
-        $user = User::with(['rol', 'modulos', 'permisos'])->findOrFail($id);
-
-        // Obtener todos los roles disponibles
-        $roles = Rol::all();
-
-        // Obtener todos los módulos disponibles
-        $modulos = Modulo::all();
-
-        // Pasar los datos a la vista
-        return view('users.edit', compact('user', 'roles', 'modulos'));
+        $user = User::with(['modulos', 'permisos'])->findOrFail($id);
+        $allModulos = Modulo::all();
+    
+        $userModulos = $user->modulos->pluck('id_modulo')->toArray();
+        $userPermisos = [];
+    
+        foreach ($user->permisos as $permiso) {
+            $userPermisos[$permiso->id_modulo] = [
+                'eliminar' => (bool) $permiso->eliminar,
+                'actualizar' => (bool) $permiso->actualizar,
+                'guardar' => (bool) $permiso->guardar,
+            ];
+        }
+    
+        return view('users.edit', compact('user', 'allModulos', 'userModulos', 'userPermisos'));
     }
     
     public function update(Request $request, $id)
     {
-        // Validar los datos del formulario
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'id_rol' => 'required|exists:roles,id_rol',
-            'modulos' => 'nullable|array',
-            'permisos' => 'nullable|array',
-        ]);
-
-        // Obtener el usuario a actualizar
+        
         $user = User::findOrFail($id);
 
-        // Actualizar los datos básicos del usuario
-        $user->update([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'id_rol' => $request->id_rol,
+        // Validación
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'phone' => 'nullable|string|max:20',
+            'role' => 'required|exists:roles,id_rol'
         ]);
-
-        // Sincronizar módulos
-        if ($request->has('modulos')) {
-            $user->modulos()->sync($request->modulos);
-        } else {
-            $user->modulos()->detach();
-        }
-
-        // Sincronizar permisos
-        if ($request->has('permisos')) {
-            foreach ($request->permisos as $moduloId => $permisos) {
+        
+        // Actualizar usuario sin afectar el rol
+        $user->update([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'phone' => $validatedData['phone']
+        ]);
+    
+        // Actualizar rol correctamente
+        $user->id_rol = $validatedData['role'];
+        $user->save();
+        
+        // Actualizar permisos
+        if ($request->has('modules')) {
+            foreach ($request->input('modules') as $moduleId => $moduleData) {
                 $user->permisos()->updateOrCreate(
-                    ['id_modulo' => $moduloId],
+                    ['id_usuario' => $user->id, 'id_modulo' => $moduleId],
                     [
-                        'eliminar' => $permisos['eliminar'] ?? false,
-                        'actualizar' => $permisos['actualizar'] ?? false,
-                        'guardar' => $permisos['guardar'] ?? false,
+                        'eliminar' => isset($moduleData['actions']['eliminar']),
+                        'actualizar' => isset($moduleData['actions']['actualizar']),
+                        'guardar' => isset($moduleData['actions']['guardar'])
                     ]
                 );
             }
         }
-
-        // Redireccionar con un mensaje de éxito
-        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
+    
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente');
     }
+    
 
     public function store(Request $request)
     {

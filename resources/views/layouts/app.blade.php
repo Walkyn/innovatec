@@ -44,7 +44,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
                 <!-- ===== Backup Excel Start ===== -->
                 @include('partials.modal-restore-excel')
                 <!-- ===== Backup Excel End ===== -->
-
+                @yield('scripts')
             </section>
         </div>
         <!-- ===== Content Area End ===== -->

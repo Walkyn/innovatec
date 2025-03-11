@@ -65,7 +65,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Modulo::class, 'usuario_modulo', 'id_usuario', 'id_modulo');
     }
-    
+
     /**
      * Obtener los permisos del usuario.
      *
@@ -73,7 +73,7 @@ class User extends Authenticatable
      */
     public function permisos()
     {
-        return $this->hasMany(Permiso::class, 'id_usuario');
+        return $this->hasMany(Permiso::class, 'id_modulo', 'id_usuario');
     }
 
     public function isOnline()
@@ -84,38 +84,35 @@ class User extends Authenticatable
             ->exists();
     }
 
-    public function checkModuloAcceso(string $modulo, string $accion) {
-    
-      if ($this->id_rol === 1) {
-        return true;
-      }
+    public function checkModuloAcceso(string $modulo, string $accion)
+    {
 
-      // si no recivo modulo 
-      if ($modulo=='all') return true;
-      
-      
-      // query 
+        if ($this->id_rol === 1) {
+            return true;
+        }
 
-      $usuarioModulo = DB::table('permisos as p')
-      ->join('modulos as m', 'm.id_modulo', '=', 'p.id_modulo')
-      ->select('p.id_permiso', 'p.eliminar', 'p.actualizar', 'p.guardar')
-      ->where('p.id_usuario', $this->id)
-      ->where('m.nombre_modulo', $modulo)
-      ->get()->first();
+        // si no recivo modulo 
+        if ($modulo == 'all') return true;
 
-      if(!$usuarioModulo){
-        // Auth::logout();
-        return false;
-      }
+        $usuarioModulo = DB::table('permisos as p')
+            ->join('modulos as m', 'm.id_modulo', '=', 'p.id_modulo')
+            ->select('p.id_permiso', 'p.eliminar', 'p.actualizar', 'p.guardar')
+            ->where('p.id_usuario', $this->id)
+            ->where('m.nombre_modulo', $modulo)
+            ->get()->first();
 
-      if($accion == 'all') return true;
-      
-      $acces = false;
-      
-      if($accion === 'eliminar') $acces = !!$usuarioModulo->eliminar;
-      else if ($accion === 'actualizar') $acces = !!$usuarioModulo->actualizar;
-      else if ($accion === 'guardar') $acces = !!$usuarioModulo->guardar;
+        if (!$usuarioModulo) {
+            return false;
+        }
 
-      return $acces;
+        if ($accion == 'all') return true;
+
+        $acces = false;
+
+        if ($accion === 'eliminar') $acces = !!$usuarioModulo->eliminar;
+        else if ($accion === 'actualizar') $acces = !!$usuarioModulo->actualizar;
+        else if ($accion === 'guardar') $acces = !!$usuarioModulo->guardar;
+
+        return $acces;
     }
 }
