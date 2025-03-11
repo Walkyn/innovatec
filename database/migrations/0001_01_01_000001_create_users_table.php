@@ -21,6 +21,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('id_rol')->nullable()->constrained('roles', 'id_rol')->onDelete('set null');
+            $table->string('profile_photo')->nullable();
+            $table->string('cover_photo')->nullable();
             $table->rememberToken();
             $table->timestamp('last_activity')->nullable();
             $table->timestamps();

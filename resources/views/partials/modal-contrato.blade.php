@@ -330,17 +330,34 @@
                         </div>
                         <!-- ====== Estado - Fecha - Precio Section End -->
 
-                        <!-- Botón Agregar -->
-                        <div class="flex flex-wrap -mx-3 mb-4">
-                            <div class="w-full md:w-full px-3 mt-2 mb-2 md:mb-0">
-                                <div class="relative">
-                                    <button type="button" @click="agregarDetalle"
-                                        class="block w-full bg-slate-500 dark:bg-slate-900 border border-slate-500 dark:border-slate-700 text-white dark:text-gray-300 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-slate-600 dark:focus:bg-slate-800 items-center justify-center">
-                                        <i class="fa fa-plus text-sm"></i>
-                                    </button>
+                        <div class="flex flex-wrap -mx-3 mb-6">
+                            <!-- Campo de Datos del Cliente -->
+                            <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
+                                    for="client-name">
+                                    Observaciones
+                                </label>
+                                <div class="relative flex items-center">
+                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                        <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
+                                    </div>
+                                    <input type="text" id="observaciones" value=""
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                        readonly required />
+                                    <input type="hidden" id="observaciones" name="observacioens" value="">
                                 </div>
                             </div>
+
+                            <!-- Botón Agregar -->
+                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0 flex items-end">
+                                <button type="button" @click="agregarDetalle"
+                                    class="w-full bg-slate-500 dark:bg-slate-900 border border-slate-500 dark:border-slate-700 text-white dark:text-gray-300 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-slate-600 dark:focus:bg-slate-800 flex items-center justify-center">
+                                    <i class="fa fa-plus text-sm"></i>
+                                </button>
+                            </div>
                         </div>
+
 
                         <!-- Alerta Cliente -->
                         <div id="alert-cliente" x-data="{ showAlert: false }">

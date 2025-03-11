@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Rol;
 
 class UserController extends Controller
 {
@@ -21,16 +22,76 @@ class UserController extends Controller
 
     public function profile()
     {
-        // Obtener el usuario autenticado
         $user = Auth::user();
-
-        // Pasar los datos a la vista
         return view('profile', compact('user'));
     }
 
     public function create()
     {
         return view('users.create');
+    }
+
+    public function edit($id)
+    {
+        // Obtener el usuario a editar
+        $user = User::with(['rol', 'modulos', 'permisos'])->findOrFail($id);
+
+        // Obtener todos los roles disponibles
+        $roles = Rol::all();
+
+        // Obtener todos los módulos disponibles
+        $modulos = Modulo::all();
+
+        // Pasar los datos a la vista
+        return view('users.edit', compact('user', 'roles', 'modulos'));
+    }
+    
+    public function update(Request $request, $id)
+    {
+        // Validar los datos del formulario
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'id_rol' => 'required|exists:roles,id_rol',
+            'modulos' => 'nullable|array',
+            'permisos' => 'nullable|array',
+        ]);
+
+        // Obtener el usuario a actualizar
+        $user = User::findOrFail($id);
+
+        // Actualizar los datos básicos del usuario
+        $user->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'id_rol' => $request->id_rol,
+        ]);
+
+        // Sincronizar módulos
+        if ($request->has('modulos')) {
+            $user->modulos()->sync($request->modulos);
+        } else {
+            $user->modulos()->detach();
+        }
+
+        // Sincronizar permisos
+        if ($request->has('permisos')) {
+            foreach ($request->permisos as $moduloId => $permisos) {
+                $user->permisos()->updateOrCreate(
+                    ['id_modulo' => $moduloId],
+                    [
+                        'eliminar' => $permisos['eliminar'] ?? false,
+                        'actualizar' => $permisos['actualizar'] ?? false,
+                        'guardar' => $permisos['guardar'] ?? false,
+                    ]
+                );
+            }
+        }
+
+        // Redireccionar con un mensaje de éxito
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function store(Request $request)
@@ -42,7 +103,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:admin,empleado',
         ];
-    
+
         $messages = [
             'name.required' => 'Por favor, ingrese el nombre completo.',
             'phone.required' => 'Por favor, ingrese el número de teléfono.',
@@ -54,15 +115,15 @@ class UserController extends Controller
             'role.required' => 'Por favor, seleccione un rol.',
             'role.in' => 'El rol seleccionado no es válido.',
         ];
-    
+
         $validator = Validator::make($request->all(), $rules, $messages);
-    
+
         if ($validator->fails()) {
             return redirect()->route('users.create')
                 ->withErrors($validator)
                 ->withInput();
         }
-    
+
         try {
             // Crear el usuario
             $user = User::create([
@@ -72,7 +133,7 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'id_rol' => $request->role === 'admin' ? 1 : 2,
             ]);
-    
+
             // Si el rol es 'admin', asignar todos los permisos
             if ($request->role === 'admin') {
                 $modules = Modulo::all();
@@ -84,7 +145,7 @@ class UserController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-    
+
                     // Guardar en permisos
                     Permiso::create([
                         'id_usuario' => $user->id,
@@ -98,12 +159,12 @@ class UserController extends Controller
             // Si el rol es 'empleado', asignar los permisos seleccionados
             elseif ($request->role === 'empleado') {
                 $modules = $request->input('modules', []);
-    
+
                 foreach ($modules as $module) {
                     $modulo = Modulo::find($module['id']);
                     if ($modulo) {
                         $actions = $module['actions'] ?? [];
-    
+
                         // Guardar en usuario_modulo
                         DB::table('usuario_modulo')->insert([
                             'id_usuario' => $user->id,
@@ -111,7 +172,7 @@ class UserController extends Controller
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
-    
+
                         // Guardar en permisos
                         Permiso::create([
                             'id_usuario' => $user->id,
@@ -123,7 +184,7 @@ class UserController extends Controller
                     }
                 }
             }
-    
+
             return redirect()->route('users.create')->with([
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Usuario registrado con éxito',

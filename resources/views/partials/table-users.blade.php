@@ -102,9 +102,10 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <a href="#"
-                                class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Editar</a>
-                        </td>
+                            <a href="{{ route('users.edit', $user->id) }}" class="text-blue-600 dark:text-blue-500 hover:underline">
+                                <i class="fas fa-pen-to-square"></i>
+                            </a>
+                        </td>                                           
                     </tr>
                 @endforeach
             </tbody>

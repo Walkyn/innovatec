@@ -20,6 +20,7 @@ use App\Models\Contrato;
 use App\Models\ContratoServicio;
 use App\Http\Controllers\DatabaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -27,6 +28,16 @@ Route::controller(AuthController::class)->group(function () {
 
     Route::post('login', 'login')->name('login.post');
     Route::post('logout', 'logout')->name('logout');
+});
+
+// Ruta para crear el enlace simbólico
+Route::get('link', function () {
+    $symlinkPath = public_path('storage');
+
+    if (is_link($symlinkPath) && file_exists($symlinkPath)) {
+        return redirect('/');
+    }
+    return view('link');
 });
 
 Route::get('sin-permisos', function () {
@@ -42,9 +53,10 @@ Route::middleware('auth')->group(function () {
     Route::controller(UserController::class)->group(function () {
         Route::get('users', 'index')->middleware('check.permissions:users,all')->name('users.index');
         Route::get('users.create', 'create')->name('users.create');
-        Route::post('store-user', 'store')->name('users.store');
+        Route::post('store-user', 'store')->middleware('check.permissions:users,guardar')->name('users.store');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
     });
-
     // Clients
     Route::controller(ClientController::class)->group(function () {
         Route::get('clients', 'index')->middleware('check.permissions:clients,all')->name('clients.index');
@@ -60,6 +72,9 @@ Route::middleware('auth')->group(function () {
 
     // Profile
     Route::get('profile', [ProfileController::class, 'index'])->middleware('check.permissions:profile,all')->name('profile.index');
+    Route::put('/profile.photo', [ProfileController::class, 'updatePhoto'])->name('profile.update.photo');
+    // Ruta para actualizar la foto de portada
+    Route::post('/profile.update-cover', [ProfileController::class, 'updateCover'])->name('profile.update.cover');
 
     // Settings
     Route::controller(SettingsController::class)->group(function () {
@@ -102,6 +117,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Rutas que devuelven datos
+
 Route::get('/categorias', [ContractController::class, 'getCategorias']);
 Route::get('/servicios/{categoriaId}', [ContractController::class, 'getServicios']);
 Route::get('/planes/{servicioId}', [ContractController::class, 'getPlanes']);

@@ -227,14 +227,14 @@
                                         <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('users.index') }}"
                                             :class="page === 'users.index' && '!text-white'">
-                                            <i class="fas fa-list"></i> Lista de Usuarios
+                                            <i class="fas fa-list"></i> Lista
                                         </a>
                                     </li>
                                     <li>
                                         <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('users.create') }}"
                                             :class="page === 'users.create' && '!text-white'">
-                                            <i class="fas fa-user-plus"></i> Registrar Usuario
+                                            <i class="fas fa-user-plus"></i> Registrar
                                         </a>
                                     </li>
                                 </ul>
