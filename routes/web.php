@@ -54,35 +54,37 @@ Route::middleware('auth')->group(function () {
         Route::get('users', 'index')->middleware('check.permissions:users,all')->name('users.index');
         Route::get('users.create', 'create')->name('users.create');
         Route::post('store-user', 'store')->middleware('check.permissions:users,guardar')->name('users.store');
-        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-        Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+        Route::get('users/{user}/edit', 'edit')->middleware('check.permissions:users,actualizar')->name('users.edit');
+        Route::put('users/{user}', 'update')->middleware('check.permissions:users,actualizar')->name('users.update');
     });
+
     // Clients
     Route::controller(ClientController::class)->group(function () {
         Route::get('clients', 'index')->middleware('check.permissions:clients,all')->name('clients.index');
         Route::get('clients.create', 'create')->middleware('check.permissions:clients,guardar')->name('clients.create');
         Route::post('clients', 'store')->middleware('check.permissions:clients,guardar')->name('clients.store');
         Route::get('clients.assign-service', 'assignService')->name('clients.assign_service');
-        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::get('clients/{id}/edit', 'edit')->middleware('check.permissions:clients,actualizar')->name('clients.edit');
+        Route::put('clients/{id}', 'update')->middleware('check.permissions:clients,actualizar')->name('clients.update');
     });
 
     // Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->middleware('check.permissions:calendar,all')->name('calendar.index');
 
     // Profile
-    Route::get('profile', [ProfileController::class, 'index'])->middleware('check.permissions:profile,all')->name('profile.index');
-    Route::put('/profile.photo', [ProfileController::class, 'updatePhoto'])->name('profile.update.photo');
-    // Ruta para actualizar la foto de portada
-    Route::post('/profile.update-cover', [ProfileController::class, 'updateCover'])->name('profile.update.cover');
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('profile', 'index')->middleware('check.permissions:profile,all')->name('profile.index');
+        Route::put('/profile.photo', 'updatePhoto')->middleware('check.permissions:profile,actualizar')->name('profile.update.photo');
+        Route::post('/profile.update-cover', 'updateCover')->middleware('check.permissions:profile,actualizar')->name('profile.update.cover');
+    });
 
     // Settings
     Route::controller(SettingsController::class)->group(function () {
         Route::get('settings', 'index')->middleware('check.permissions:settings,all')->name('settings.index');
         Route::get('settings.create', 'create')->name('settings.create');
-        Route::post('settings.store', 'store')->name('settings.store');
-        Route::post('settings.redes-sociales', 'storeRedesSociales')->name('settings.storeRedesSociales');
-        Route::post('settings.info-ticket/store', 'storeInfoTicket')->name('settings.storeInfoTicket');
+        Route::post('settings.store', 'store')->middleware('check.permissions:settings,guardar')->name('settings.store');
+        Route::post('settings.redes-sociales', 'storeRedesSociales')->middleware('check.permissions:settings,guardar')->name('settings.storeRedesSociales');
+        Route::post('settings.info-ticket/store', 'storeInfoTicket')->middleware('check.permissions:settings,guardar')->name('settings.storeInfoTicket');
     });
 
     // Charts

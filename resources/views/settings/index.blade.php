@@ -24,6 +24,10 @@
                 </div>
                 <!-- Breadcrumb End -->
 
+                <!-- ====== Alerts Start -->
+                @include('partials.alerts')
+                <!-- ====== Alerts End -->
+
                 <!-- ====== Profile Section Start -->
                 <div
                     class="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -90,23 +94,28 @@
                                 {{ $configuracion->nombre ?? 'Nombre de la empresa' }}
                             </h3>
                             <p class="font-medium">Sobre Nosotros</p>
-                            <div class="mx-auto mb-5.5 mt-4.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F] hover:shadow-lg transition-shadow duration-300">
+                            <div
+                                class="mx-auto mb-5.5 mt-4.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F] hover:shadow-lg transition-shadow duration-300">
                                 <!-- Clientes Activos -->
-                                <div class="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark hover:scale-105 transition-transform duration-300">
+                                <div
+                                    class="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark hover:scale-105 transition-transform duration-300">
                                     <span class="text-sm">Clientes</span>
-                                    <span class="font-semibold text-black dark:text-white">{{ $cantidadClientesActivos }}</span>
+                                    <span
+                                        class="font-semibold text-black dark:text-white">{{ $cantidadClientesActivos }}</span>
                                 </div>
                                 <!-- Años de Experiencia -->
-                                <div class="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark hover:scale-105 transition-transform duration-300">
+                                <div
+                                    class="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark hover:scale-105 transition-transform duration-300">
                                     <span class="text-sm">Años</span>
                                     <span class="font-semibold text-black dark:text-white">10+</span>
                                 </div>
                                 <!-- Soporte 24/7 -->
-                                <div class="flex flex-col items-center justify-center gap-1 px-4 hover:scale-105 transition-transform duration-300">
+                                <div
+                                    class="flex flex-col items-center justify-center gap-1 px-4 hover:scale-105 transition-transform duration-300">
                                     <span class="text-sm">Soporte</span>
                                     <span class="font-semibold text-black dark:text-white">24/7</span>
                                 </div>
-                            </div>                            
+                            </div>
 
                             <div class="mx-auto max-w-180">
                                 <p class="mt-4.5 text-sm font-normal">

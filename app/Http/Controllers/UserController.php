@@ -33,64 +33,162 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user = User::with(['modulos', 'permisos'])->findOrFail($id);
-        $allModulos = Modulo::all();
-    
-        $userModulos = $user->modulos->pluck('id_modulo')->toArray();
-        $userPermisos = [];
-    
-        foreach ($user->permisos as $permiso) {
-            $userPermisos[$permiso->id_modulo] = [
-                'eliminar' => (bool) $permiso->eliminar,
-                'actualizar' => (bool) $permiso->actualizar,
-                'guardar' => (bool) $permiso->guardar,
-            ];
-        }
-    
-        return view('users.edit', compact('user', 'allModulos', 'userModulos', 'userPermisos'));
-    }
-    
-    public function update(Request $request, $id)
-    {
-        
-        $user = User::findOrFail($id);
+        // Consulta para obtener usuario, rol, módulos y permisos
+        $userData = DB::table('users as u')
+            ->leftJoin('roles as r', 'u.id_rol', '=', 'r.id_rol')
+            ->leftJoin('permisos as p', 'u.id', '=', 'p.id_usuario')
+            ->leftJoin('modulos as m', 'p.id_modulo', '=', 'm.id_modulo')
+            ->select(
+                'u.id as user_id',
+                'u.name as user_name',
+                'u.email',
+                'u.phone',
+                'r.id_rol',
+                'r.nombre_rol',
+                'm.id_modulo',
+                'm.nombre_modulo',
+                'p.eliminar',
+                'p.actualizar',
+                'p.guardar'
+            )
+            ->where('u.id', $id)
+            ->get();
 
-        // Validación
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'phone' => 'nullable|string|max:20',
-            'role' => 'required|exists:roles,id_rol'
-        ]);
-        
-        // Actualizar usuario sin afectar el rol
-        $user->update([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'phone' => $validatedData['phone']
-        ]);
-    
-        // Actualizar rol correctamente
-        $user->id_rol = $validatedData['role'];
-        $user->save();
-        
-        // Actualizar permisos
-        if ($request->has('modules')) {
-            foreach ($request->input('modules') as $moduleId => $moduleData) {
-                $user->permisos()->updateOrCreate(
-                    ['id_usuario' => $user->id, 'id_modulo' => $moduleId],
-                    [
-                        'eliminar' => isset($moduleData['actions']['eliminar']),
-                        'actualizar' => isset($moduleData['actions']['actualizar']),
-                        'guardar' => isset($moduleData['actions']['guardar'])
-                    ]
-                );
+        // Si el usuario no tiene permisos, devolver error 404
+        if ($userData->isEmpty()) {
+            abort(404, 'Usuario no encontrado.');
+        }
+
+        $allModulos = Modulo::all();
+
+        // Organizar datos para la vista
+        $user = (object) [
+            'id' => $userData->first()->user_id,
+            'name' => $userData->first()->user_name,
+            'email' => $userData->first()->email,
+            'phone' => $userData->first()->phone,
+            'id_rol' => $userData->first()->id_rol,
+            'rol' => $userData->first()->nombre_rol
+        ];
+
+        $userModulos = $userData->pluck('id_modulo')->toArray();
+
+        $userPermisos = [];
+        foreach ($userData as $permiso) {
+            if ($permiso->id_modulo) {
+                $userPermisos[$permiso->id_modulo] = [
+                    'eliminar' => (bool) $permiso->eliminar,
+                    'actualizar' => (bool) $permiso->actualizar,
+                    'guardar' => (bool) $permiso->guardar,
+                ];
             }
         }
-    
-        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente');
+
+        return view('users.edit', compact('user', 'allModulos', 'userModulos', 'userPermisos'));
     }
+
+    public function update(Request $request, $id)
+    {
+        // Validación de los datos
+        $rules = [
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'role' => 'required|in:admin,empleado',
+        ];
     
+        $messages = [
+            'name.required' => 'Por favor, ingrese el nombre completo.',
+            'phone.required' => 'Por favor, ingrese el número de teléfono.',
+            'email.required' => 'Por favor, ingrese el correo electrónico.',
+            'email.unique' => 'El correo electrónico ya está en uso.',
+            'role.required' => 'Por favor, seleccione un rol.',
+            'role.in' => 'El rol seleccionado no es válido.',
+        ];
+    
+        $validator = Validator::make($request->all(), $rules, $messages);
+    
+        if ($validator->fails()) {
+            return redirect()->route('users.edit', $id)
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
+        try {
+            // Actualizar el usuario
+            $user = User::findOrFail($id);
+            $user->update([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'id_rol' => $request->role === 'admin' ? 1 : 2,
+            ]);
+    
+            // Eliminar permisos y módulos anteriores
+            DB::table('usuario_modulo')->where('id_usuario', $user->id)->delete();
+            DB::table('permisos')->where('id_usuario', $user->id)->delete();
+    
+            // Si el rol es 'admin', asignar todos los permisos
+            if ($request->role === 'admin') {
+                $modules = Modulo::all();
+                foreach ($modules as $module) {
+                    // Guardar en usuario_modulo
+                    DB::table('usuario_modulo')->insert([
+                        'id_usuario' => $user->id,
+                        'id_modulo' => $module->id_modulo,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+    
+                    // Guardar en permisos
+                    Permiso::create([
+                        'id_usuario' => $user->id,
+                        'id_modulo' => $module->id_modulo,
+                        'eliminar' => true,
+                        'actualizar' => true,
+                        'guardar' => true,
+                    ]);
+                }
+            }
+            // Si el rol es 'empleado', asignar los permisos seleccionados
+            elseif ($request->role === 'empleado') {
+                $modules = $request->input('modules', []);
+    
+                foreach ($modules as $module) {
+                    $modulo = Modulo::find($module['id']);
+                    if ($modulo) {
+                        $actions = $module['actions'] ?? [];
+    
+                        // Guardar en usuario_modulo
+                        DB::table('usuario_modulo')->insert([
+                            'id_usuario' => $user->id,
+                            'id_modulo' => $modulo->id_modulo,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+    
+                        // Guardar en permisos
+                        Permiso::create([
+                            'id_usuario' => $user->id,
+                            'id_modulo' => $modulo->id_modulo,
+                            'eliminar' => in_array('eliminar', $actions),
+                            'actualizar' => in_array('actualizar', $actions),
+                            'guardar' => in_array('guardar', $actions),
+                        ]);
+                    }
+                }
+            }
+    
+            return redirect()->route('users.edit', $id)->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Usuario actualizado con éxito',
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('users.edit', $id)->with([
+                'errorDetails' => 'Ocurrió un error al actualizar el usuario.',
+            ]);
+        }
+    }
 
     public function store(Request $request)
     {

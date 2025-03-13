@@ -214,6 +214,7 @@
                                 </label>
                             </div>
                         </form>
+                        
                         <script>
                             document.getElementById('profilePhotoInput').addEventListener('change', function() {
                                 const form = document.getElementById('profilePhotoForm');

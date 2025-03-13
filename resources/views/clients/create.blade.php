@@ -191,7 +191,7 @@
                                             <input list="pueblos_list"
                                                 class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('pueblo') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                                 id="pueblo" name="pueblo"
-                                                placeholder="Escribe o selecciona un pueblo" required
+                                                placeholder="Escribe o selecciona una zona" required
                                                 value="{{ old('pueblo') }}"
                                                 oninput="this.value = this.value.toUpperCase()">
                                             <datalist id="pueblos_list"></datalist>

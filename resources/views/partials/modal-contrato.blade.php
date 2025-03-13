@@ -46,7 +46,7 @@
                         </div>
 
                         <!-- Botón de Seleccionar Cliente -->
-                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                        <div class="w-full md:w-1/3 px-3 mb-0 md:mb-0">
                             <label
                                 class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
                                 for="client-name">
@@ -121,7 +121,7 @@
                         </div>
                     </div>
 
-                    <!-- ====== Categoría - Servicio - Plan Section Start -->
+
                     <div x-data="{
                         detalles: [],
                         total: 0,
@@ -134,6 +134,8 @@
                         categorias: @js($categorias),
                         serviciosDisponibles: [],
                         planesDisponibles: [],
+                        mostrarModalIp: false,
+                        ip: '',
                     
                         fetchServicios() {
                             const categoriaSeleccionada = this.categorias.find(c => c.id == this.categoriaId);
@@ -157,6 +159,13 @@
                         actualizarPrecio() {
                             const planSeleccionado = this.planesDisponibles.find(p => p.id == this.planId);
                             this.precioPlan = planSeleccionado ? planSeleccionado.precio : '';
+                        },
+                    
+                        verificarServicio() {
+                            const servicioSeleccionado = this.serviciosDisponibles.find(s => s.id == this.servicioId);
+                            if (servicioSeleccionado && servicioSeleccionado.nombre.toLowerCase() === 'internet') {
+                                this.mostrarModalIp = true;
+                            }
                         },
                     
                         agregarDetalle() {
@@ -242,6 +251,8 @@
                             this.actualizarTotal();
                         }
                     }">
+
+                        <!-- ====== Categoría - Servicio - Plan Section Start -->
                         <div class="flex flex-wrap -mx-3 mb-6">
                             <!-- Categoría -->
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
@@ -263,7 +274,7 @@
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Servicio</label>
                                 <div class="relative">
-                                    <select x-model="servicioId" @change="fetchPlanes()"
+                                    <select x-model="servicioId" @change="fetchPlanes(); verificarServicio()"
                                         class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                         <option value="">Seleccionar</option>
                                         <template x-for="servicio in serviciosDisponibles" :key="servicio.id">
@@ -273,8 +284,32 @@
                                 </div>
                             </div>
 
+                            <!-- Modal de IP -->
+                            <div x-show="mostrarModalIp"
+                                class="fixed z-50 inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-96 relative">
+                                    <button type="button" @click="mostrarModalIp = false"
+                                        class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                        <i class="fas fa-times text-lg"></i>
+                                    </button>
+
+                                    <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200 mb-4">Dirección
+                                        IP</h2>
+                                    <input type="text" x-model="ip" placeholder="192.168.1.1"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+
+                                    <!-- Botones -->
+                                    <div class="flex justify-end mt-4 space-x-2">
+                                        <button type="button" @click="mostrarModalIp = false"
+                                            class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+                                            <i class="fas fa-save mr-2"></i> Aceptar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Plan -->
-                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <div class="w-full md:w-1/3 px-3 mb-0 md:mb-0">
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Plan</label>
                                 <div class="relative">
@@ -330,34 +365,32 @@
                         </div>
                         <!-- ====== Estado - Fecha - Precio Section End -->
 
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <!-- Campo de Datos del Cliente -->
+                        <div class="flex flex-wrap -mx-3 mb-4">
+                            <!-- Campo observaciones -->
                             <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="client-name">
+                                    for="observaciones">
                                     Observaciones
                                 </label>
                                 <div class="relative flex items-center">
-                                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                        <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
                                     </div>
-                                    <input type="text" id="observaciones" value=""
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        readonly required />
-                                    <input type="hidden" id="observaciones" name="observacioens" value="">
+                                    <input type="text" id="observaciones" name="observaciones" value=""
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                        required />
                                 </div>
                             </div>
 
                             <!-- Botón Agregar -->
-                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0 flex items-end">
+                            <div class="w-full md:w-1/3 px-3 md:mb-0 flex items-end">
                                 <button type="button" @click="agregarDetalle"
                                     class="w-full bg-slate-500 dark:bg-slate-900 border border-slate-500 dark:border-slate-700 text-white dark:text-gray-300 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-slate-600 dark:focus:bg-slate-800 flex items-center justify-center">
                                     <i class="fa fa-plus text-sm"></i>
                                 </button>
                             </div>
                         </div>
-
 
                         <!-- Alerta Cliente -->
                         <div id="alert-cliente" x-data="{ showAlert: false }">
@@ -406,14 +439,7 @@
                         </div>
 
                         <main class="h-full overflow-y-auto">
-                            <div>
-                                <div class="flex justify-start items-center mb-2">
-                                    <!-- Título -->
-                                    <h4 class="text-lg mt-4 font-semibold text-gray-600 dark:text-gray-300">
-                                        Detalles
-                                    </h4>
-                                </div>
-
+                            <div class="mt-4">
                                 <div class="w-full overflow-hidden rounded-lg shadow-xs">
                                     <div class="w-full overflow-x-auto">
                                         <table class="w-full whitespace-no-wrap">
