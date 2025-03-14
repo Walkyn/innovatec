@@ -88,19 +88,19 @@
                                 :class="(selected === 'manage') ? 'block' : 'hidden'">
                                 <ul class="mb-3 mt-4 flex flex-col gap-2 pl-6">
                                     <li>
-                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 py-2 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('services.index') }}">
                                             <i class="fas fa-tools"></i> Servicios
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 py-2 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('contracts.index') }}">
                                             <i class="fas fa-file-contract"></i> Contratos
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 py-2 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('months.index') }}">
                                             <i class="fas fa-calendar-alt"></i> Gestión de Meses
                                         </a>
@@ -207,40 +207,47 @@
 
                     <!-- Menú Usuarios -->
                     @if ($user && ($user->id_rol === 1 || in_array('users', $modulos)))
-                        <li>
-                            <a class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
-                                href="#" @click.prevent="selected = (selected === 'users' ? '' : 'users')"
-                                :class="{
-                                    'bg-graydark dark:bg-meta-4': (selected === 'users')
-                                }">
-                                <i class="fa fa-user-shield"></i>
-                                Usuarios
-                                <i class="fa fa-chevron-down text-xs absolute right-4 top-1/2 -translate-y-1/2 fill-current"
-                                    :class="{ 'rotate-180': (selected === 'users') }" aria-hidden="true"></i>
-                            </a>
-
-                            <!-- Dropdown Menu Start -->
-                            <div class="translate transform overflow-hidden"
-                                :class="(selected === 'users') ? 'block' : 'hidden'">
-                                <ul class="mb-3 mt-4 flex flex-col gap-2 pl-6">
-                                    <li>
-                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
-                                            href="{{ route('users.index') }}"
-                                            :class="page === 'users.index' && '!text-white'">
-                                            <i class="fas fa-list"></i> Lista
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
-                                            href="{{ route('users.create') }}"
-                                            :class="page === 'users.create' && '!text-white'">
-                                            <i class="fas fa-user-plus"></i> Registrar
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!-- Dropdown Menu End -->
-                        </li>
+                    <li>
+                        <a class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                            href="#" @click.prevent="selected = (selected === 'users' ? '' : 'users')"
+                            :class="{
+                                'bg-graydark dark:bg-meta-4': (selected === 'users')
+                            }">
+                            <i class="fa fa-user-shield"></i>
+                            Autenticación
+                            <i class="fa fa-chevron-down text-xs absolute right-4 top-1/2 -translate-y-1/2 fill-current"
+                                :class="{ 'rotate-180': (selected === 'users') }" aria-hidden="true"></i>
+                        </a>
+                    
+                        <!-- Dropdown Menu Start -->
+                        <div class="translate transform overflow-hidden"
+                            :class="(selected === 'users') ? 'block' : 'hidden'">
+                            <ul class="mb-3 mt-4 flex flex-col gap-2 pl-8">
+                                <li>
+                                    <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                        href="{{ route('users.index') }}"
+                                        :class="page === 'users.index' && '!text-white'">
+                                        Usuarios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                        href="{{ route('users.create') }}"
+                                        :class="page === 'users.create' && '!text-white'">
+                                        Registrar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                        href="{{ route('users.create') }}"
+                                        :class="page === 'users.create' && '!text-white'">
+                                        Restablecer contraseña
+                                    </a>
+                                </li>
+                            </ul>                                
+                        </div>
+                        <!-- Dropdown Menu End -->
+                    </li>
                     @endif
                 </ul>
             </div>

@@ -35,12 +35,10 @@
                         enctype="multipart/form-data">
                         @csrf
                         <div class="relative z-20 h-35 md:h-65">
-                            <!-- Imagen de portada actual -->
                             <img id="coverPhotoPreview"
                                 src="{{ auth()->user()->cover_photo ? asset('storage/covers/' . auth()->user()->cover_photo) : './images/cover/cover-01.png' }}"
                                 alt="profile cover"
                                 class="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center" />
-                            <!-- Botón para subir una nueva foto de portada -->
                             <div class="absolute bottom-1 right-1 z-10 xsm:bottom-4 xsm:right-4">
                                 <label for="coverPhotoInput"
                                     class="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary px-2 py-1 text-sm font-medium text-white hover:bg-opacity-80 xsm:px-4">
@@ -62,122 +60,50 @@
                             </div>
                         </div>
                     </form>
-                    <script>
-                        document.getElementById('coverPhotoInput').addEventListener('change', function() {
-                            const form = document.getElementById('coverPhotoForm');
-                            const formData = new FormData(form);
-                            const modal = document.getElementById('errorModal');
-                            const modalIcon = document.getElementById('modalIcon');
-                            const modalIconSvg = document.getElementById('modalIconSvg');
-                            const modalTitle = document.getElementById('modalTitle');
-                            const modalMessage = document.getElementById('modalMessage');
-                            const modalOkButton = document.getElementById('modalOkButton');
-
-                            fetch(form.action, {
-                                    method: 'POST',
-                                    body: formData,
-                                    headers: {
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                        'Accept': 'application/json',
-                                    },
-                                })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        // Si la respuesta no es exitosa, lanzar un error
-                                        return response.json().then(err => {
-                                            throw err;
-                                        });
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    if (data.success) {
-                                        // Actualizar la imagen de portada en la vista
-                                        document.getElementById('coverPhotoPreview').src = data.cover_url;
-                                        // Configurar el modal para éxito
-                                        modalTitle.textContent = 'Éxito';
-                                        modalMessage.textContent = 'Foto de portada actualizada correctamente.';
-                                        modalIcon.classList.replace('bg-red-100', 'bg-green-100');
-                                        modalIconSvg.classList.replace('text-red-600', 'text-green-600');
-                                        modalOkButton.classList.replace('bg-red-600', 'bg-green-600');
-                                        modalOkButton.classList.replace('hover:bg-red-500', 'hover:bg-green-500');
-                                    } else {
-                                        // Configurar el modal para error
-                                        modalTitle.textContent = 'Error';
-                                        modalMessage.textContent = 'Error: ' + data.message;
-                                        modalIcon.classList.replace('bg-green-100', 'bg-red-100');
-                                        modalIconSvg.classList.replace('text-green-600', 'text-red-600');
-                                        modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
-                                        modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
-                                    }
-                                    // Mostrar el modal
-                                    modal.classList.remove('hidden');
-                                })
-                                .catch(error => {
-                                    // Configurar el modal para error
-                                    modalTitle.textContent = 'Error';
-                                    modalMessage.textContent = 'Error: ' + (error.message ||
-                                        'No se pudo actualizar la foto de portada.');
-                                    modalIcon.classList.replace('bg-green-100', 'bg-red-100');
-                                    modalIconSvg.classList.replace('text-green-600', 'text-red-600');
-                                    modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
-                                    modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
-                                    // Mostrar el modal
-                                    modal.classList.remove('hidden');
-                                });
-
-                            // Cerrar el modal al hacer clic en el botón OK
-                            modalOkButton.addEventListener('click', () => {
-                                modal.classList.add('hidden');
-                            });
-
-                            // Cerrar el modal al hacer clic fuera de él
-                            modal.addEventListener('click', (e) => {
-                                if (e.target === modal) {
-                                    modal.classList.add('hidden');
-                                }
-                            });
-                        });
-                    </script>
 
                     <!-- Modal de errores y éxito -->
                     <div id="errorModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog"
                         aria-modal="true">
                         <!-- Fondo oscuro -->
-                        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+                        <div class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/75 transition-opacity" aria-hidden="true">
+                        </div>
 
                         <!-- Contenedor del modal -->
                         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                                 <!-- Panel del modal -->
                                 <div
-                                    class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                    <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                         <div class="sm:flex sm:items-start">
                                             <!-- Ícono de error o éxito -->
                                             <div id="modalIcon"
-                                                class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                                                <svg id="modalIconSvg" class="size-6 text-red-600" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                    aria-hidden="true" data-slot="icon">
+                                                class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20 sm:mx-0 sm:size-10">
+                                                <svg id="modalIconSvg" class="size-6 text-red-600 dark:text-red-500"
+                                                    fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                    stroke="currentColor" aria-hidden="true" data-slot="icon">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                                                 </svg>
                                             </div>
                                             <!-- Contenido del modal -->
                                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                                <h3 id="modalTitle" class="text-base font-semibold text-gray-900">Error</h3>
+                                                <h3 id="modalTitle"
+                                                    class="text-base font-semibold text-gray-900 dark:text-white">Error</h3>
                                                 <div class="mt-2">
-                                                    <p id="modalMessage" class="text-sm text-gray-500">Hubo un problema al
+                                                    <p id="modalMessage" class="text-sm text-gray-500 dark:text-gray-400">
+                                                        Hubo un problema al
                                                         actualizar la foto de portada.</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Botón OK -->
-                                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                         <button id="modalOkButton" type="button"
-                                            class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">OK</button>
+                                            class="inline-flex w-full justify-center rounded-md bg-red-600 dark:bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 dark:hover:bg-red-600 sm:ml-3 sm:w-auto">
+                                            OK
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -191,14 +117,11 @@
                             @method('PUT')
                             <div
                                 class="relative z-30 mx-auto -mt-22 h-30 w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:w-44 sm:p-3">
-                                <!-- Contenedor de la foto de perfil -->
                                 <div class="relative h-full w-full rounded-full overflow-hidden">
-                                    <!-- Mostrar la foto de perfil actual -->
                                     <img id="profilePhotoPreview"
                                         src="{{ auth()->user()->profile_photo ? asset('storage/profiles/' . auth()->user()->profile_photo) : './images/user/profile.png' }}"
                                         alt="profile" class="w-full h-full object-cover" />
                                 </div>
-                                <!-- Botón para subir una nueva foto -->
                                 <label for="profilePhotoInput"
                                     class="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2">
                                     <svg class="fill-current" width="14" height="14" viewBox="0 0 14 14"
@@ -214,89 +137,7 @@
                                 </label>
                             </div>
                         </form>
-                        
-                        <script>
-                            document.getElementById('profilePhotoInput').addEventListener('change', function() {
-                                const form = document.getElementById('profilePhotoForm');
-                                const formData = new FormData(form);
-                                const modal = document.getElementById('errorModal');
-                                const modalIcon = document.getElementById('modalIcon');
-                                const modalIconSvg = document.getElementById('modalIconSvg');
-                                const modalTitle = document.getElementById('modalTitle');
-                                const modalMessage = document.getElementById('modalMessage');
-                                const modalOkButton = document.getElementById('modalOkButton');
 
-                                // Prevenir el comportamiento predeterminado del formulario
-                                form.addEventListener('submit', function(e) {
-                                    e.preventDefault();
-                                });
-
-                                fetch(form.action, {
-                                        method: 'POST', // Usamos POST porque @method('PUT') simula PUT
-                                        body: formData,
-                                        headers: {
-                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                            'Accept': 'application/json',
-                                        },
-                                    })
-                                    .then(response => {
-                                        if (!response.ok) {
-                                            // Si la respuesta no es exitosa, lanzar un error
-                                            return response.json().then(err => {
-                                                throw err;
-                                            });
-                                        }
-                                        return response.json();
-                                    })
-                                    .then(data => {
-                                        if (data.success) {
-                                            // Actualizar la imagen de perfil en la vista
-                                            document.getElementById('profilePhotoPreview').src = data.photo_url;
-                                            // Configurar el modal para éxito
-                                            modalTitle.textContent = 'Éxito';
-                                            modalMessage.textContent = 'Foto de perfil actualizada correctamente.';
-                                            modalIcon.classList.replace('bg-red-100', 'bg-green-100');
-                                            modalIconSvg.classList.replace('text-red-600', 'text-green-600');
-                                            modalOkButton.classList.replace('bg-red-600', 'bg-green-600');
-                                            modalOkButton.classList.replace('hover:bg-red-500', 'hover:bg-green-500');
-                                        } else {
-                                            // Configurar el modal para error
-                                            modalTitle.textContent = 'Error';
-                                            modalMessage.textContent = 'Error: ' + data.message;
-                                            modalIcon.classList.replace('bg-green-100', 'bg-red-100');
-                                            modalIconSvg.classList.replace('text-green-600', 'text-red-600');
-                                            modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
-                                            modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
-                                        }
-                                        // Mostrar el modal
-                                        modal.classList.remove('hidden');
-                                    })
-                                    .catch(error => {
-                                        // Configurar el modal para error
-                                        modalTitle.textContent = 'Error';
-                                        modalMessage.textContent = 'Error: ' + (error.message ||
-                                            'No se pudo actualizar la foto de perfil.');
-                                        modalIcon.classList.replace('bg-green-100', 'bg-red-100');
-                                        modalIconSvg.classList.replace('text-green-600', 'text-red-600');
-                                        modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
-                                        modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
-                                        // Mostrar el modal
-                                        modal.classList.remove('hidden');
-                                    });
-
-                                // Cerrar el modal al hacer clic en el botón OK
-                                modalOkButton.addEventListener('click', () => {
-                                    modal.classList.add('hidden');
-                                });
-
-                                // Cerrar el modal al hacer clic fuera de él
-                                modal.addEventListener('click', (e) => {
-                                    if (e.target === modal) {
-                                        modal.classList.add('hidden');
-                                    }
-                                });
-                            });
-                        </script>
                         <div class="mt-4">
                             @auth
                                 @php
@@ -372,4 +213,186 @@
     </main>
     <!-- ===== Main Content End ===== -->
 
+@endsection
+
+@section('scripts')
+    <!-- ===== Script Cover Photo Upload ===== -->
+    <script>
+        document.getElementById('coverPhotoInput').addEventListener('change', function() {
+            const form = document.getElementById('coverPhotoForm');
+            const modal = document.getElementById('errorModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalIconSvg = document.getElementById('modalIconSvg');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalOkButton = document.getElementById('modalOkButton');
+
+            @if (!auth()->user()->checkModuloAcceso('profile', 'actualizar'))
+
+                modalTitle.textContent = 'Error';
+                modalMessage.textContent = 'No tienes permisos para actualizar la foto de portada.';
+                modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
+                modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+
+                modal.classList.remove('hidden');
+            @else
+
+                const formData = new FormData(form);
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                });
+
+                fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => {
+                                throw err;
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+
+                            document.getElementById('coverPhotoPreview').src = data.cover_url;
+
+                            modalTitle.textContent = 'Éxito';
+                            modalMessage.textContent = 'Foto de portada actualizada correctamente.';
+                            modalIcon.classList.replace('bg-red-100', 'bg-green-100');
+                            modalIconSvg.classList.replace('text-red-600', 'text-green-600');
+                            modalOkButton.classList.replace('bg-red-600', 'bg-green-600');
+                            modalOkButton.classList.replace('hover:bg-red-500', 'hover:bg-green-500');
+                        } else {
+
+                            modalTitle.textContent = 'Error';
+                            modalMessage.textContent = 'Error: ' + data.message;
+                            modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                            modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                            modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
+                            modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+                        }
+
+                        modal.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        modalTitle.textContent = 'Error';
+                        modalMessage.textContent = 'Error: ' + (error.message ||
+                            'No se pudo actualizar la foto de portada.');
+                        modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                        modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                        modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
+                        modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+
+                        modal.classList.remove('hidden');
+                    });
+            @endif
+
+            modalOkButton.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+
+    <!-- ===== Script Profile Photo Upload ===== -->
+    <script>
+        document.getElementById('profilePhotoInput').addEventListener('change', function() {
+            const form = document.getElementById('profilePhotoForm');
+            const modal = document.getElementById('errorModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalIconSvg = document.getElementById('modalIconSvg');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalOkButton = document.getElementById('modalOkButton');
+
+            // Verificar permisos antes de enviar el formulario
+            @if (!auth()->user()->checkModuloAcceso('profile', 'actualizar'))
+                modalTitle.textContent = 'Error';
+                modalMessage.textContent = 'No tienes permisos para actualizar la foto de perfil.';
+                modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
+                modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+
+                modal.classList.remove('hidden');
+            @else
+                const formData = new FormData(form);
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                });
+
+                fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => {
+                                throw err;
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('profilePhotoPreview').src = data.photo_url;
+                            modalTitle.textContent = 'Éxito';
+                            modalMessage.textContent = 'Foto de perfil actualizada correctamente.';
+                            modalIcon.classList.replace('bg-red-100', 'bg-green-100');
+                            modalIconSvg.classList.replace('text-red-600', 'text-green-600');
+                            modalOkButton.classList.replace('bg-red-600', 'bg-green-600');
+                            modalOkButton.classList.replace('hover:bg-red-500', 'hover:bg-green-500');
+                        } else {
+                            modalTitle.textContent = 'Error';
+                            modalMessage.textContent = 'Error: ' + data.message;
+                            modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                            modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                            modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
+                            modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+                        }
+                        modal.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        modalTitle.textContent = 'Error';
+                        modalMessage.textContent = 'Error: ' + (error.message ||
+                            'No se pudo actualizar la foto de perfil.');
+                        modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                        modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                        modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
+                        modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+                        modal.classList.remove('hidden');
+                    });
+            @endif
+
+            modalOkButton.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 @endsection
