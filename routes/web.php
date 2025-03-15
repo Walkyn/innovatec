@@ -20,7 +20,6 @@ use App\Models\Contrato;
 use App\Models\ContratoServicio;
 use App\Http\Controllers\DatabaseController;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -52,10 +51,15 @@ Route::middleware('auth')->group(function () {
     // Users
     Route::controller(UserController::class)->group(function () {
         Route::get('users', 'index')->middleware('check.permissions:users,all')->name('users.index');
-        Route::get('users.create', 'create')->name('users.create');
+        Route::get('users.create', 'create')->middleware('check.permissions:users,all')->name('users.create');
         Route::post('store-user', 'store')->middleware('check.permissions:users,guardar')->name('users.store');
         Route::get('users/{user}/edit', 'edit')->middleware('check.permissions:users,actualizar')->name('users.edit');
         Route::put('users/{user}', 'update')->middleware('check.permissions:users,actualizar')->name('users.update');
+        Route::delete('users/{user}', 'destroy')->middleware('check.permissions:users,eliminar')->name('users.destroy');
+
+        Route::get('reset-password', 'passwordReset')->middleware('check.permissions:users,all')->name('password.reset');
+        Route::post('verify-email', 'verifyEmail')->name('users.verifyEmail');
+        Route::post('update-password', 'updatePassword')->middleware('check.permissions:users,actualizar')->name('users.updatePassword');
     });
 
     // Clients

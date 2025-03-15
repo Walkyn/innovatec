@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Business Manager - Editar Usuario')
+@section('title', 'Nexus - Editar Usuario')
 
 @section('content')
     <!-- ===== Main Content Start ===== -->

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Business Manager - Registrar')
+@section('title', 'Nexus - Registrar')
 
 @section('content')
 
@@ -456,6 +456,5 @@
         password.addEventListener('input', validatePasswords);
         passwordConfirmation.addEventListener('input', validatePasswords);
     </script>
-
 
 @endsection

@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Rol;
 
 class UserController extends Controller
 {
@@ -18,6 +17,66 @@ class UserController extends Controller
     {
         $users = User::with('rol')->get();
         return view('users.index', compact('users'));
+    }
+
+    public function passwordReset()
+    {
+        return view('users.reset-password');
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        try {
+            $email = $request->input('email');
+
+            if (empty($email)) {
+                return response()->json([
+                    'error' => 'El campo de correo electrónico es obligatorio.',
+                ], 400);
+            }
+
+            $user = User::where('email', $email)->first();
+
+            if (!$user) {
+                return response()->json([
+                    'error' => 'Correo no encontrado.',
+                ], 404);
+            }
+
+            return response()->json([
+                'id' => $user->id,
+                'name' => $user->name,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Correo no encontrado.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        try {
+            $user = User::findOrFail($request->id);
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return redirect()->route('password.reset')->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Contraseña actualizado con éxito',
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('password.reset')->with([
+                'errorMessage' => 'Error',
+                'errorDetails' => 'No se pudo actualizar la contraseña. Inténtalo de nuevo.',
+            ]);
+        }
     }
 
     public function profile()
@@ -29,6 +88,23 @@ class UserController extends Controller
     public function create()
     {
         return view('users.create');
+    }
+
+    public function destroy(User $user)
+    {
+        try {
+            $user->delete();
+
+            return redirect()->route('users.index')->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Usuario eliminado correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('users.index')->with([
+                'errorMessage' => 'Error',
+                'errorDetails' => 'No se pudo eliminar el usuario.',
+            ]);
+        }
     }
 
     public function edit($id)
@@ -96,7 +172,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'role' => 'required|in:admin,empleado',
         ];
-    
+
         $messages = [
             'name.required' => 'Por favor, ingrese el nombre completo.',
             'phone.required' => 'Por favor, ingrese el número de teléfono.',
@@ -105,15 +181,15 @@ class UserController extends Controller
             'role.required' => 'Por favor, seleccione un rol.',
             'role.in' => 'El rol seleccionado no es válido.',
         ];
-    
+
         $validator = Validator::make($request->all(), $rules, $messages);
-    
+
         if ($validator->fails()) {
             return redirect()->route('users.edit', $id)
                 ->withErrors($validator)
                 ->withInput();
         }
-    
+
         try {
             // Actualizar el usuario
             $user = User::findOrFail($id);
@@ -123,11 +199,11 @@ class UserController extends Controller
                 'email' => $request->email,
                 'id_rol' => $request->role === 'admin' ? 1 : 2,
             ]);
-    
+
             // Eliminar permisos y módulos anteriores
             DB::table('usuario_modulo')->where('id_usuario', $user->id)->delete();
             DB::table('permisos')->where('id_usuario', $user->id)->delete();
-    
+
             // Si el rol es 'admin', asignar todos los permisos
             if ($request->role === 'admin') {
                 $modules = Modulo::all();
@@ -139,7 +215,7 @@ class UserController extends Controller
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
-    
+
                     // Guardar en permisos
                     Permiso::create([
                         'id_usuario' => $user->id,
@@ -153,12 +229,12 @@ class UserController extends Controller
             // Si el rol es 'empleado', asignar los permisos seleccionados
             elseif ($request->role === 'empleado') {
                 $modules = $request->input('modules', []);
-    
+
                 foreach ($modules as $module) {
                     $modulo = Modulo::find($module['id']);
                     if ($modulo) {
                         $actions = $module['actions'] ?? [];
-    
+
                         // Guardar en usuario_modulo
                         DB::table('usuario_modulo')->insert([
                             'id_usuario' => $user->id,
@@ -166,7 +242,7 @@ class UserController extends Controller
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
-    
+
                         // Guardar en permisos
                         Permiso::create([
                             'id_usuario' => $user->id,
@@ -178,13 +254,13 @@ class UserController extends Controller
                     }
                 }
             }
-    
-            return redirect()->route('users.edit', $id)->with([
+
+            return redirect()->route('users.index', $id)->with([
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Usuario actualizado con éxito',
             ]);
         } catch (\Exception $e) {
-            return redirect()->route('users.edit', $id)->with([
+            return redirect()->route('users.index', $id)->with([
                 'errorDetails' => 'Ocurrió un error al actualizar el usuario.',
             ]);
         }
