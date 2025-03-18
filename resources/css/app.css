@@ -34,7 +34,21 @@
   }
 }
 
-/* third-party libraries CSS */
+/* Ajustar el contenedor del plugin intlTelInput*/
+.iti {
+  width: 100%;
+  position: relative;
+}
+
+/* Ajustar el ícono del teléfono */
+.iti + span {
+  position: absolute;
+  right: 1rem;
+  top: 50%; 
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
 
 .tableCheckbox:checked ~ div span {
   @apply opacity-100;

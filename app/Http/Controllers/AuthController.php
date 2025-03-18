@@ -36,7 +36,7 @@ class AuthController extends Controller
 
                 if ($modulos->isEmpty()) {
                     Auth::logout();
-                    return redirect()->route('sin-permisos');
+                    return redirect()->route('forbidden');
                 }
 
                 // Redirigir al primer módulo que tenga asignado

@@ -21,6 +21,7 @@
         "apexcharts": "^3.54.1",
         "flatpickr": "^4.6.13",
         "flowbite": "^2.5.2",
+        "intl-tel-input": "^25.3.0",
         "jsvectormap": "^1.5.1",
         "laravel-echo": "^2.0.2",
         "pusher-js": "^8.4.0"

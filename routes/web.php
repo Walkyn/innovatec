@@ -39,9 +39,9 @@ Route::get('link', function () {
     return view('link');
 });
 
-Route::get('sin-permisos', function () {
-    return view('errors.sin-permisos');
-})->name('sin-permisos');
+Route::get('forbidden', function () {
+    return view('errors.forbidden');
+})->name('forbidden');
 
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {

@@ -279,6 +279,7 @@ class UserController extends Controller
         $messages = [
             'name.required' => 'Por favor, ingrese el nombre completo.',
             'phone.required' => 'Por favor, ingrese el número de teléfono.',
+            'phone_display.required' => 'Por favor, ingrese el número de teléfono.',
             'email.required' => 'Por favor, ingrese el correo electrónico.',
             'email.unique' => 'El correo electrónico ya está en uso.',
             'password.required' => 'Por favor, ingrese una contraseña.',

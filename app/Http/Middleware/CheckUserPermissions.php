@@ -34,7 +34,7 @@ class CheckUserPermissions
       ->get()->first();
 
     if (!$usuarioModulo) {
-      return redirect()->route('sin-permisos');
+      return redirect()->route('forbidden');
     }
 
     if ($accion == 'all') return $next($request);

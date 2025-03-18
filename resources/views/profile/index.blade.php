@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Business Manager - Perfil')
+@section('title', 'Nexus - Perfil')
 
 @section('content')
 
@@ -167,43 +167,27 @@
                                 </div>
                             </div>
 
-                            <div class="mx-auto max-w-180">
-                                <h4 class="font-medium text-black dark:text-white">
-                                    Acerca de mí
-                                </h4>
-                                <p class="mt-4.5 text-sm font-normal">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                    Pellentesque posuere fermentum urna, eu condimentum
-                                    mauris tempus ut. Donec fermentum blandit aliquet. Etiam
-                                    dictum dapibus ultricies. Sed vel aliquet libero. Nunc a
-                                    augue fermentum, pharetra ligula sed, aliquam lacus.
-                                </p>
-                            </div>
-
                             <div class="mt-6.5">
                                 <h4 class="mb-3.5 font-medium text-black dark:text-white">
-                                    Mis redes
+                                    Contacto
                                 </h4>
                                 <div class="flex items-center justify-center gap-3.5">
-                                    <a href="#" class="hover:text-primary" name="social-icon"
-                                        aria-label="Facebook">
-                                        <i class="fab fa-facebook-square text-2xl"></i>
+                                    <!-- Icono de teléfono -->
+                                    <a href="tel:{{ $user->phone }}" class="hover:text-primary" name="social-icon" aria-label="Teléfono">
+                                        <i class="fas fa-phone-square-alt text-2xl"></i>
                                     </a>
-                                    <a href="#" class="hover:text-primary" name="social-icon"
-                                        aria-label="Twitter">
-                                        <i class="fab fa-twitter-square text-2xl"></i>
+                            
+                                    <!-- Icono de WhatsApp -->
+                                    <a href="https://wa.me/{{ $user->phone }}" class="hover:text-primary" name="social-icon" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
+                                        <i class="fab fa-whatsapp-square text-2xl"></i>
                                     </a>
-                                    <a href="#" class="hover:text-primary" name="social-icon"
-                                        aria-label="Instagram">
-                                        <i class="fab fa-instagram-square text-2xl"></i>
-                                    </a>
-                                    <a href="#" class="hover:text-primary" name="social-icon"
-                                        aria-label="LinkedIn">
-                                        <i class="fab fa-linkedin text-2xl"></i>
+                            
+                                    <!-- Icono de correo electrónico -->
+                                    <a href="mailto:{{ $user->email }}" class="hover:text-primary" name="social-icon" aria-label="Email" target="_blank" rel="noopener noreferrer">
+                                        <i class="fas fa-envelope-square text-2xl"></i>
                                     </a>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>

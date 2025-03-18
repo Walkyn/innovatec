@@ -83,9 +83,11 @@
                                     <div class="w-full md:w-1/2">
                                         <label class="mb-2.5 block font-medium text-black dark:text-white">Teléfono</label>
                                         <div class="relative">
-                                            <input type="tel" name="phone" placeholder="Introduce tu número"
+                                            <input type="tel" id="phone_display_edit" placeholder="Introduce tu número"
                                                 value="{{ old('phone', $user->phone) }}"
                                                 class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
+                                            <input type="hidden" id="phone_edit" name="phone"
+                                                value="{{ old('phone', $user->phone) }}" />
                                             <span class="absolute right-4 top-4">
                                                 <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22"
                                                     fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -97,6 +99,7 @@
                                                     </g>
                                                 </svg>
                                             </span>
+                                            <!-- Mensaje de error -->
                                             @error('phone')
                                                 <p class="text-red-500 mt-2 text-xs italic">{{ $message }}</p>
                                             @enderror
@@ -142,8 +145,8 @@
                                                 <label class="flex items-center justify-between cursor-pointer">
                                                     <span class="text-black dark:text-white">Administrador</span>
                                                     <div class="relative">
-                                                        <input type="radio" name="role" value="admin" class="sr-only"
-                                                            @click="selectedRole = 'admin'"
+                                                        <input type="radio" name="role" value="admin"
+                                                            class="sr-only" @click="selectedRole = 'admin'"
                                                             :checked="selectedRole === 'admin' ||
                                                                 {{ $user->id_rol === 1 ? 'true' : 'false' }}" />
                                                         <div
@@ -282,6 +285,7 @@
         </div>
     </main>
     <!-- ===== Main Content End ===== -->
+    
 @endsection
 
 <!-- ===== Scritps ===== -->
@@ -379,5 +383,77 @@
 
         password.addEventListener('input', validatePasswords);
         passwordConfirmation.addEventListener('input', validatePasswords);
+    </script>
+
+    <!-- intlTelInput -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const phoneDisplayCreate = document.querySelector("#phone_display");
+            const phoneInputCreate = document.querySelector("#phone");
+
+            const phoneDisplayEdit = document.querySelector("#phone_display_edit");
+            const phoneInputEdit = document.querySelector("#phone_edit");
+
+            const initializePhoneField = (phoneDisplay, phoneInput) => {
+                if (phoneDisplay && phoneInput) {
+                    const iti = window.intlTelInput(phoneDisplay, {
+                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                        separateDialCode: true,
+                        preferredCountries: ['pe', 'mx', 'es'],
+                        initialCountry: "auto",
+                        geoIpLookup: function(callback) {
+                            fetch("https://ipapi.co/json")
+                                .then(response => response.json())
+                                .then(data => callback(data.country_code))
+                                .catch(() => callback("pe"));
+                        },
+                        formatOnDisplay: true,
+                        nationalMode: false,
+                    });
+
+                    const formatPhoneNumber = (number) => {
+                        const cleaned = number.replace(/\D/g, "");
+                        const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+                        if (match) {
+                            return `${match[1]}${match[2] ? " " + match[2] : ""}${match[3] ? " " + match[3] : ""}`;
+                        }
+                        return number;
+                    };
+
+                    const limitDigitsByCountry = (countryCode) => {
+                        const digitLimits = {
+                            pe: 9,
+                            mx: 10,
+                            es: 9,
+                        };
+                        return digitLimits[countryCode] || 10;
+                    };
+
+                    phoneDisplay.addEventListener("input", function() {
+                        const countryData = iti.getSelectedCountryData();
+                        const countryCode = countryData.iso2;
+                        const digitLimit = limitDigitsByCountry(countryCode);
+
+                        let currentValue = phoneDisplay.value.replace(/\D/g, "");
+                        if (currentValue.length > digitLimit) {
+                            currentValue = currentValue.slice(0, digitLimit);
+                        }
+
+                        phoneDisplay.value = formatPhoneNumber(currentValue);
+
+                        if (iti.isValidNumber()) {
+                            phoneInput.value = iti.getNumber();
+                        }
+                    });
+
+                    if (phoneInput.value) {
+                        iti.setNumber(phoneInput.value);
+                    }
+                }
+            };
+
+            initializePhoneField(phoneDisplayCreate, phoneInputCreate);
+            initializePhoneField(phoneDisplayEdit, phoneInputEdit);
+        });
     </script>
 @endsection
