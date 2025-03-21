@@ -7,7 +7,7 @@
     <main>
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
             <!-- Breadcrumb Start -->
-            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 class="text-title-md2 font-bold text-black dark:text-white">
                     Gestión de Servicios
                 </h2>
@@ -29,6 +29,14 @@
 
             <!-- ====== Table Section Start -->
             <div class="flex flex-col gap-10">
+
+                <!-- ====== Modal Category Start -->
+                @include('partials.modal-category')
+                <!-- ====== Modal Category End -->
+
+                <!-- ====== Modal Category Edit Start -->
+                @include('partials.modal-category-edit')
+                <!-- ====== Modal Category Edit End -->
 
                 <!-- ====== Table Services Start -->
                 @include('partials.table-services')

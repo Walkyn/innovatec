@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Nexus - Perfil')
+@section('title', 'Nexus - Perfil de usuario')
 
 @section('content')
 
@@ -149,6 +149,7 @@
                                 </h3>
                                 <p class="font-medium">{{ $rol->nombre_rol }}</p>
                             @endauth
+
                             <div
                                 class="mx-auto mb-5.5 mt-4.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F]">
                                 <div

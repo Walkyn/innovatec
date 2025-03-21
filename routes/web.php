@@ -89,6 +89,8 @@ Route::middleware('auth')->group(function () {
         Route::post('settings.store', 'store')->middleware('check.permissions:settings,guardar')->name('settings.store');
         Route::post('settings.redes-sociales', 'storeRedesSociales')->middleware('check.permissions:settings,guardar')->name('settings.storeRedesSociales');
         Route::post('settings.info-ticket/store', 'storeInfoTicket')->middleware('check.permissions:settings,guardar')->name('settings.storeInfoTicket');
+        Route::put('/company/update-cover', 'updateCover')->middleware('check.permissions:settings,actualizar')->name('company.update.cover');
+        Route::put('/company/update-logo', 'updateLogo')->middleware('check.permissions:settings,actualizar')->name('company.update.logo');
     });
 
     // Charts
@@ -103,8 +105,14 @@ Route::middleware('auth')->group(function () {
         Route::post('services', 'store')->middleware('check.permissions:manage,guardar')->name('services.store');
         Route::post('services.store-plan', 'storePlan')->middleware('check.permissions:manage,guardar')->name('services.storePlan');
         Route::delete('services/{servicio}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('services.destroy');
+        Route::post('/category/store', 'storeCategory')->middleware('check.permissions:manage,guardar')->name('category.store');
+        Route::get('/categorias/{id}/edit', 'edit')->middleware('check.permissions:manage,actualizar')->name('categorias.edit');
+        Route::put('/categorias/{id}/update', 'updateCategory')->middleware('check.permissions:manage,actualizar')->name('categorias.update');
+        Route::delete('/categorias/{id}', 'destroyCategory')->middleware('check.permissions:manage,eliminar')->name('categorias.destroy');
     });
-
+    Route::delete('/categorias/{id}', [ServiceController::class, 'destroyCategory'])
+    ->middleware('check.permissions:manage,eliminar')
+    ->name('categorias.destroy');
     // Contracts
     Route::controller(ContractController::class)->group(function () {
         Route::get('contracts', 'index')->middleware('check.permissions:manage,all')->name('contracts.index');

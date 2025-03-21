@@ -7,6 +7,7 @@ use App\Models\Categoria;
 use App\Models\Servicio;
 use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; 
 
 class ServiceController extends Controller
 {
@@ -17,6 +18,88 @@ class ServiceController extends Controller
         $user = Auth::user();
 
         return view('services.index', compact('servicios', 'categorias', 'user'));
+    }
+
+    public function edit($id)
+    {
+        $categoria = Categoria::findOrFail($id);
+        return response()->json($categoria);
+    }
+    
+    public function updateCategory(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+    
+        $existeCategoria = Categoria::where('nombre', $request->nombre)
+            ->where('id', '!=', $id)
+            ->exists();
+    
+        if ($existeCategoria) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La categoría ya existe.',
+            ], 422);
+        }
+    
+        $categoria = Categoria::findOrFail($id);
+        $categoria->update([
+            'nombre' => $request->nombre,
+        ]);
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Categoría actualizada correctamente.',
+        ]);
+    }
+    
+    public function destroyCategory($id)
+    {
+        try {
+            // Buscar la categoría por ID
+            $categoria = Categoria::findOrFail($id);
+    
+            // Eliminar la categoría
+            $categoria->delete();
+    
+            // Retornar una respuesta JSON de éxito
+            return response()->json([
+                'success' => true,
+                'message' => 'Categoría eliminada correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            // Retornar una respuesta JSON de error
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar la categoría: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        $existeCategoria = Categoria::where('nombre', $request->nombre)->exists();
+
+        if ($existeCategoria) {
+            return redirect()->back()->with([
+                'errorMessage' => 'Error',
+                'errorDetails' => 'La categoría ya existe.',
+            ])->withInput();
+        }
+
+        Categoria::create([
+            'nombre' => $request->nombre,
+        ]);
+
+        return redirect()->route('services.index')->with([
+            'successMessage' => 'Éxito',
+            'successDetails' => 'Categoría creada exitosamente.',
+        ]);
     }
 
     public function storePlan(Request $request)
@@ -85,8 +168,6 @@ class ServiceController extends Controller
             'successDetails' => 'Servicio registrado exitosamente.'
         ]);
     }
-
-
 
     public function destroy(Servicio $servicio)
     {

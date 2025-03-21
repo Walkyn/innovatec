@@ -7,14 +7,108 @@ use App\Models\ConfiguracionEmpresa;
 use App\Models\InfoTicket;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
     public function index()
     {
-        $configuracion = ConfiguracionEmpresa::first();
+        $company = ConfiguracionEmpresa::first();
         $cantidadClientesActivos = Cliente::where('estado_cliente', 'activo')->count();
-        return view('settings.index', compact('configuracion','cantidadClientesActivos'));
+        return view('settings.index', compact('company', 'cantidadClientesActivos'));
+    }
+
+    public function updateCover(Request $request)
+    {
+        try {
+            // Validar la imagen
+            $request->validate([
+                'cover' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            // Obtener la configuración de la empresa
+            $company = ConfiguracionEmpresa::first();
+
+            if (!$company) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontró la configuración de la empresa.',
+                ], 404);
+            }
+
+            // Eliminar la portada anterior si existe
+            if ($company->portada) {
+                $oldCoverPath = 'public/covers/' . $company->portada;
+                if (Storage::exists($oldCoverPath)) {
+                    Storage::delete($oldCoverPath);
+                }
+            }
+
+            // Guardar la nueva portada
+            $coverPath = $request->file('cover')->store('covers', 'public');
+            $company->portada = basename($coverPath);
+            $company->save();
+
+            // Respuesta JSON para actualizar la vista
+            return response()->json([
+                'success' => true,
+                'cover_url' => asset('storage/covers/' . $company->portada),
+            ]);
+        } catch (\Exception $e) {
+            // Manejar errores
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la portada de la empresa: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateLogo(Request $request)
+    {
+        try {
+            // Validar la imagen
+            $request->validate([
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            // Obtener la configuración de la empresa
+            $company = ConfiguracionEmpresa::first();
+
+            if (!$company) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontró la configuración de la empresa.',
+                ], 404);
+            }
+
+            // Obtener el nombre del logo actual
+            $currentLogo = $company->logo;
+
+            // Eliminar el logo anterior si existe
+            if ($currentLogo) {
+                $oldLogoPath = public_path('storage/logos/' . $currentLogo);
+                if (file_exists($oldLogoPath)) {
+                    unlink($oldLogoPath); // Eliminar el archivo
+                }
+            }
+
+            // Guardar el nuevo logo
+            $logoPath = $request->file('logo')->store('logos', 'public');
+            $company->logo = basename($logoPath);
+            $company->save();
+
+            // Respuesta JSON para actualizar la vista
+            return response()->json([
+                'success' => true,
+                'logo_url' => asset('storage/logos/' . $company->logo),
+            ]);
+        } catch (\Exception $e) {
+            // Manejar errores y devolver una respuesta JSON
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el logo de la empresa: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function create()
@@ -86,7 +180,7 @@ class SettingsController extends Controller
                 ->withInput()
                 ->with('errorDetails', 'Complete los campos antes de guardar');
         }
-    }  
+    }
 
     public function storeInfoTicket(Request $request)
     {
@@ -99,30 +193,30 @@ class SettingsController extends Controller
             'thankYouMessage' => 'nullable|string',
             'website' => ['nullable', 'max:255', 'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/'],
         ];
-    
+
         $messages = [
             'companyName.required' => 'Por favor, ingrese el nombre de la empresa',
             'ruc.required' => 'Por favor ingrese el RUC',
             'ruc.unique' => 'El RUC ya está en uso.',
             'website.regex' => 'La URL del sitio web no es válida. Por favor, ingresa una URL válida.',
         ];
-    
+
         $validator = Validator::make($request->all(), $rules, $messages);
-    
+
         if ($validator->fails()) {
             $errorMessage = $validator->errors()->first();
-    
+
             return redirect()->route('settings.create')
                 ->with('errorDetails', $errorMessage)
                 ->withInput();
         }
-    
+
         try {
             $website = $request->website;
             if ($website && !preg_match('/^https?:\/\//i', $website)) {
                 $website = 'http://' . $website;
             }
-    
+
             $infoTicket = InfoTicket::updateOrCreate(
                 ['id' => $request->id],
                 [
@@ -135,7 +229,7 @@ class SettingsController extends Controller
                     'sitio_web' => $website,
                 ]
             );
-    
+
             return redirect()->route('settings.create')->with([
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Información del ticket guardada correctamente.',

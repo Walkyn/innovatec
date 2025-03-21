@@ -81,7 +81,7 @@ class ProfileController extends Controller
     
             // Eliminar la foto de perfil anterior si existe
             if ($currentPhoto) {
-                $oldPhotoPath = public_path('storage/profiles/' . $currentPhoto); // Ruta completa al archivo
+                $oldPhotoPath = public_path('storage/profiles/' . $currentPhoto);
                 if (file_exists($oldPhotoPath)) {
                     unlink($oldPhotoPath); // Eliminar el archivo
                 }

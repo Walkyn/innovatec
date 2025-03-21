@@ -1,5 +1,5 @@
 @extends('layouts.login')
-@section('title', 'Business Manager - Iniciar Sesión')
+@section('title', 'Nexus - Iniciar Sesión')
 
 @section('content')
 
