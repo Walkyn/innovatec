@@ -4,7 +4,7 @@ import "flatpickr/dist/flatpickr.min.css";
 import '../css/satoshi.css';
 import "../css/app.css";
 import 'flowbite';
-
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
@@ -19,7 +19,6 @@ import map01 from "./components/map-01";
 Alpine.plugin(persist);
 window.Alpine = Alpine;
 Alpine.start();
-
 
 // Init flatpickr
 flatpickr(".datepicker", {

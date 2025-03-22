@@ -6,13 +6,9 @@
     <!-- ===== Main Content Start ===== -->
     <main>
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 flex items-center justify-center min-h-screen">
-            <!-- Breadcrumb Start -->
-            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            </div>
-            <!-- Breadcrumb End -->
 
             <!-- ====== Forms Section Start -->
-            <div class="rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div class="w-full md:w-auto rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                 <div class="flex flex-wrap items-center">
                     <div class="hidden md:block w-full md:w-1/2">
 
@@ -35,7 +31,7 @@
                     <div class="w-full md:w-1/2 border-stroke dark:border-strokedark md:border-l-2">
 
                         <div class="w-full p-4 sm:p-12.5 xl:p-17.5">
-                            
+
                             <!-- ====== Alerts Start -->
                             @include('partials.alerts')
                             <!-- ====== Alerts End -->
@@ -96,13 +92,6 @@
                                 <div class="mb-5">
                                     <input type="submit" value="Acceder"
                                         class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-3 font-medium text-white transition hover:bg-opacity-90" />
-                                </div>
-
-                                <div class="mt-6 text-center">
-                                    <p class="font-medium">
-                                        ¿No tienes ninguna cuenta?
-                                        <a href="#" class="text-primary">Contáctanos</a>
-                                    </p>
                                 </div>
                             </form>
 

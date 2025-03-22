@@ -136,6 +136,11 @@
                         planesDisponibles: [],
                         mostrarModalIp: false,
                         ip: '',
+                        observaciones: '',
+                    
+                        validarIP(event) {
+                            this.ip = event.target.value.replace(/[^0-9.]/g, '');
+                        },
                     
                         fetchServicios() {
                             const categoriaSeleccionada = this.categorias.find(c => c.id == this.categoriaId);
@@ -185,7 +190,8 @@
                                     planId: plan.id,
                                     plan: plan.nombre,
                                     estado: this.estadoContrato,
-                                    precio: this.precioPlan
+                                    precio: this.precioPlan,
+                                    ip: this.ip
                                 };
                     
                                 this.detalles.push(nuevoDetalle);
@@ -244,6 +250,7 @@
                             this.precioPlan = '';
                             this.serviciosDisponibles = [];
                             this.planesDisponibles = [];
+                            this.ip = '';
                         },
                     
                         eliminarDetalle(id) {
@@ -287,23 +294,38 @@
                             <!-- Modal de IP -->
                             <div x-show="mostrarModalIp"
                                 class="fixed z-50 inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg w-96 relative">
-                                    <button type="button" @click="mostrarModalIp = false"
-                                        class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                                        <i class="fas fa-times text-lg"></i>
-                                    </button>
-
-                                    <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200 mb-4">Dirección
-                                        IP</h2>
-                                    <input type="text" x-model="ip" placeholder="192.168.1.1"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-
-                                    <!-- Botones -->
-                                    <div class="flex justify-end mt-4 space-x-2">
+                                <div
+                                    class="bg-zinc-50 rounded-lg shadow-md border dark:border-gray-600 w-80 dark:bg-gray-700">
+                                    <div class="p-3 border-b border-gray-200 dark:border-gray-600">
+                                        <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200">Dirección
+                                            IP</h2>
                                         <button type="button" @click="mostrarModalIp = false"
-                                            class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
-                                            <i class="fas fa-save mr-2"></i> Aceptar
+                                            class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                            <i class="fas fa-times text-lg"></i>
                                         </button>
+                                    </div>
+                                    <div class="p-2">
+                                        <label for="ipInput" class="sr-only">Dirección IP</label>
+                                        <div class="relative">
+                                            <div
+                                                class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                                <i
+                                                    class="fas fa-network-wired w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+                                            </div>
+                                            <input type="text" id="ipInput" x-model="ip"
+                                                placeholder="192.168.1.1" pattern="[0-9.]*"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                @input="validarIP($event)" />
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="p-2 border-t border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 rounded-b-lg">
+                                        <div class="flex justify-end space-x-2">
+                                            <button type="button" @click="mostrarModalIp = false"
+                                                class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+                                                Aceptar
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -343,8 +365,8 @@
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Fecha</label>
                                 <input type="date" name="fecha" x-model="fecha"
                                     class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
-                                border border-gray-200 dark:border-gray-600 rounded py-3 px-4 leading-tight 
-                                focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                    border border-gray-200 dark:border-gray-600 rounded py-3 px-4 leading-tight 
+                                    focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                     required>
                             </div>
 
@@ -355,29 +377,30 @@
                                     Estado
                                 </label>
                                 <div class="relative">
-                                    <select x-model="estadoContrato"
+                                    <select name="estado" x-model="estadoContrato"
                                         class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 cursor-not-allowed"
                                         disabled>
                                         <option value="activo">Activo</option>
                                     </select>
+                                    <input type="hidden" name="estado" x-model="estadoContrato" value="activo">
                                 </div>
                             </div>
                         </div>
-                        <!-- ====== Estado - Fecha - Precio Section End -->
 
+                        <!-- ====== Observaciones y Botón Agregar Section Start -->
                         <div class="flex flex-wrap -mx-3 mb-4">
                             <!-- Campo observaciones -->
                             <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
                                 <label
-                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="observaciones">
+                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
                                     Observaciones
                                 </label>
                                 <div class="relative flex items-center">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                         <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
                                     </div>
-                                    <input type="text" id="observaciones" name="observaciones" value=""
+                                    <input type="text" name="observaciones" x-model="observaciones"
+                                        placeholder="Ingrese observaciones"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                         required />
                                 </div>
@@ -415,7 +438,7 @@
                             </div>
                         </div>
 
-                        <!-- Alerta -->
+                        <!-- Alerta Datos-->
                         <div id="modal" x-data="{ showAlert: false }">
                             <!-- Contenido del modal -->
                             <div x-show="showAlert" x-transition:enter="transition transform ease-out duration-500"
@@ -438,6 +461,7 @@
                             </div>
                         </div>
 
+                        <!-- ====== Tabla de Detalles Section Start -->
                         <main class="h-full overflow-y-auto">
                             <div class="mt-4">
                                 <div class="w-full overflow-hidden rounded-lg shadow-xs">
@@ -450,6 +474,7 @@
                                                     <th class="px-4 py-3 hidden">Categoria</th>
                                                     <th class="px-4 py-3">Servicio</th>
                                                     <th class="px-4 py-3">Plan</th>
+                                                    <th class="px-4 py-3 whitespace-nowrap">Dirección IP</th>
                                                     <th class="px-4 py-3 text-right">Precio</th>
                                                 </tr>
                                             </thead>
@@ -463,29 +488,26 @@
                                                                 <i class="fa fa-trash"></i>
                                                             </button>
                                                         </td>
-
-                                                        <!-- Solo los ID -->
+                                                        <!-- Campos ocultos para enviar los datos al controlador -->
                                                         <input type="hidden" name="categoria_id[]"
                                                             x-model="detalle.categoriaId">
                                                         <input type="hidden" name="servicio_id[]"
                                                             x-model="detalle.servicioId">
                                                         <input type="hidden" name="plan_id[]"
                                                             x-model="detalle.planId">
-                                                        <input type="hidden" name="estado"
-                                                            x-model="estadoContrato">
+                                                        <input type="hidden" name="ip_servicio[]"
+                                                            x-model="detalle.ip">
                                                         <input type="hidden" name="precio[]"
                                                             x-model="detalle.precio">
-
-                                                        <!-- No necesitas los campos de texto -->
-                                                        <td class="px-4 py-3 hidden" x-text="detalle.id"></td>
+                                                        <!-- Campos visibles -->
                                                         <td class="px-4 py-3 hidden" x-text="detalle.categoria"></td>
                                                         <td class="px-4 py-3" x-text="detalle.servicio"></td>
                                                         <td class="px-4 py-3" x-text="detalle.plan"></td>
+                                                        <td class="px-4 py-3" x-text="detalle.ip"></td>
                                                         <td class="px-4 py-3 text-right" x-text="detalle.precio"></td>
                                                     </tr>
                                                 </template>
                                             </tbody>
-
                                         </table>
                                     </div>
                                     <div
@@ -499,6 +521,7 @@
                             </div>
                         </main>
                     </div>
+
                 </div>
 
                 <!-- Modal footer -->
@@ -586,6 +609,7 @@
 
                 selectedClientInput.value = `${nombres} ${apellidos}`;
                 selectedClientIdInput.value = clientId;
+                dropdown.classList.add('hidden');
             }
         });
 

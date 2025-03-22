@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('contrato_id')->constrained('contratos')->onDelete('cascade');
             $table->foreignId('servicio_id')->constrained('servicios')->onDelete('cascade');
             $table->foreignId('plan_id')->constrained('planes')->onDelete('cascade');
+            $table->string('ip_servicio', 20)->nullable();
             $table->timestamp('fecha_servicio')->useCurrent();
             $table->enum('estado_servicio_cliente', ['activo', 'suspendido']);
             $table->timestamps();

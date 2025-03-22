@@ -1,89 +1,88 @@
 <main class="h-full pb-16 overflow-y-auto">
     <div>
-        <div class="flex flex-col md:flex-row justify-between items-center mb-2">
-            <!-- Título -->
-            <h4 class="text-lg font-semibold text-gray-600 dark:text-gray-300 w-full">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
+            <h4 class="text-lg font-semibold text-gray-600 dark:text-gray-300 w-full md:w-2/3">
                 Lista de Servicios
             </h4>
-
-            <div class="flex items-center space-x-3 w-full md:w-auto py-2">
-                <!-- Botón "Agregar" -->
-                <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown"
-                    class="w-full md:w-auto flex items-center justify-center py-2 px-8 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                    type="button">
-                    Agregar
-                    <svg class="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path clip-rule="evenodd" fill-rule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
-                </button>
-                <div id="actionsDropdown"
-                    class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="actionsDropdownButton">
-                        <li>
-                            <button data-modal-target="category-modal" data-modal-toggle="category-modal"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <i class="fas fa-plus mr-2"></i> Categorías
-                            </button>
-                        </li>
-                        <li>
-                            <button data-modal-target="service-modal" data-modal-toggle="service-modal"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <i class="fas fa-plus mr-2"></i> Servicios
-                            </button>
-                        </li>
-                        <li>
-                            <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <i class="fas fa-plus mr-2"></i> Planes
-                            </button>
-                        </li>
-                    </ul>
+            <div class="flex items-center space-x-3 w-full md:w-1/3 py-2">
+                <div class="w-1/2">
+                    <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown"
+                        class="w-full flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                        type="button">
+                        Agregar
+                        <svg class="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                    </button>
+                    <div id="actionsDropdown"
+                        class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                            aria-labelledby="actionsDropdownButton">
+                            <li>
+                                <button data-modal-target="category-modal" data-modal-toggle="category-modal"
+                                    class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <i class="fas fa-plus mr-2"></i> Categorías
+                                </button>
+                            </li>
+                            <li>
+                                <button data-modal-target="service-modal" data-modal-toggle="service-modal"
+                                    class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <i class="fas fa-plus mr-2"></i> Servicios
+                                </button>
+                            </li>
+                            <li>
+                                <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
+                                    class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <i class="fas fa-plus mr-2"></i> Planes
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            
-                <!-- Botón "Modificar" -->
-                <button id="modifyDropdownButton" data-dropdown-toggle="modifyDropdown"
-                    class="w-full md:w-auto flex items-center justify-center py-2 px-8 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                    type="button">
-                    Modificar
-                    <svg class="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path clip-rule="evenodd" fill-rule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
-                </button>
-                <div id="modifyDropdown"
-                    class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="modifyDropdownButton">
-                        <li>
-                            <button data-modal-target="list-categories-modal" data-modal-toggle="list-categories-modal"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <i class="fas fa-edit mr-2"></i> Categorías
-                            </button>
-                        </li>
-                        <li>
-                            <button data-modal-target="service-modal" data-modal-toggle="service-modal"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <i class="fas fa-edit mr-2"></i> Servicios
-                            </button>
-                        </li>
-                        <li>
-                            <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <i class="fas fa-edit mr-2"></i> Planes
-                            </button>
-                        </li>
-                    </ul>
+
+                <div class="w-1/2">
+                    <button id="modifyDropdownButton" data-dropdown-toggle="modifyDropdown"
+                        class="w-full flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                        type="button">
+                        Modificar
+                        <svg class="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path clip-rule="evenodd" fill-rule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                    </button>
+                    <div id="modifyDropdown"
+                        class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                            aria-labelledby="modifyDropdownButton">
+                            <li>
+                                <button data-modal-target="list-categories-modal"
+                                    data-modal-toggle="list-categories-modal"
+                                    class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <i class="fas fa-edit mr-2"></i> Categorías
+                                </button>
+                            </li>
+                            <li>
+                                <button data-modal-target="service-modal" data-modal-toggle="service-modal"
+                                    class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <i class="fas fa-edit mr-2"></i> Servicios
+                                </button>
+                            </li>
+                            <li>
+                                <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
+                                    class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                    <i class="fas fa-edit mr-2"></i> Planes
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-
         </div>
 
-        <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 mb-4">
-            <!-- Item Buscador Start -->
+        <div class="flex flex-col md:flex-row items-center justify-between md:space-y-0 gap-4 mb-4">
             <form class="w-full md:w-2/3">
                 <label for="default-search" class="sr-only">Search</label>
                 <div class="relative">
@@ -103,13 +102,11 @@
                     </button>
                 </div>
             </form>
-            <!-- Item Buscador End -->
 
-            <!-- Campo de Estado Servicio -->
             <div class="w-full md:w-1/3">
                 <div class="relative">
                     <select
-                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-4 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                        class="block appearance-none w-full p-4 pr-8 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         id="servicio">
                         <option>Activo</option>
                         <option>Inactivo</option>

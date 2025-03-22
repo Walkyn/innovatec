@@ -190,34 +190,102 @@
             .catch(() => showMessageModal(false, 'Hubo un problema al actualizar la categoría.'));
     });
 
+    const swalWithTailwindButtons = Swal.mixin({
+        customClass: {
+            confirmButton: "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400",
+            cancelButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400",
+            actions: "flex justify-center gap-4"
+        },
+        buttonsStyling: false
+    });
+
     async function deleteCategory(categoryId) {
-        try {
-            const response = await fetch(`/categorias/${categoryId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+        const result = await swalWithTailwindButtons.fire({
+            title: "¿Estás seguro?",
+            text: "Se eliminarán todos los servicios asociados",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "No, cancelar",
+            reverseButtons: true
+        });
+
+        // Si el usuario confirma la eliminación
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/categorias/${categoryId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('La respuesta del servidor no es válida.');
                 }
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Error al eliminar la categoría.');
+                }
+
+                swalWithTailwindButtons.fire({
+                    title: "¡Eliminado!",
+                    text: data.message || "La categoría ha sido eliminada.",
+                    icon: "success"
+                }).then(() => {
+                    location.reload();
+                });
+            } catch (error) {
+                console.error('Error al eliminar la categoría:', error);
+
+                swalWithTailwindButtons.fire({
+                    title: "Error",
+                    text: error.message || "Hubo un problema al eliminar la categoría.",
+                    icon: "error"
+                });
+            }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            swalWithTailwindButtons.fire({
+                title: "Cancelado",
+                text: "La categoría no ha sido eliminada.",
+                icon: "error"
             });
-
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new Error('La respuesta del servidor no es válida.');
-            }
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(data.message || 'Error al eliminar la categoría.');
-            }
-
-            showMessageModal(true, data.message);
-            location.reload();
-        } catch (error) {
-            console.error('Error al eliminar la categoría:', error);
-            showMessageModal(false, error.message || 'Hubo un problema al eliminar la categoría.');
         }
+    }
+
+    function showMessageModal(isSuccess, message) {
+        const modal = document.getElementById('messageModal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalIconSvg = document.getElementById('modalIconSvg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+
+        modalIcon.classList.toggle('bg-red-100', !isSuccess);
+        modalIcon.classList.toggle('dark:bg-red-900/20', !isSuccess);
+        modalIcon.classList.toggle('bg-green-100', isSuccess);
+        modalIcon.classList.toggle('dark:bg-green-900/20', isSuccess);
+        modalIconSvg.classList.toggle('text-red-600', !isSuccess);
+        modalIconSvg.classList.toggle('dark:text-red-500', !isSuccess);
+        modalIconSvg.classList.toggle('text-green-600', isSuccess);
+        modalIconSvg.classList.toggle('dark:text-green-500', isSuccess);
+        modalTitle.textContent = isSuccess ? 'Éxito' : 'Error';
+        modalMessage.textContent = message;
+        modal.classList.remove('hidden');
+
+        document.getElementById('modalOkButton').addEventListener('click', () => {
+            modal.classList.add('hidden');
+            if (isSuccess) {
+                // Recargar la página solo si es un mensaje de éxito
+                location.reload();
+            }
+        }, {
+            once: true
+        });
     }
 
     document.getElementById('searchCategoryInput').addEventListener('input', function() {

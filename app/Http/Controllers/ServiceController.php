@@ -57,19 +57,15 @@ class ServiceController extends Controller
     public function destroyCategory($id)
     {
         try {
-            // Buscar la categoría por ID
             $categoria = Categoria::findOrFail($id);
-    
-            // Eliminar la categoría
+
             $categoria->delete();
-    
-            // Retornar una respuesta JSON de éxito
+
             return response()->json([
                 'success' => true,
                 'message' => 'Categoría eliminada correctamente.'
             ]);
         } catch (\Exception $e) {
-            // Retornar una respuesta JSON de error
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar la categoría: ' . $e->getMessage()

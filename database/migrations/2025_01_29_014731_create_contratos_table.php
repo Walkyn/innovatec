@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('contratos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->string('observaciones', 500)->nullable();
             $table->date('fecha_contrato');
             $table->enum('estado_contrato', ['activo', 'suspendido']);
             $table->timestamps();
