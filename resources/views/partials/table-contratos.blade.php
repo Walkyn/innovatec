@@ -54,13 +54,13 @@
 
         <div class="w-full overflow-hidden rounded-lg shadow-xs">
             <div class="w-full overflow-x-auto">
-                <table class="w-full whitespace-no-wrap">
+                <table x-data="{ openDropdown: null }" class="w-full whitespace-no-wrap">
                     <thead>
-                        <tr
-                            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                             <th class="px-4 py-3">Código</th>
                             <th class="px-4 py-3">Cliente</th>
                             <th class="px-4 py-3">Servicios</th>
+                            <th class="px-4 py-3">IPs</th>
                             <th class="px-4 py-3">Total</th>
                             <th class="px-4 py-3">Fecha</th>
                             <th class="px-4 py-3">Estado</th>
@@ -74,12 +74,47 @@
                                     {{ 'CTR-' . str_pad($contrato->id, 6, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="px-4 py-3 text-sm">
-                                    <p class="font-semibold">{{ $contrato->cliente->nombres }}
-                                        {{ $contrato->cliente->apellidos }}</p>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400">
-                                        {{ $contrato->cliente->identificacion ?? 'N/A' }}</p>
+                                    <p class="font-semibold">{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}</p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ $contrato->cliente->identificacion ?? 'N/A' }}</p>
                                 </td>
-                                <td class="px-4 py-3 text-sm">{{ $contrato->totalServicios() }}</td>
+                                <td class="px-4 py-3 text-sm text-center">{{ $contrato->totalServicios() }}</td>
+                                <td class="px-4 py-3 text-sm relative">
+                                    @php
+                                        $ips = $contrato->contratoServicios->pluck('ip_servicio')->filter()->unique();
+                                    @endphp
+                                    @if ($ips->isEmpty())
+                                        <span class="text-gray-500 dark:text-gray-400">No disponible</span>
+                                    @elseif ($ips->count() == 1)
+                                        <a href="http://{{ $ips->first() }}" target="_blank" class="text-blue-500 hover:underline">
+                                            {{ $ips->first() }}
+                                        </a>
+                                    @else
+                                        <div class="relative inline-block">
+                                            <!-- Botón para mostrar/ocultar el desplegable de IPs -->
+                                            <button @click="openDropdown === {{ $contrato->id }} ? openDropdown = null : openDropdown = {{ $contrato->id }}"
+                                                class="inline-flex items-center text-sm dark:text-white">
+                                                <i :class="openDropdown === {{ $contrato->id }} ? 'fas fa-chevron-up mr-2 text-xs' : 'fas fa-chevron-down mr-2 text-xs'"></i>
+                                                <span class="transition-colors duration-200"
+                                                    :class="openDropdown === {{ $contrato->id }} ? 'text-blue-500' : ''">Ver IPs</span>
+                                            </button>
+        
+                                            <!-- Desplegable de IPs -->
+                                            <div x-show="openDropdown === {{ $contrato->id }}" x-transition
+                                                class="fixed z-50 mt-2 bg-zinc-100 divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600"
+                                                style="display: none;">
+                                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
+                                                    @foreach ($ips as $ip)
+                                                        <li>
+                                                            <a href="http://{{ $ip }}" target="_blank" class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                                {{ $ip }}
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3 text-sm">{{ number_format($contrato->totalPago(), 2) }}</td>
                                 <td class="px-4 py-3 text-sm w-32 whitespace-nowrap">
                                     {{ $contrato->fecha_contrato ? $contrato->fecha_contrato->format('d-m-Y') : 'N/A' }}
@@ -87,26 +122,20 @@
                                 <td class="px-4 py-3 text-xs">
                                     @php
                                         $estadoClase = [
-                                            'activo' =>
-                                                'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100',
+                                            'activo' => 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100',
                                             'suspendido' => 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100',
                                         ];
                                     @endphp
-
-                                    <span
-                                        class="px-2 py-1 font-semibold leading-tight rounded-full 
-                                        {{ $estadoClase[$contrato->estado_contrato] ?? 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100' }}">
+                                    <span class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$contrato->estado_contrato] ?? 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100' }}">
                                         {{ ucfirst($contrato->estado_contrato) }}
                                     </span>
                                 </td>
-
                                 <td class="px-4 py-3">
                                     <div class="flex items-center text-sm">
                                         <button data-modal-target="modificar-modal" data-modal-toggle="modificar-modal"
                                             class="px-2 py-2 text-yellow-600">
                                             <i class="fas fa-edit"></i>
                                         </button>
-
                                         <button data-modal-target="ver-contrato" data-modal-toggle="ver-contrato"
                                             data-id="{{ $contrato->id }}"
                                             data-cliente="{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}"
@@ -115,12 +144,10 @@
                                             class="px-2 py-2 text-blue-600 open-modal">
                                             <i class="fas fa-eye"></i>
                                         </button>
-
                                         <button class="px-2 py-2 text-green-600">
                                             <i class="fas fa-print"></i>
                                         </button>
-                                        <form action="{{ route('contratos.destroy', $contrato->id) }}" method="POST"
-                                            class="inline">
+                                        <form action="{{ route('contratos.destroy', $contrato->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-2 py-2 text-red-600">

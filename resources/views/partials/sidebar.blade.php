@@ -27,7 +27,7 @@
             <!-- Menu Group -->
             <div>
                 <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">Menu</h3>
-
+        
                 <ul class="mb-6 flex flex-col gap-1.5">
                     @php
                         $user = Auth::user();
@@ -37,7 +37,7 @@
                             $modulos = [];
                         }
                     @endphp
-
+        
                     <!-- Menú Inicio -->
                     @if ($user && ($user->id_rol === 1 || in_array('home', $modulos)))
                         <li>
@@ -45,14 +45,14 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('home.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'home' }"
-                                @click="selected = 'home'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'home'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-home"></i>
                                 Inicio
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Clientes -->
                     @if ($user && ($user->id_rol === 1 || in_array('clients', $modulos)))
                         <li>
@@ -60,14 +60,14 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('clients.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'clients' }"
-                                @click="selected = 'clients'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'clients'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-users-cog"></i>
                                 Clientes
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Administrar -->
                     @if ($user && ($user->id_rol === 1 || in_array('manage', $modulos)))
                         <li>
@@ -92,7 +92,7 @@
                                             class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('services.index') }}"
                                             :class="{ 'text-white': subSelected === 'services' }"
-                                            @click="subSelected = 'services'; localStorage.setItem('subSelected', subSelected);"
+                                            @click="subSelected = 'services'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             <i class="fas fa-tools"></i> Servicios
                                         </a>
@@ -102,7 +102,7 @@
                                             class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('contracts.index') }}"
                                             :class="{ 'text-white': subSelected === 'contracts' }"
-                                            @click="subSelected = 'contracts'; localStorage.setItem('subSelected', subSelected);"
+                                            @click="subSelected = 'contracts'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             <i class="fas fa-file-contract"></i> Contratos
                                         </a>
@@ -112,7 +112,7 @@
                                             class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('months.index') }}"
                                             :class="{ 'text-white': subSelected === 'months' }"
-                                            @click="subSelected = 'months'; localStorage.setItem('subSelected', subSelected);"
+                                            @click="subSelected = 'months'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             <i class="fas fa-calendar-alt"></i> Gestión de Meses
                                         </a>
@@ -121,7 +121,7 @@
                             </div>
                         </li>
                     @endif
-
+        
                     <!-- Menú Cobranzas -->
                     @if ($user && ($user->id_rol === 1 || in_array('payments', $modulos)))
                         <li>
@@ -129,14 +129,14 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('payments.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'payments' }"
-                                @click="selected = 'payments'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'payments'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-credit-card"></i>
                                 Cobranzas
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Calendario -->
                     @if ($user && ($user->id_rol === 1 || in_array('calendar', $modulos)))
                         <li>
@@ -144,14 +144,14 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('calendar.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'calendar' }"
-                                @click="selected = 'calendar'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'calendar'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-calendar-alt"></i>
                                 Calendario
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Perfil -->
                     @if ($user && ($user->id_rol === 1 || in_array('profile', $modulos)))
                         <li>
@@ -159,14 +159,14 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('profile.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'profile' }"
-                                @click="selected = 'profile'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'profile'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-user"></i>
                                 Perfil
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Configuración -->
                     @if ($user && ($user->id_rol === 1 || in_array('settings', $modulos)))
                         <li>
@@ -174,7 +174,7 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('settings.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'settings' }"
-                                @click="selected = 'settings'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'settings'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i :class="selected === 'settings' ? 'fas fa-cogs' : 'fas fa-wrench'"></i>
                                 Configuración
@@ -183,11 +183,11 @@
                     @endif
                 </ul>
             </div>
-
+        
             <!-- Others Group -->
             <div>
                 <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">Más</h3>
-
+        
                 <ul class="mb-6 flex flex-col gap-1.5">
                     <!-- Menú Gráficos -->
                     @if ($user && ($user->id_rol === 1 || in_array('charts', $modulos)))
@@ -196,14 +196,14 @@
                                 class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('charts.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'charts' }"
-                                @click="selected = 'charts'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'charts'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-chart-pie"></i>
                                 Gráficos
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Database -->
                     @if ($user && ($user->id_rol === 1 || in_array('database', $modulos)))
                         <li>
@@ -211,14 +211,14 @@
                                 class="group relative flex items-center gap-3.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
                                 href="{{ route('database.index') }}"
                                 :class="{ 'bg-graydark dark:bg-meta-4': selected === 'database' }"
-                                @click="selected = 'database'; localStorage.setItem('selected', selected);"
+                                @click="selected = 'database'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fa fa-database"></i>
                                 Database
                             </a>
                         </li>
                     @endif
-
+        
                     <!-- Menú Usuarios -->
                     @if ($user && ($user->id_rol === 1 || in_array('users', $modulos)))
                         <li>
@@ -244,7 +244,7 @@
                                             class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('users.index') }}"
                                             :class="{ 'text-white': subSelected === 'users.index' }"
-                                            @click="subSelected = 'users.index'; localStorage.setItem('subSelected', subSelected);"
+                                            @click="subSelected = 'users.index'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             Usuarios
                                         </a>
@@ -254,7 +254,7 @@
                                             class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('users.create') }}"
                                             :class="{ 'text-white': subSelected === 'users.create' }"
-                                            @click="subSelected = 'users.create'; localStorage.setItem('subSelected', subSelected);"
+                                            @click="subSelected = 'users.create'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             Registrar
                                         </a>
@@ -264,7 +264,7 @@
                                             class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                             href="{{ route('password.reset') }}"
                                             :class="{ 'text-white': subSelected === 'password.reset' }"
-                                            @click="subSelected = 'password.reset'; localStorage.setItem('subSelected', subSelected);"
+                                            @click="subSelected = 'password.reset'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             Restablecer contraseña
                                         </a>

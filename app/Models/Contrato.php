@@ -13,6 +13,7 @@ class Contrato extends Model
 
     protected $fillable = [
         'cliente_id',
+        'observaciones',
         'fecha_contrato',
         'estado_contrato',
     ];

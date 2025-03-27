@@ -38,6 +38,10 @@
                 @include('partials.modal-category-edit')
                 <!-- ====== Modal Category Edit End -->
 
+                <!-- ====== Modal Services Edit Start -->
+                @include('partials.modal-services-edit')
+                <!-- ====== Modal Services Edit End -->
+
                 <!-- ====== Table Services Start -->
                 @include('partials.table-services')
                 <!-- ====== Table Services End -->

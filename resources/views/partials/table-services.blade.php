@@ -65,7 +65,7 @@
                                 </button>
                             </li>
                             <li>
-                                <button data-modal-target="service-modal" data-modal-toggle="service-modal"
+                                <button data-modal-target="list-services-modal" data-modal-toggle="list-services-modal"
                                     class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                     <i class="fas fa-edit mr-2"></i> Servicios
                                 </button>
@@ -150,6 +150,7 @@
                                             ${{ number_format($servicio->planes->first()->precio, 2, '.', ',') }}
                                         @else
                                             <div class="relative inline-block">
+                                                <!-- Botón para mostrar/ocultar el desplegable -->
                                                 <button
                                                     @click="openDropdown === {{ $servicio->id }} ? openDropdown = null : openDropdown = {{ $servicio->id }}"
                                                     class="inline-flex items-center text-sm dark:text-white"
@@ -163,8 +164,10 @@
                                                         planes</span>
                                                 </button>
 
+                                                <!-- Desplegable de planes -->
                                                 <div x-show="openDropdown === {{ $servicio->id }}" x-transition
-                                                    class="absolute left-full ml-2 top-0 z-10 bg-zinc-100 divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600">
+                                                    class="fixed z-50 mt-2 bg-zinc-100 divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600"
+                                                    x-ref="dropdown{{ $servicio->id }}" style="display: none;">
                                                     <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
                                                         @foreach ($servicio->planes as $plan)
                                                             <li>

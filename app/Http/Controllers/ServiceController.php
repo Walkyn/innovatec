@@ -7,7 +7,6 @@ use App\Models\Categoria;
 use App\Models\Servicio;
 use App\Models\Plan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log; 
 
 class ServiceController extends Controller
 {
@@ -20,40 +19,87 @@ class ServiceController extends Controller
         return view('services.index', compact('servicios', 'categorias', 'user'));
     }
 
+    public function getServiciosByCategoria($id)
+    {
+        $categoria = Categoria::with('servicios')->findOrFail($id);
+        return response()->json($categoria->servicios);
+    }
+
+    public function editServicio($id)
+    {
+        $servicio = Servicio::findOrFail($id);
+        return response()->json($servicio);
+    }
+
+    public function updateServicio(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+        ]);
+
+        $servicio = Servicio::findOrFail($id);
+        $servicio->update([
+            'nombre' => $request->nombre,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Servicio actualizado correctamente.',
+        ]);
+    }
+
+    public function destroyServices($id)
+    {
+        try {
+            $servicio = Servicio::findOrFail($id);
+            $servicio->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Servicio eliminado correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el servicio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function edit($id)
     {
         $categoria = Categoria::findOrFail($id);
         return response()->json($categoria);
     }
-    
+
     public function updateCategory(Request $request, $id)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
         ]);
-    
+
         $existeCategoria = Categoria::where('nombre', $request->nombre)
             ->where('id', '!=', $id)
             ->exists();
-    
+
         if ($existeCategoria) {
             return response()->json([
                 'success' => false,
                 'message' => 'La categoría ya existe.',
             ], 422);
         }
-    
+
         $categoria = Categoria::findOrFail($id);
         $categoria->update([
             'nombre' => $request->nombre,
         ]);
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Categoría actualizada correctamente.',
         ]);
     }
-    
+
     public function destroyCategory($id)
     {
         try {

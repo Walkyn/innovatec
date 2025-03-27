@@ -174,17 +174,21 @@
                                 </h4>
                                 <div class="flex items-center justify-center gap-3.5">
                                     <!-- Icono de teléfono -->
-                                    <a href="tel:{{ $user->phone }}" class="hover:text-primary" name="social-icon" aria-label="Teléfono">
+                                    <a href="tel:{{ $user->phone }}" class="hover:text-primary" name="social-icon"
+                                        aria-label="Teléfono">
                                         <i class="fas fa-phone-square-alt text-2xl"></i>
                                     </a>
-                            
+
                                     <!-- Icono de WhatsApp -->
-                                    <a href="https://wa.me/{{ $user->phone }}" class="hover:text-primary" name="social-icon" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
+                                    <a href="https://wa.me/{{ $user->phone }}" class="hover:text-primary"
+                                        name="social-icon" aria-label="WhatsApp" target="_blank"
+                                        rel="noopener noreferrer">
                                         <i class="fab fa-whatsapp-square text-2xl"></i>
                                     </a>
-                            
+
                                     <!-- Icono de correo electrónico -->
-                                    <a href="mailto:{{ $user->email }}" class="hover:text-primary" name="social-icon" aria-label="Email" target="_blank" rel="noopener noreferrer">
+                                    <a href="mailto:{{ $user->email }}" class="hover:text-primary" name="social-icon"
+                                        aria-label="Email" target="_blank" rel="noopener noreferrer">
                                         <i class="fas fa-envelope-square text-2xl"></i>
                                     </a>
                                 </div>
@@ -309,10 +313,15 @@
             @if (!auth()->user()->checkModuloAcceso('profile', 'actualizar'))
                 modalTitle.textContent = 'Error';
                 modalMessage.textContent = 'No tienes permisos para actualizar la foto de perfil.';
+
                 modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                modalIcon.classList.replace('dark:bg-green-900/20', 'dark:bg-red-900/20');
                 modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                modalIconSvg.classList.replace('dark:text-green-500', 'dark:text-red-500');
                 modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
                 modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+                modalOkButton.classList.replace('dark:bg-green-500', 'dark:bg-red-500');
+                modalOkButton.classList.replace('dark:hover:bg-green-600', 'dark:hover:bg-red-600');
 
                 modal.classList.remove('hidden');
             @else
@@ -343,17 +352,29 @@
                             document.getElementById('profilePhotoPreview').src = data.photo_url;
                             modalTitle.textContent = 'Éxito';
                             modalMessage.textContent = 'Foto de perfil actualizada correctamente.';
+
+                            // Actualiza colores a verde para éxito
                             modalIcon.classList.replace('bg-red-100', 'bg-green-100');
+                            modalIcon.classList.replace('dark:bg-red-900/20', 'dark:bg-green-900/20');
                             modalIconSvg.classList.replace('text-red-600', 'text-green-600');
+                            modalIconSvg.classList.replace('dark:text-red-500', 'dark:text-green-500');
                             modalOkButton.classList.replace('bg-red-600', 'bg-green-600');
                             modalOkButton.classList.replace('hover:bg-red-500', 'hover:bg-green-500');
+                            modalOkButton.classList.replace('dark:bg-red-500', 'dark:bg-green-500');
+                            modalOkButton.classList.replace('dark:hover:bg-red-600', 'dark:hover:bg-green-600');
                         } else {
                             modalTitle.textContent = 'Error';
                             modalMessage.textContent = 'Error: ' + data.message;
+
+                            // Actualiza colores a rojo para error
                             modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                            modalIcon.classList.replace('dark:bg-green-900/20', 'dark:bg-red-900/20');
                             modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                            modalIconSvg.classList.replace('dark:text-green-500', 'dark:text-red-500');
                             modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
                             modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+                            modalOkButton.classList.replace('dark:bg-green-500', 'dark:bg-red-500');
+                            modalOkButton.classList.replace('dark:hover:bg-green-600', 'dark:hover:bg-red-600');
                         }
                         modal.classList.remove('hidden');
                     })
@@ -361,10 +382,16 @@
                         modalTitle.textContent = 'Error';
                         modalMessage.textContent = 'Error: ' + (error.message ||
                             'No se pudo actualizar la foto de perfil.');
+
                         modalIcon.classList.replace('bg-green-100', 'bg-red-100');
+                        modalIcon.classList.replace('dark:bg-green-900/20', 'dark:bg-red-900/20');
                         modalIconSvg.classList.replace('text-green-600', 'text-red-600');
+                        modalIconSvg.classList.replace('dark:text-green-500', 'dark:text-red-500');
                         modalOkButton.classList.replace('bg-green-600', 'bg-red-600');
                         modalOkButton.classList.replace('hover:bg-green-500', 'hover:bg-red-500');
+                        modalOkButton.classList.replace('dark:bg-green-500', 'dark:bg-red-500');
+                        modalOkButton.classList.replace('dark:hover:bg-green-600', 'dark:hover:bg-red-600');
+
                         modal.classList.remove('hidden');
                     });
             @endif

@@ -109,7 +109,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/categorias/{id}/edit', 'edit')->middleware('check.permissions:manage,actualizar')->name('categorias.edit');
         Route::put('/categorias/{id}/update', 'updateCategory')->middleware('check.permissions:manage,actualizar')->name('categorias.update');
         Route::delete('/categorias/{id}', 'destroyCategory')->middleware('check.permissions:manage,eliminar')->name('categorias.destroy');
+        Route::get('/categorias/{id}/servicios', [ServiceController::class, 'getServiciosByCategoria']);
+        Route::get('/servicios/{id}/edit', [ServiceController::class, 'editServicio']);
+        Route::put('/servicios/{id}/update', [ServiceController::class, 'updateServicio']);
+        Route::delete('/servicios/{servicio}', [ServiceController::class, 'destroyServices'])->name('servicios.destroy');
     });
+    
     Route::delete('/categorias/{id}', [ServiceController::class, 'destroyCategory'])
     ->middleware('check.permissions:manage,eliminar')
     ->name('categorias.destroy');

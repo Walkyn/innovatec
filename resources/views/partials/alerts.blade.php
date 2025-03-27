@@ -82,3 +82,15 @@
         </div>
     </div>
 @endif
+
+<script>
+    // Configuración global de SweetAlert
+    window.swalWithTailwindButtons = Swal.mixin({
+        customClass: {
+            confirmButton: "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400",
+            cancelButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400",
+            actions: "flex justify-center gap-4"
+        },
+        buttonsStyling: false
+    });
+</script>
