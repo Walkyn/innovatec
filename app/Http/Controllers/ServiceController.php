@@ -19,6 +19,55 @@ class ServiceController extends Controller
         return view('services.index', compact('servicios', 'categorias', 'user'));
     }
 
+    // Métodos para Planes
+    public function getPlanes(Servicio $servicio)
+    {
+        return response()->json($servicio->planes);
+    }
+
+    public function editPlan($id)
+    {
+        $plan = Plan::findOrFail($id);
+        return response()->json($plan);
+    }
+
+    public function updatePlan(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'precio' => 'required|numeric|min:0',
+        ]);
+
+        $plan = Plan::findOrFail($id);
+        $plan->update([
+            'nombre' => $request->nombre,
+            'precio' => $request->precio,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Plan actualizado correctamente.',
+        ]);
+    }
+
+    public function destroyPlan($id)
+    {
+        try {
+            $plan = Plan::findOrFail($id);
+            $plan->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Plan eliminado correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el plan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getServiciosByCategoria($id)
     {
         $categoria = Categoria::with('servicios')->findOrFail($id);

@@ -64,7 +64,6 @@
                     <!-- Modal de errores y éxito -->
                     <div id="errorModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog"
                         aria-modal="true">
-                        <!-- Fondo oscuro -->
                         <div class="fixed inset-0 bg-gray-900/50 dark:bg-gray-900/75 transition-opacity" aria-hidden="true">
                         </div>
 
@@ -195,6 +194,89 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="max-w-4xl mx-auto space-y-4">
+
+                        <!-- Card de Bienvenida -->
+                        <div class="bg-white p-4 rounded-2xl shadow-md">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-rose-600">&iexcl;Bienvenido!</h2>
+                                    <p class="text-xl font-bold">B***** C***</p>
+                                    <p class="text-gray-600 flex items-center"><span
+                                            class="material-icons mr-2">email</span>ID de Correo electrónico
+                                        walkyngami****@gmail.com</p>
+                                </div>
+                                <button class="bg-gray-100 p-2 rounded-full">Cambiar</button>
+                            </div>
+                        </div>
+
+                        <!-- Grid de Opciones -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <!-- Cambiar Contraseña -->
+                            <div class="bg-white p-4 rounded-2xl shadow-md">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-semibold flex items-center"><span
+                                            class="material-icons mr-2">lock</span>Cambiar contraseña</h3>
+                                    <span class="material-icons">chevron_right</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2">&Uacute;ltima modificaci&oacute;n el 25.03.2025</p>
+                                <p class="text-sm text-gray-500">Recomendamos cambiar su contrase&ntilde;a cada tres meses.
+                                </p>
+                            </div>
+
+                            <!-- Historial de Inicio de Sesión -->
+                            <div class="bg-white p-4 rounded-2xl shadow-md">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-semibold flex items-center"><span
+                                            class="material-icons mr-2">history</span>Historial de inicio de sesión</h3>
+                                    <span class="material-icons">chevron_right</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2">&Uacute;ltima historia</p>
+                                <p class="text-sm text-gray-500">LGE Members Site | Chrome</p>
+                                <p class="text-sm text-green-500">Inicio de sesi&oacute;n correcto</p>
+                                <p class="text-sm text-gray-500">&iquest;Iniciaste sesi&oacute;n? De lo contrario, cambie
+                                    su contrase&ntilde;a.</p>
+                            </div>
+
+                            <!-- Servicios en uso -->
+                            <div class="bg-white p-4 rounded-2xl shadow-md">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-semibold flex items-center"><span
+                                            class="material-icons mr-2">apps</span>Servicios en uso</h3>
+                                    <span class="material-icons">chevron_right</span>
+                                </div>
+                                <div class="flex space-x-4 mt-4">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG.com
+                                    </div>
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
+                                    </div>
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG Dev
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Servicio Disponible -->
+                            <div class="bg-white p-4 rounded-2xl shadow-md">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-semibold flex items-center"><span
+                                            class="material-icons mr-2">add_box</span>Servicio disponible</h3>
+                                    <span class="material-icons">chevron_right</span>
+                                </div>
+                                <div class="flex space-x-4 mt-4">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
+                                        ThinQ</div>
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
+                                        Editor</div>
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
+                                        Cloud</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
                 <!-- ====== Profile Section End -->
             </div>

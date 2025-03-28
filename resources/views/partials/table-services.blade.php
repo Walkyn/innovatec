@@ -71,7 +71,7 @@
                                 </button>
                             </li>
                             <li>
-                                <button data-modal-target="plan-modal" data-modal-toggle="plan-modal"
+                                <button data-modal-target="list-plans-modal" data-modal-toggle="list-plans-modal"
                                     class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                     <i class="fas fa-edit mr-2"></i> Planes
                                 </button>

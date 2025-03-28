@@ -113,11 +113,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/servicios/{id}/edit', [ServiceController::class, 'editServicio']);
         Route::put('/servicios/{id}/update', [ServiceController::class, 'updateServicio']);
         Route::delete('/servicios/{servicio}', [ServiceController::class, 'destroyServices'])->name('servicios.destroy');
+        Route::get('/categorias/{categoria}/servicios', [ServiceController::class, 'getServicios']);
+        // Rutas para Planes
+        Route::get('/servicios/{servicio}/planes', [ServiceController::class, 'getPlanes']);
+        Route::get('/planes/{id}/edit', [ServiceController::class, 'editPlan']);
+        Route::put('/planes/{id}/update', [ServiceController::class, 'updatePlan']);
+        Route::delete('/planes/{plan}', [ServiceController::class, 'destroyPlan'])->name('planes.destroy');
     });
-    
-    Route::delete('/categorias/{id}', [ServiceController::class, 'destroyCategory'])
-    ->middleware('check.permissions:manage,eliminar')
-    ->name('categorias.destroy');
+
     // Contracts
     Route::controller(ContractController::class)->group(function () {
         Route::get('contracts', 'index')->middleware('check.permissions:manage,all')->name('contracts.index');
