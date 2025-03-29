@@ -106,7 +106,7 @@ Route::middleware('auth')->group(function () {
         Route::post('services.store-plan', 'storePlan')->middleware('check.permissions:manage,guardar')->name('services.storePlan');
         Route::delete('services/{servicio}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('services.destroy');
         Route::post('/category/store', 'storeCategory')->middleware('check.permissions:manage,guardar')->name('category.store');
-        Route::get('/categorias/{id}/edit', 'edit')->middleware('check.permissions:manage,actualizar')->name('categorias.edit');
+        Route::get('/categorias/{id}/edit', 'editCategory')->middleware('check.permissions:manage,actualizar')->name('categorias.edit');
         Route::put('/categorias/{id}/update', 'updateCategory')->middleware('check.permissions:manage,actualizar')->name('categorias.update');
         Route::delete('/categorias/{id}', 'destroyCategory')->middleware('check.permissions:manage,eliminar')->name('categorias.destroy');
         Route::get('/categorias/{id}/servicios', [ServiceController::class, 'getServiciosByCategoria']);

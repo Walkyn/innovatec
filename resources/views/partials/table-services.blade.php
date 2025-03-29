@@ -58,20 +58,19 @@
                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="modifyDropdownButton">
                             <li>
-                                <button data-modal-target="list-categories-modal"
-                                    data-modal-toggle="list-categories-modal"
+                                <button @click="$dispatch('open-list-modal')"
                                     class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                     <i class="fas fa-edit mr-2"></i> Categorías
                                 </button>
                             </li>
                             <li>
-                                <button data-modal-target="list-services-modal" data-modal-toggle="list-services-modal"
+                                <button @click="$dispatch('open-services-modal')"
                                     class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                     <i class="fas fa-edit mr-2"></i> Servicios
                                 </button>
                             </li>
                             <li>
-                                <button data-modal-target="list-plans-modal" data-modal-toggle="list-plans-modal"
+                                <button @click="$dispatch('open-plans-modal')"
                                     class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                                     <i class="fas fa-edit mr-2"></i> Planes
                                 </button>
@@ -242,7 +241,7 @@
 </main>
 
 <!-- Modal de Confirmación -->
-<div id="popup-modal" tabindex="-1"
+<div id="popup-modal" tabindex="-1" data-modal-target="popup-modal"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">

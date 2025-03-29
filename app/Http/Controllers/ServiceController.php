@@ -115,7 +115,7 @@ class ServiceController extends Controller
         }
     }
 
-    public function edit($id)
+    public function editCategory($id)
     {
         $categoria = Categoria::findOrFail($id);
         return response()->json($categoria);

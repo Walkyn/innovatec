@@ -91,10 +91,6 @@
                 @include('partials.modal-services')
                 <!-- ====== Modal Services End -->
 
-                <!-- ====== Edit Modal Services End -->
-                @include('partials.modal-edit-services')
-                <!-- ====== Edit Modal Services End -->
-
                 <!-- ====== Edit Modal Planes End -->
                 @include('partials.modal-planes')
                 <!-- ====== Edit Modal Planes End -->
