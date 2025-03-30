@@ -636,15 +636,19 @@
         };
 
         const loadServicios = async (contratoId, clientId) => {
-            elements.servicioSelect.innerHTML =
-                '';
+            elements.servicioSelect.innerHTML = '';
             try {
                 const response = await fetch(`/contratos/${contratoId}/servicios`);
+                if (!response.ok) {
+                    throw new Error('Error al obtener servicios');
+                }
                 const servicios = await response.json();
                 if (servicios.length > 0) {
                     servicios.forEach(servicio => {
-                        const option = new Option(servicio.nombre, servicio
-                            .contrato_servicio_id);
+                        const option = new Option(
+                            `${servicio.nombre} - ${servicio.plan_nombre}`, 
+                            servicio.contrato_servicio_id
+                        );
                         elements.servicioSelect.add(option);
                     });
                     elements.servicioSelect.value = servicios[0].contrato_servicio_id;
@@ -654,6 +658,7 @@
                 }
             } catch (error) {
                 console.error('Error al obtener servicios:', error);
+                elements.servicioSelect.add(new Option('Error al cargar servicios', '', true, true));
             }
         };
 

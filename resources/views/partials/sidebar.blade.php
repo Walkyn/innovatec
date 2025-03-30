@@ -114,7 +114,7 @@
                                             :class="{ 'text-white': subSelected === 'months' }"
                                             @click="subSelected = 'months'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
-                                            <i class="fas fa-calendar-alt"></i> Gestión de Meses
+                                            <i class="fas fa-calendar-alt"></i> Meses
                                         </a>
                                     </li>
                                 </ul>

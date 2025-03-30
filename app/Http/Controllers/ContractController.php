@@ -16,7 +16,7 @@ class ContractController extends Controller
 {
     public function index()
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::where('estado_cliente', 'activo')->get();
         $categorias = Categoria::with('servicios.planes')->get();
         $contratos = Contrato::with(['cliente', 'servicios'])->paginate(7);
     

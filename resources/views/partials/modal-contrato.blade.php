@@ -181,6 +181,16 @@
                             const plan = this.planesDisponibles.find(p => p.id == this.planId);
                     
                             if (categoria && servicio && plan) {
+                                // Verificar si ya existe el mismo servicio y plan
+                                const existeDuplicado = this.detalles.some(detalle => 
+                                    detalle.servicioId === servicio.id && detalle.planId === plan.id
+                                );
+
+                                if (existeDuplicado) {
+                                    this.mostrarAlerta('Duplicado: servicio y plan ya agregados.');
+                                    return;
+                                }
+
                                 const nuevoDetalle = {
                                     id: Date.now(),
                                     categoriaId: categoria.id,

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('contrato_servicio', function (Blueprint $table) {
             $table->id();
             $table->foreignId('contrato_id')->constrained('contratos')->onDelete('cascade');
-            $table->foreignId('servicio_id')->constrained('servicios')->onDelete('cascade');
-            $table->foreignId('plan_id')->constrained('planes')->onDelete('cascade');
+            $table->foreignId('servicio_id')->nullable()->constrained('servicios')->onDelete('set null');
+            $table->foreignId('plan_id')->nullable()->constrained('planes')->onDelete('set null');
             $table->string('ip_servicio', 20)->nullable();
             $table->timestamp('fecha_servicio')->useCurrent();
             $table->enum('estado_servicio_cliente', ['activo', 'suspendido']);

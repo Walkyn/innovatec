@@ -211,10 +211,14 @@ Route::get('/contratos/{id}/servicios', function ($id) {
             ->with(['servicio', 'plan'])
             ->get()
             ->map(function ($contratoServicio) {
+                $nombreServicio = $contratoServicio->servicio->nombre;
+                $nombrePlan = $contratoServicio->plan ? $contratoServicio->plan->nombre : 'Sin Plan';
+                
                 return [
                     'contrato_servicio_id' => $contratoServicio->id,
                     'id' => $contratoServicio->servicio->id,
-                    'nombre' => $contratoServicio->servicio->nombre . ' - ' . $contratoServicio->plan->nombre,
+                    'nombre' => $nombreServicio,
+                    'plan_nombre' => $nombrePlan,
                     'fecha_servicio' => $contratoServicio->fecha_servicio,
                 ];
             })
