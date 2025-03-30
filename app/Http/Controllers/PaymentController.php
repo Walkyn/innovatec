@@ -9,7 +9,7 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::where('estado_cliente', '!=', 'inactivo')->get();
     
         return view('payments.index', compact('clientes'));
     }    

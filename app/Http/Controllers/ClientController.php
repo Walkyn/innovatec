@@ -238,4 +238,92 @@ class ClientController extends Controller
     {
         return view('clients.assign_service');
     }
+
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $cliente = Cliente::findOrFail($id);
+
+            $cliente->contratos()->each(function ($contrato) {
+                $contrato->contratoServicios()->delete();
+                $contrato->delete();
+            });
+
+            $cliente->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Cliente eliminado con éxito'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'errorDetails' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getDetails($id)
+    {
+        try {
+            $cliente = Cliente::with(['region', 'provincia', 'distrito', 'pueblo', 'contratos' => function($query) {
+                $query->where('estado_contrato', 'activo');
+            }])->findOrFail($id);
+
+            $contratoActivo = $cliente->contratos->first();
+            $servicioActivo = null;
+            $planActivo = null;
+
+            if ($contratoActivo) {
+                $servicioActivo = $contratoActivo->contratoServicios()->with(['servicio', 'plan'])->first();
+                if ($servicioActivo) {
+                    $planActivo = $servicioActivo->plan;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'cliente' => [
+                    'id' => $cliente->id,
+                    'nombres' => $cliente->nombres,
+                    'apellidos' => $cliente->apellidos,
+                    'identificacion' => $cliente->identificacion,
+                    'telefono' => $cliente->telefono,
+                    'direccion' => $cliente->direccion,
+                    'gps' => $cliente->gps,
+                    'estado_cliente' => $cliente->estado_cliente,
+                    'region' => $cliente->region ? $cliente->region->nombre : null,
+                    'provincia' => $cliente->provincia ? $cliente->provincia->nombre : null,
+                    'distrito' => $cliente->distrito ? $cliente->distrito->nombre : null,
+                    'pueblo' => $cliente->pueblo ? $cliente->pueblo->nombre : null,
+                    'contrato_activo' => $contratoActivo ? [
+                        'id' => $contratoActivo->id,
+                        'numero' => $contratoActivo->numero,
+                        'fecha_inicio' => $contratoActivo->fecha_inicio
+                    ] : null,
+                    'servicio_activo' => $servicioActivo ? [
+                        'id' => $servicioActivo->id,
+                        'nombre' => $servicioActivo->servicio->nombre,
+                        'fecha_inicio' => $servicioActivo->fecha_servicio
+                    ] : null,
+                    'plan_activo' => $planActivo ? [
+                        'id' => $planActivo->id,
+                        'nombre' => $planActivo->nombre,
+                        'precio' => $planActivo->precio
+                    ] : null
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'errorDetails' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

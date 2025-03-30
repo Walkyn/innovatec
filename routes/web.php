@@ -70,6 +70,8 @@ Route::middleware('auth')->group(function () {
         Route::get('clients.assign-service', 'assignService')->name('clients.assign_service');
         Route::get('clients/{id}/edit', 'edit')->middleware('check.permissions:clients,actualizar')->name('clients.edit');
         Route::put('clients/{id}', 'update')->middleware('check.permissions:clients,actualizar')->name('clients.update');
+        Route::delete('clients/{id}', 'destroy')->middleware('check.permissions:clients,eliminar')->name('clients.destroy');
+        Route::get('clients/{id}/details', 'getDetails')->name('clients.details');
     });
 
     // Calendar

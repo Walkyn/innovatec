@@ -56,13 +56,14 @@
             <div class="w-full overflow-x-auto">
                 <table class="w-full whitespace-no-wrap">
                     <thead>
-                        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                        <tr
+                            class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                             <th class="px-4 py-3">Clientes</th>
                             <th class="px-4 py-3">Instalación</th>
                             <th class="px-4 py-3">Telefono</th>
                             <th class="px-4 py-3">Dirección</th>
                             <th class="px-4 py-3">Estado</th>
-                            <th class="px-4 py-3">Contrato</th>
+                            <th class="px-4 py-3">Detalles</th>
                             <th class="px-4 py-3">Acción</th>
                         </tr>
                     </thead>
@@ -80,13 +81,15 @@
                                 <td class="px-4 py-3">
                                     <div class="flex items-center text-sm">
                                         <!-- Avatar (oculto en móviles) -->
-                                        <div class="hidden md:flex items-center px-2 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                                        <div
+                                            class="hidden md:flex items-center px-2 py-4 text-gray-900 whitespace-nowrap dark:text-white">
                                             <img class="w-10 h-10 rounded-full object-cover" src="{{ $avatarUrl }}"
                                                 alt="{{ $cliente->nombres }} {{ $cliente->apellidos }}"
                                                 loading="lazy" />
                                         </div>
                                         <div>
-                                            <p class="font-semibold">{{ $cliente->nombres }} {{ $cliente->apellidos }}</p>
+                                            <p class="font-semibold">{{ $cliente->nombres }} {{ $cliente->apellidos }}
+                                            </p>
                                             <p class="text-xs text-gray-600 dark:text-gray-400">
                                                 {{ $cliente->identificacion }}
                                             </p>
@@ -109,20 +112,23 @@
                                                 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100',
                                             'inactivo' =>
                                                 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100',
-                                            'suspendido' =>
-                                                'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100',
+                                            'suspendido' => 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100',
                                         ];
                                     @endphp
-                
+
                                     <span
                                         class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$cliente->estado_cliente] ?? 'text-gray-700 bg-gray-100' }}">
                                         {{ ucfirst($cliente->estado_cliente) }}
                                     </span>
                                 </td>
-                
+
                                 <td class="px-4 py-3 text-sm">
-                                    <button data-modal-target="meses-modal" data-modal-toggle="meses-modal"
-                                        class="fas fa-eye flex items-center justify-between px-2 py-2 text-sm font-bold leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray w-5 h-5"></button>
+                                    <button type="button" 
+                                        data-modal-target="meses-modal"
+                                        onclick="verDetallesCliente({{ $cliente->id }})"
+                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex items-center space-x-4 text-sm">
@@ -132,9 +138,9 @@
                                             aria-label="Edit">
                                             <i class="fas fa-edit w-5 h-5"></i>
                                         </a>
-                
+
                                         <!-- Botón Eliminar -->
-                                        <button
+                                        <button onclick="eliminarCliente({{ $cliente->id }})"
                                             class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                                             aria-label="Delete">
                                             <i class="fas fa-trash-alt w-5 h-5"></i>
@@ -155,3 +161,183 @@
 
     </div>
 </main>
+
+<script>
+    function eliminarCliente(clienteId) {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará el cliente y todos sus registros permanentemente",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "No, cancelar",
+            reverseButtons: true,
+            customClass: {
+                confirmButton: "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400",
+                cancelButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400",
+                actions: "flex justify-center gap-4"
+            },
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/clients/${clienteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: data.successMessage,
+                                text: data.successDetails,
+                                icon: "success",
+                                customClass: {
+                                    confirmButton: "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400"
+                                },
+                                buttonsStyling: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: data.errorDetails,
+                                icon: "error",
+                                customClass: {
+                                    confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: "Error",
+                            text: "Hubo un problema al eliminar el cliente.",
+                            icon: "error",
+                            customClass: {
+                                confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                            },
+                            buttonsStyling: false
+                        });
+                    });
+            }
+        });
+    }
+
+    function verDetallesCliente(clienteId) {
+        // Realizar la petición AJAX para obtener los detalles del cliente
+        fetch(`/clients/${clienteId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const cliente = data.cliente;
+                    
+                    // Actualizar las iniciales en el avatar
+                    document.querySelector('#meses-modal .text-2xl').textContent = 
+                        `${cliente.nombres.charAt(0)}${cliente.apellidos.charAt(0)}`;
+                    
+                    // Actualizar el nombre completo
+                    document.querySelector('#meses-modal [data-field="nombre"]').textContent = 
+                        `${cliente.nombres} ${cliente.apellidos}`;
+                    
+                    // Actualizar información de contacto
+                    document.querySelector('#meses-modal [data-field="identificacion"]').textContent = cliente.identificacion;
+                    document.querySelector('#meses-modal [data-field="telefono"]').textContent = cliente.telefono;
+                    document.querySelector('#meses-modal [data-field="gps"]').textContent = cliente.gps || 'No especificado';
+                    
+                    // Actualizar información de ubicación
+                    document.querySelector('#meses-modal [data-field="region"]').textContent = cliente.region || 'No especificado';
+                    document.querySelector('#meses-modal [data-field="provincia"]').textContent = cliente.provincia || 'No especificado';
+                    document.querySelector('#meses-modal [data-field="distrito"]').textContent = cliente.distrito || 'No especificado';
+                    document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo || 'No especificado';
+                    document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
+                    
+                    // Actualizar información del plan
+                    if (cliente.plan_activo) {
+                        document.querySelector('#meses-modal [data-field="plan"]').textContent = cliente.plan_activo.nombre;
+                        document.querySelector('#meses-modal [data-field="precio"]').textContent = `S/. ${cliente.plan_activo.precio}`;
+                    } else {
+                        document.querySelector('#meses-modal [data-field="plan"]').textContent = 'Sin plan activo';
+                        document.querySelector('#meses-modal [data-field="precio"]').textContent = 'S/. 0.00';
+                    }
+
+                    // Actualizar estado del cliente
+                    const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
+                    estadoElement.textContent = cliente.estado_cliente.charAt(0).toUpperCase() + cliente.estado_cliente.slice(1);
+                    estadoElement.className = `text-sm font-semibold ${
+                        cliente.estado_cliente === 'activo' ? 'text-green-600 dark:text-green-400' :
+                        cliente.estado_cliente === 'inactivo' ? 'text-gray-600 dark:text-gray-400' :
+                        'text-red-600 dark:text-red-400'
+                    }`;
+
+                    // Actualizar fecha de inicio
+                    if (cliente.contrato_activo) {
+                        const fechaInicio = new Date(cliente.contrato_activo.fecha_inicio);
+                        const mes = fechaInicio.toLocaleString('es-ES', { month: 'short' });
+                        const año = fechaInicio.getFullYear();
+                        document.querySelector('#meses-modal [data-field="fecha-inicio"]').textContent = 
+                            `Cliente activo desde ${mes} ${año}`;
+                    } else {
+                        document.querySelector('#meses-modal [data-field="fecha-inicio"]').textContent = 
+                            'Sin contrato activo';
+                    }
+
+                    // Mostrar el modal usando la API de Flowbite
+                    const modal = document.getElementById('meses-modal');
+                    const modalInstance = new Modal(modal, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modalInstance.show();
+                } else {
+                    // Mostrar error si la petición falla
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.errorDetails,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo cargar la información del cliente',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+    }
+
+    // Inicializar el modal y los botones de cierre
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('meses-modal');
+        const modalInstance = new Modal(modal, {
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        // Manejar los botones de cierre
+        const closeButtons = document.querySelectorAll('[data-modal-hide="meses-modal"]');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                modalInstance.hide();
+            });
+        });
+
+        // Manejar el cierre al hacer clic fuera del modal
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modalInstance.hide();
+            }
+        });
+    });
+</script>
