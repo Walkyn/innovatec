@@ -1,7 +1,8 @@
 <!-- Meses Modal -->
-<div id="meses-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity"></div>
-    <div class="relative w-full max-w-2xl max-h-full mx-auto">
+<div id="meses-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 py-20 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+    x-data="mesesModal()">
+    <div class="relative p-4 w-full max-w-2xl max-h-full mx-auto">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <!-- Modal header -->
@@ -9,7 +10,8 @@
                 <h3 class="text-xl font-medium text-gray-900 dark:text-white">
                     Información del cliente
                 </h3>
-                <button type="button" data-modal-hide="meses-modal"
+                <button type="button" 
+                    @click="closeModal"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 14 14">
@@ -91,7 +93,7 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Instalación</p>
-                                            <p class="text-gray-800 dark:text-white font-medium">--</p>
+                                            <p class="text-gray-800 dark:text-white font-medium" data-field="fecha-instalacion">--</p>
                                         </div>
                                     </div>
 
@@ -190,38 +192,38 @@
                                             <div>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400">Estado</p>
                                                 <p class="text-sm font-semibold text-green-600 dark:text-green-400" data-field="estado">--</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                            </div>
+                                </div>
+                                </div>
                                 </div>
                             </div>
 
                             <!-- Inputs en grid -->
                             <div x-data="mesesData()" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <!-- Input para seleccionar el contrato -->
+                            <!-- Input para seleccionar el contrato -->
                                 <div>
-                                    <label
-                                        class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
-                                        Contrato
-                                    </label>
-                                    <div class="relative">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                                    Contrato
+                                </label>
+                                <div class="relative">
                                         <select x-model="contratoSeleccionado" @change="cargarServicios"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccione un contrato</option>
                                             <template x-for="contrato in contratos" :key="contrato.id">
                                                 <option :value="contrato.id" x-text="contrato.numero"></option>
                                             </template>
-                                        </select>
-                                    </div>
+                                    </select>
                                 </div>
+                            </div>
 
-                                <!-- Input para seleccionar el servicio -->
+                            <!-- Input para seleccionar el servicio -->
                                 <div>
-                                    <label
-                                        class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
-                                        Servicio
-                                    </label>
-                                    <div class="relative">
+                                <label
+                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                                    Servicio
+                                </label>
+                                <div class="relative">
                                         <select x-model="servicioSeleccionado" @change="ajustarAnio"
                                             class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccione un servicio</option>
@@ -239,11 +241,11 @@
                                     </label>
                                     <div class="relative">
                                         <select x-model="anioSeleccionado" @change="cargarMeses"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <template x-for="anio in anios" :key="anio">
                                                 <option :value="anio" x-text="anio"></option>
                                             </template>
-                                        </select>
+                                    </select>
                                     </div>
                                 </div>
                             </div>
@@ -261,7 +263,7 @@
                                         <span class="text-sm text-gray-600 dark:text-gray-300"
                                             x-text="porcentajeCompletado + '% completado'"></span>
                                     </div>
-                                </div>
+                            </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4">
                                     <template x-for="(mes, index) in meses" :key="index">
@@ -306,7 +308,7 @@
                                                             .estado === 'no-aplica'
                                                     }"
                                                     x-text="mes.estado === 'pagado' ? 'Pagado' : (mes.estado === 'pendiente' ? 'Pendiente' : (mes.estado === 'falta' ? 'Falta' : 'No aplica'))">
-                                                </span>
+                                            </span>
                                             </div>
 
                                             <template x-if="mes.estado !== 'no-aplica'">
@@ -331,9 +333,9 @@
             </div>
             <!-- Modal footer -->
             <div class="flex items-center p-4 md:p-5 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600">
-                <button data-modal-hide="meses-modal" type="button"
+                <button @click="closeModal" type="button"
                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Aceptar</button>
-                <button data-modal-hide="meses-modal" type="button"
+                <button @click="closeModal" type="button"
                     class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Cancelar</button>
             </div>
         </div>
@@ -341,137 +343,162 @@
 </div>
 
 <script>
-    function mesesData() {
-        return {
-            contratoSeleccionado: '',
-            servicioSeleccionado: '',
-            anioSeleccionado: new Date().getFullYear(),
-            porcentajeCompletado: 0,
-            contratos: [{
+document.addEventListener('alpine:init', () => {
+    Alpine.data('mesesModal', () => ({
+        init() {
+            window.addEventListener('open-meses-modal', () => {
+                this.openModal();
+            });
+        },
+        
+        openModal() {
+            const modal = document.getElementById('meses-modal');
+            const modalInstance = new Modal(modal, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            modalInstance.show();
+        },
+        
+        closeModal() {
+            const modal = document.getElementById('meses-modal');
+            const modalInstance = new Modal(modal);
+            modalInstance.hide();
+        }
+    }));
+});
+
+function mesesData() {
+    return {
+        contratoSeleccionado: '',
+        servicioSeleccionado: '',
+        anioSeleccionado: new Date().getFullYear(),
+        porcentajeCompletado: 0,
+        contratos: [{
+                id: 1,
+                numero: 'CON-001'
+            },
+            {
+                id: 2,
+                numero: 'CON-002'
+            },
+            {
+                id: 3,
+                numero: 'CON-003'
+            }
+        ],
+        servicios: [],
+        anios: Array.from({
+            length: 5
+        }, (_, i) => new Date().getFullYear() - i),
+        meses: [{
+                nombre: 'Enero',
+                estado: 'pagado',
+                vencimiento: '05/01',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Febrero',
+                estado: 'pendiente',
+                vencimiento: '05/02',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Marzo',
+                estado: 'falta',
+                vencimiento: '05/03',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Abril',
+                estado: 'pagado',
+                vencimiento: '05/04',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Mayo',
+                estado: 'no-aplica',
+                vencimiento: '05/05',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Junio',
+                estado: 'pagado',
+                vencimiento: '05/06',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Julio',
+                estado: 'pendiente',
+                vencimiento: '05/07',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Agosto',
+                estado: 'falta',
+                vencimiento: '05/08',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Septiembre',
+                estado: 'no-aplica',
+                vencimiento: '05/09',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Octubre',
+                estado: 'pagado',
+                vencimiento: '05/10',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Noviembre',
+                estado: 'pendiente',
+                vencimiento: '05/11',
+                monto: '50.00'
+            },
+            {
+                nombre: 'Diciembre',
+                estado: 'pagado',
+                vencimiento: '05/12',
+                monto: '50.00'
+            }
+        ],
+        cargarServicios() {
+            // Simulación de carga de servicios
+            this.servicios = [{
                     id: 1,
-                    numero: 'CON-001'
+                    nombre: 'Internet Básico',
+                    fechaInicio: '2023-01-01'
                 },
                 {
                     id: 2,
-                    numero: 'CON-002'
+                    nombre: 'Internet Premium',
+                    fechaInicio: '2023-06-01'
                 },
                 {
                     id: 3,
-                    numero: 'CON-003'
+                    nombre: 'Internet Empresarial',
+                    fechaInicio: '2023-03-01'
                 }
-            ],
-            servicios: [],
-            anios: Array.from({
-                length: 5
-            }, (_, i) => new Date().getFullYear() - i),
-            meses: [{
-                    nombre: 'Enero',
-                    estado: 'pagado',
-                    vencimiento: '05/01',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Febrero',
-                    estado: 'pendiente',
-                    vencimiento: '05/02',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Marzo',
-                    estado: 'falta',
-                    vencimiento: '05/03',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Abril',
-                    estado: 'pagado',
-                    vencimiento: '05/04',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Mayo',
-                    estado: 'no-aplica',
-                    vencimiento: '05/05',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Junio',
-                    estado: 'pagado',
-                    vencimiento: '05/06',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Julio',
-                    estado: 'pendiente',
-                    vencimiento: '05/07',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Agosto',
-                    estado: 'falta',
-                    vencimiento: '05/08',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Septiembre',
-                    estado: 'no-aplica',
-                    vencimiento: '05/09',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Octubre',
-                    estado: 'pagado',
-                    vencimiento: '05/10',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Noviembre',
-                    estado: 'pendiente',
-                    vencimiento: '05/11',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Diciembre',
-                    estado: 'pagado',
-                    vencimiento: '05/12',
-                    monto: '50.00'
-                }
-            ],
-            cargarServicios() {
-                // Simulación de carga de servicios
-                this.servicios = [{
-                        id: 1,
-                        nombre: 'Internet Básico',
-                        fechaInicio: '2023-01-01'
-                    },
-                    {
-                        id: 2,
-                        nombre: 'Internet Premium',
-                        fechaInicio: '2023-06-01'
-                    },
-                    {
-                        id: 3,
-                        nombre: 'Internet Empresarial',
-                        fechaInicio: '2023-03-01'
-                    }
-                ];
-            },
-            ajustarAnio() {
-                const servicio = this.servicios.find(s => s.id === this.servicioSeleccionado);
-                if (servicio) {
-                    this.anioSeleccionado = new Date(servicio.fechaInicio).getFullYear();
-                    this.cargarMeses();
-                }
-            },
-            cargarMeses() {
-                // Simulación de carga de meses según el año seleccionado
-                this.actualizarPorcentajeCompletado();
-            },
-            actualizarPorcentajeCompletado() {
-                const totalMeses = this.meses.length;
-                const mesesCompletados = this.meses.filter(mes => mes.estado === 'pagado').length;
-                this.porcentajeCompletado = Math.round((mesesCompletados / totalMeses) * 100);
+            ];
+        },
+        ajustarAnio() {
+            const servicio = this.servicios.find(s => s.id === this.servicioSeleccionado);
+            if (servicio) {
+                this.anioSeleccionado = new Date(servicio.fechaInicio).getFullYear();
+                this.cargarMeses();
             }
+        },
+        cargarMeses() {
+            // Simulación de carga de meses según el año seleccionado
+            this.actualizarPorcentajeCompletado();
+        },
+        actualizarPorcentajeCompletado() {
+            const totalMeses = this.meses.length;
+            const mesesCompletados = this.meses.filter(mes => mes.estado === 'pagado').length;
+            this.porcentajeCompletado = Math.round((mesesCompletados / totalMeses) * 100);
         }
     }
+}
 </script>

@@ -277,25 +277,23 @@
                         'text-red-600 dark:text-red-400'
                     }`;
 
-                    // Actualizar fecha de inicio
-                    if (cliente.contrato_activo) {
-                        const fechaInicio = new Date(cliente.contrato_activo.fecha_inicio);
-                        const mes = fechaInicio.toLocaleString('es-ES', { month: 'short' });
-                        const año = fechaInicio.getFullYear();
-                        document.querySelector('#meses-modal [data-field="fecha-inicio"]').textContent = 
-                            `Cliente activo desde ${mes} ${año}`;
-                    } else {
-                        document.querySelector('#meses-modal [data-field="fecha-inicio"]').textContent = 
-                            'Sin contrato activo';
+                    // Actualizar fecha de inicio y fecha de instalación
+                    const fechaInicioElement = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
+                    const fechaInstalacionElement = document.querySelector('#meses-modal [data-field="fecha-instalacion"]');
+
+                    if (fechaInicioElement) {
+                        fechaInicioElement.innerHTML = `
+                            <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                            Cliente activo desde ${cliente.created_at || 'No especificada'}
+                        `;
                     }
 
-                    // Mostrar el modal usando la API de Flowbite
-                    const modal = document.getElementById('meses-modal');
-                    const modalInstance = new Modal(modal, {
-                        backdrop: 'static',
-                        keyboard: false
-                    });
-                    modalInstance.show();
+                    if (fechaInstalacionElement) {
+                        fechaInstalacionElement.textContent = cliente.contrato_activo?.fecha_instalacion || 'No especificada';
+                    }
+
+                    // Mostrar el modal usando el evento de Alpine.js
+                    window.dispatchEvent(new CustomEvent('open-meses-modal'));
                 } else {
                     // Mostrar error si la petición falla
                     Swal.fire({
@@ -316,28 +314,4 @@
                 });
             });
     }
-
-    // Inicializar el modal y los botones de cierre
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('meses-modal');
-        const modalInstance = new Modal(modal, {
-            backdrop: 'static',
-            keyboard: false
-        });
-
-        // Manejar los botones de cierre
-        const closeButtons = document.querySelectorAll('[data-modal-hide="meses-modal"]');
-        closeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                modalInstance.hide();
-            });
-        });
-
-        // Manejar el cierre al hacer clic fuera del modal
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                modalInstance.hide();
-            }
-        });
-    });
 </script>
