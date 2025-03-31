@@ -261,12 +261,17 @@
                     
                     // Actualizar información del plan
                     if (cliente.plan_activo) {
-                        document.querySelector('#meses-modal [data-field="plan"]').textContent = cliente.plan_activo.nombre;
-                        document.querySelector('#meses-modal [data-field="servicio"]').textContent = cliente.servicio_activo?.nombre || 'Sin servicio';
+                        const servicioNombre = cliente.servicio_activo?.nombre;
+                        const planNombre = cliente.plan_activo.nombre;
+                        
+                        if (servicioNombre) {
+                            document.querySelector('#meses-modal [data-field="servicio"]').textContent = `${servicioNombre} ${planNombre}`;
+                        } else {
+                            document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
+                        }
                         document.querySelector('#meses-modal [data-field="precio"]').textContent = `S/. ${cliente.plan_activo.precio}`;
                     } else {
-                        document.querySelector('#meses-modal [data-field="plan"]').textContent = 'Sin plan activo';
-                        document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicio';
+                        document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
                         document.querySelector('#meses-modal [data-field="precio"]').textContent = 'S/. 0.00';
                     }
 

@@ -193,10 +193,10 @@
                                                 <i class="fas fa-wifi text-green-500 dark:text-green-300"></i>
                                             </div>
                                             <div>
-                                                <p class="text-sm text-gray-500 dark:text-gray-400" data-field="plan">
-                                                    --</p>
-                                                <p class="text-xs text-gray-600 dark:text-gray-400" data-field="servicio">
-                                                    --</p>
+                                                <div class="flex items-center space-x-1">
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400" data-field="servicio">
+                                                        --</p>
+                                                </div>
                                                 <p class="text-lg font-bold text-gray-800 dark:text-white"
                                                     data-field="precio">--</p>
                                             </div>
