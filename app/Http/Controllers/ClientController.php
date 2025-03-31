@@ -281,9 +281,15 @@ class ClientController extends Controller
             $planActivo = null;
 
             if ($contratoActivo) {
-                $servicioActivo = $contratoActivo->contratoServicios()->with(['servicio', 'plan'])->first();
-                if ($servicioActivo) {
-                    $planActivo = $servicioActivo->plan;
+                $contratoServicio = $contratoActivo->contratoServicios()
+                    ->with(['servicio' => function($query) {
+                        $query->where('estado_servicio', 'activo');
+                    }, 'plan'])
+                    ->first();
+
+                if ($contratoServicio && $contratoServicio->servicio) {
+                    $servicioActivo = $contratoServicio->servicio;
+                    $planActivo = $contratoServicio->plan;
                 }
             }
 
@@ -311,8 +317,8 @@ class ClientController extends Controller
                     ] : null,
                     'servicio_activo' => $servicioActivo ? [
                         'id' => $servicioActivo->id,
-                        'nombre' => $servicioActivo->servicio->nombre,
-                        'fecha_inicio' => $servicioActivo->fecha_servicio
+                        'nombre' => $servicioActivo->nombre,
+                        'descripcion' => $servicioActivo->descripcion
                     ] : null,
                     'plan_activo' => $planActivo ? [
                         'id' => $planActivo->id,

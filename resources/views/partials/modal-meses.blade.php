@@ -39,12 +39,9 @@
 
                                         <!-- Indicador de estado (activo) -->
                                         <div
-                                            class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
-                                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd"
-                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                    clip-rule="evenodd"></path>
-                                            </svg>
+                                            class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center"
+                                            data-field="estado-indicator">
+                                            <i class="fas fa-check-circle text-white text-xs"></i>
                                         </div>
                                     </div>
 
@@ -84,7 +81,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="telefono">
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="telefono">
                                                 --</p>
                                         </div>
                                     </div>
@@ -110,7 +108,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Ubicación</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="gps">--</p>
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="gps">--</p>
                                         </div>
                                     </div>
 
@@ -122,7 +121,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Región</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="region">--
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="region">--
                                             </p>
                                         </div>
                                     </div>
@@ -135,7 +135,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Provincia</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="provincia">
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="provincia">
                                                 --</p>
                                         </div>
                                     </div>
@@ -148,7 +149,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Distrito</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="distrito">
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="distrito">
                                                 --</p>
                                         </div>
                                     </div>
@@ -161,7 +163,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Zona</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="pueblo">--
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="pueblo">--
                                             </p>
                                         </div>
                                     </div>
@@ -174,7 +177,8 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Dirección Completa</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="direccion">
+                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                                data-field="direccion">
                                                 --</p>
                                         </div>
                                     </div>
@@ -191,6 +195,8 @@
                                             <div>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400" data-field="plan">
                                                     --</p>
+                                                <p class="text-xs text-gray-600 dark:text-gray-400" data-field="servicio">
+                                                    --</p>
                                                 <p class="text-lg font-bold text-gray-800 dark:text-white"
                                                     data-field="precio">--</p>
                                             </div>
@@ -199,53 +205,53 @@
                                         <div class="flex items-center space-x-3">
                                             <div
                                                 class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                                <i class="fas fa-check-circle text-green-500 dark:text-green-300"></i>
+                                                <i class="fas fa-check-circle text-green-500 dark:text-green-300" data-field="estado-icon"></i>
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400">Estado</p>
                                                 <p class="text-sm font-semibold text-green-600 dark:text-green-400"
                                                     data-field="estado">--</p>
-                            </div>
-                                </div>
-                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Inputs en grid -->
                             <div x-data="mesesData()" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- Input para seleccionar el contrato -->
+                                <!-- Input para seleccionar el contrato -->
                                 <div>
-                                <label
-                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
-                                    Contrato
-                                </label>
-                                <div class="relative">
+                                    <label
+                                        class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                                        Contrato
+                                    </label>
+                                    <div class="relative">
                                         <select x-model="contratoSeleccionado" @change="cargarServicios"
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccione un contrato</option>
                                             <template x-for="contrato in contratos" :key="contrato.id">
                                                 <option :value="contrato.id" x-text="contrato.numero"></option>
                                             </template>
-                                    </select>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Input para seleccionar el servicio -->
+                                <!-- Input para seleccionar el servicio -->
                                 <div>
-                                <label
-                                    class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
-                                    Servicio
-                                </label>
-                                <div class="relative">
+                                    <label
+                                        class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                                        Servicio
+                                    </label>
+                                    <div class="relative">
                                         <select x-model="servicioSeleccionado" @change="ajustarAnio"
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccione un servicio</option>
                                             <template x-for="servicio in servicios" :key="servicio.id">
                                                 <option :value="servicio.id" x-text="servicio.nombre"></option>
                                             </template>
-                                    </select>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
 
                                 <div>
                                     <label
@@ -321,7 +327,7 @@
                                                             .estado === 'no-aplica'
                                                     }"
                                                     x-text="mes.estado === 'pagado' ? 'Pagado' : (mes.estado === 'pendiente' ? 'Pendiente' : (mes.estado === 'falta' ? 'Falta' : 'No aplica'))">
-                                            </span>
+                                                </span>
                                             </div>
 
                                             <template x-if="mes.estado !== 'no-aplica'">
