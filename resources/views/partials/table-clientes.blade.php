@@ -270,12 +270,62 @@
 
                     // Actualizar estado del cliente
                     const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
+                    const estadoIcon = document.querySelector('#meses-modal .absolute.bottom-0.right-0');
+                    const estadoIconPlan = document.querySelector('#meses-modal .fa-check-circle');
+                    
                     estadoElement.textContent = cliente.estado_cliente.charAt(0).toUpperCase() + cliente.estado_cliente.slice(1);
                     estadoElement.className = `text-sm font-semibold ${
                         cliente.estado_cliente === 'activo' ? 'text-green-600 dark:text-green-400' :
                         cliente.estado_cliente === 'inactivo' ? 'text-gray-600 dark:text-gray-400' :
                         'text-red-600 dark:text-red-400'
                     }`;
+
+                    // Actualizar el color del icono según el estado
+                    if (estadoIcon) {
+                        // Definir el ícono según el estado
+                        let iconSvg = '';
+                        if (cliente.estado_cliente === 'activo') {
+                            iconSvg = `<svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>`;
+                        } else if (cliente.estado_cliente === 'inactivo') {
+                            iconSvg = `<svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>`;
+                        } else {
+                            iconSvg = `<svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>`;
+                        }
+
+                        estadoIcon.className = `absolute bottom-0 right-0 w-5 h-5 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center ${
+                            cliente.estado_cliente === 'activo' ? 'bg-green-500' :
+                            cliente.estado_cliente === 'inactivo' ? 'bg-gray-500' :
+                            'bg-red-500'
+                        }`;
+                        
+                        // Actualizar el contenido del ícono
+                        estadoIcon.innerHTML = iconSvg;
+                    }
+
+                    // Actualizar el ícono en la sección de Plan y detalles
+                    if (estadoIconPlan) {
+                        const iconContainer = estadoIconPlan.parentElement;
+                        if (iconContainer) {
+                            iconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                                cliente.estado_cliente === 'activo' ? 'bg-green-100 dark:bg-green-900' :
+                                cliente.estado_cliente === 'inactivo' ? 'bg-gray-100 dark:bg-gray-900' :
+                                'bg-red-100 dark:bg-red-900'
+                            }`;
+                            
+                            // Actualizar el ícono según el estado
+                            estadoIconPlan.className = `fas ${
+                                cliente.estado_cliente === 'activo' ? 'fa-check-circle text-green-500 dark:text-green-300' :
+                                cliente.estado_cliente === 'inactivo' ? 'fa-times-circle text-gray-500 dark:text-gray-300' :
+                                'fa-exclamation-circle text-red-500 dark:text-red-300'
+                            }`;
+                        }
+                    }
 
                     // Actualizar fecha de inicio y fecha de instalación
                     const fechaInicioElement = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
@@ -289,7 +339,7 @@
                     }
 
                     if (fechaInstalacionElement) {
-                        fechaInstalacionElement.textContent = cliente.contrato_activo?.fecha_instalacion || 'No especificada';
+                        fechaInstalacionElement.textContent = cliente.created_at || 'No especificada';
                     }
 
                     // Mostrar el modal usando el evento de Alpine.js
