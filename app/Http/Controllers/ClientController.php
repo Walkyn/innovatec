@@ -296,10 +296,10 @@ class ClientController extends Controller
                     'identificacion' => $cliente->identificacion,
                     'telefono' => $cliente->telefono,
                     'gps' => $cliente->gps,
-                    'region' => $cliente->region,
-                    'provincia' => $cliente->provincia,
-                    'distrito' => $cliente->distrito,
-                    'pueblo' => $cliente->pueblo,
+                    'region' => $cliente->region ? $cliente->region->nombre : null,
+                    'provincia' => $cliente->provincia ? $cliente->provincia->nombre : null,
+                    'distrito' => $cliente->distrito ? $cliente->distrito->nombre : null,
+                    'pueblo' => $cliente->pueblo ? $cliente->pueblo->nombre : null,
                     'direccion' => $cliente->direccion,
                     'estado_cliente' => $cliente->estado_cliente,
                     'created_at' => $cliente->created_at ? date('d/m/Y', strtotime($cliente->created_at)) : null,
@@ -307,7 +307,7 @@ class ClientController extends Controller
                         'id' => $contratoActivo->id,
                         'numero' => $contratoActivo->numero,
                         'fecha_inicio' => $contratoActivo->fecha_inicio ? date('d/m/Y', strtotime($contratoActivo->fecha_inicio)) : null,
-                        'fecha_instalacion' => $servicioActivo ? date('d/m/Y', strtotime($servicioActivo->fecha_servicio)) : null
+                        'fecha_instalacion' => $cliente->created_at ? date('d/m/Y', strtotime($cliente->created_at)) : null
                     ] : null,
                     'servicio_activo' => $servicioActivo ? [
                         'id' => $servicioActivo->id,
