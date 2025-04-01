@@ -646,7 +646,7 @@
                 if (servicios.length > 0) {
                     servicios.forEach(servicio => {
                         const option = new Option(
-                            `${servicio.nombre} - ${servicio.plan_nombre}`, 
+                            `${servicio.nombre} - ${servicio.plan_nombre}`,
                             servicio.contrato_servicio_id
                         );
                         elements.servicioSelect.add(option);
@@ -667,27 +667,49 @@
 
         const loadMeses = async (contratoServicioId) => {
             elements.mesSelect.innerHTML = '';
+            elements.mesSelect.disabled = true;
+
             try {
+                // Mostrar estado de carga
+                const loadingOption = new Option('Cargando meses...', '', true, true);
+                elements.mesSelect.add(loadingOption);
+
                 const response = await fetch(`/meses-pendientes/${contratoServicioId}`);
                 const data = await response.json();
-                const mesesPendientes = data.meses_pendientes;
-                const precioPlan = parseFloat(data.precio_plan);
-                const montoProporcional = parseFloat(data.monto_proporcional);
+
+                // Limpiar el select
+                elements.mesSelect.innerHTML = '';
+                elements.mesSelect.disabled = false;
+
+                if (!data.success) {
+                    // Mostrar mensaje de error
+                    const errorOption = new Option(data.message || 'Error al cargar meses', '', true,
+                        true);
+                    elements.mesSelect.add(errorOption);
+
+                    const precioPlanInput = document.getElementById('precio-plan');
+                    if (precioPlanInput) {
+                        precioPlanInput.value = 'S/ 0.00';
+                    }
+
+                    // Mostrar notificación al usuario
+                    showAlert(data.message || 'Error al obtener meses pendientes', 'error');
+                    return;
+                }
+
+                const mesesPendientes = data.meses_pendientes || [];
+                const precioPlan = parseFloat(data.precio_plan) || 0;
+                const montoProporcional = parseFloat(data.monto_proporcional) || 0;
 
                 if (mesesPendientes.length > 0) {
                     mesesPendientes.forEach((mes, index) => {
-                        // Calcular el precio del mes
                         const precioMes = (index === 0 && montoProporcional > 0) ?
                             montoProporcional : precioPlan;
-
                         const precioRedondeado = Math.round(precioMes);
-                        const precioFormateado = precioRedondeado.toFixed(
-                            2);
+                        const precioFormateado = precioRedondeado.toFixed(2);
 
-                        // Almacenar el precio en el objeto preciosMeses
                         preciosMeses[mes.id] = precioFormateado;
 
-                        // Mostrar solo el mes y el año
                         const option = new Option(
                             `${mes.nombre} ${mes.anio}`,
                             mes.id
@@ -695,27 +717,79 @@
                         elements.mesSelect.add(option);
                     });
 
-                    // Seleccionar el primer mes por defecto
                     elements.mesSelect.value = mesesPendientes[0].id;
-
                     const precioAMostrar = preciosMeses[mesesPendientes[0].id];
+
                     const precioPlanInput = document.getElementById('precio-plan');
                     if (precioPlanInput) {
                         precioPlanInput.value = `S/ ${precioAMostrar}`;
                     }
                 } else {
-                    elements.mesSelect.add(new Option('No hay meses pendientes de pago', '', true,
-                        true));
+                    // Mostrar mensaje cuando no hay meses
+                    const noDataOption = new Option(
+                        data.message || 'No hay meses pendientes',
+                        '',
+                        true,
+                        true
+                    );
+                    elements.mesSelect.add(noDataOption);
 
                     const precioPlanInput = document.getElementById('precio-plan');
                     if (precioPlanInput) {
                         precioPlanInput.value = 'S/ 0.00';
                     }
+
+                    // Mostrar notificación al usuario
+                    showAlert(data.message || 'No hay meses pendientes de pago para este servicio',
+                        'info');
                 }
             } catch (error) {
                 console.error('Error al obtener meses pendientes:', error);
+
+                elements.mesSelect.innerHTML = '';
+                const errorOption = new Option('Error al cargar meses', '', true, true);
+                elements.mesSelect.add(errorOption);
+
+                const precioPlanInput = document.getElementById('precio-plan');
+                if (precioPlanInput) {
+                    precioPlanInput.value = 'S/ 0.00';
+                }
+
+                // Mostrar notificación al usuario
+                showAlert('Ocurrió un error al cargar los meses pendientes', 'error');
             }
         };
+
+        // Función auxiliar para mostrar alertas
+        function showAlert(message, type = 'error') {
+            const modal = document.getElementById('modal');
+            if (modal) {
+                const alpineData = Alpine.$data(modal);
+                alpineData.showAlert = true;
+
+                const alertMessage = document.getElementById('alert-message');
+                if (alertMessage) {
+                    alertMessage.textContent = message;
+
+                    // Cambiar color según el tipo
+                    const alertBox = modal.querySelector('.border-l-6');
+                    if (alertBox) {
+                        alertBox.className = alertBox.className.replace(/border-\[.*?\] bg-\[.*?\]/, '');
+                        if (type === 'error') {
+                            alertBox.classList.add('border-red-500', 'bg-red-100', 'dark:bg-red-800');
+                        } else if (type === 'info') {
+                            alertBox.classList.add('border-blue-500', 'bg-blue-100', 'dark:bg-blue-800');
+                        } else {
+                            alertBox.classList.add('border-[#D0915C]', 'bg-[#D0915C]');
+                        }
+                    }
+                }
+
+                setTimeout(() => {
+                    alpineData.showAlert = false;
+                }, 5500);
+            }
+        }
 
         // Evento change para actualizar el precio cuando se selecciona un mes
         elements.mesSelect.addEventListener('change', () => {

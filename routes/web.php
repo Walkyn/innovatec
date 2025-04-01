@@ -20,6 +20,7 @@ use App\Models\Contrato;
 use App\Models\ContratoServicio;
 use App\Http\Controllers\DatabaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -212,7 +213,7 @@ Route::middleware('auth')->group(function () {
                 ->map(function ($contratoServicio) {
                     $nombreServicio = $contratoServicio->servicio->nombre;
                     $nombrePlan = $contratoServicio->plan ? $contratoServicio->plan->nombre : 'Sin Plan';
-                    
+
                     return [
                         'contrato_servicio_id' => $contratoServicio->id,
                         'id' => $contratoServicio->servicio->id,
@@ -268,7 +269,13 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
     $contratoServicio = DB::table('contrato_servicio')->find($contratoServicioId);
 
     if (!$contratoServicio) {
-        return response()->json([]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Contrato de servicio no encontrado',
+            'meses_pendientes' => [],
+            'precio_plan' => 0,
+            'monto_proporcional' => 0
+        ]);
     }
 
     $fechaInicioServicio = $contratoServicio->fecha_servicio;
@@ -279,6 +286,19 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
         ->where('contrato_servicio_id', $contratoServicioId)
         ->max('mes_id');
 
+    // Verificar si existe la tabla meses
+    $tablaMesesExiste = Schema::hasTable('meses');
+
+    if (!$tablaMesesExiste) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Tabla de meses no existe en la base de datos',
+            'meses_pendientes' => [],
+            'precio_plan' => $precioPlan,
+            'monto_proporcional' => 0
+        ]);
+    }
+
     $mesInicioDeuda = $ultimaFechaPagada
         ? $ultimaFechaPagada + 1
         : DB::table('meses')
@@ -287,7 +307,13 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
         ->value('id');
 
     if (!$mesInicioDeuda) {
-        return response()->json([]);
+        return response()->json([
+            'success' => false,
+            'message' => 'No hay meses generados para el cálculo',
+            'meses_pendientes' => [],
+            'precio_plan' => $precioPlan,
+            'monto_proporcional' => 0
+        ]);
     }
 
     $mes = DB::table('meses')->find($mesInicioDeuda);
@@ -311,9 +337,11 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
         ->get();
 
     return response()->json([
+        'success' => true,
+        'message' => $mesesPendientes->isEmpty() ? 'No hay meses pendientes de pago' : 'Meses pendientes obtenidos',
         'meses_pendientes' => $mesesPendientes,
         'precio_plan' => (float) $precioPlan,
-        'monto_proporcional' => (float) $montoProporcional,
+        'monto_proporcional' => (float) $montoProporcional
     ]);
 });
 
@@ -325,7 +353,7 @@ Route::get('/contratos/{id}/servicios', function ($id) {
             ->map(function ($contratoServicio) {
                 $nombreServicio = $contratoServicio->servicio->nombre;
                 $nombrePlan = $contratoServicio->plan ? $contratoServicio->plan->nombre : 'Sin Plan';
-                
+
                 return [
                     'contrato_servicio_id' => $contratoServicio->id,
                     'id' => $contratoServicio->servicio->id,
@@ -337,7 +365,7 @@ Route::get('/contratos/{id}/servicios', function ($id) {
     );
 });
 
-//Rutas para la Vista de Creación
+//Rutas para la Vista de Creación Cliente
 Route::get('/provincias/{regionId}', function ($regionId) {
     return response()->json(Provincia::where('region_id', $regionId)->get());
 });
@@ -350,7 +378,7 @@ Route::get('/pueblos/{distritoId}', function ($distritoId) {
     return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
 });
 
-//Rutas para la Vista de Edición
+//Rutas para la Vista de Edición Cliente
 Route::get('/regiones/{regionId}/provincias', function ($regionId) {
     return response()->json(Provincia::where('region_id', $regionId)->get());
 });
