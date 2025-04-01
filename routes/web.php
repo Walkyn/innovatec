@@ -111,16 +111,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/categorias/{id}/edit', 'editCategory')->middleware('check.permissions:manage,actualizar')->name('categorias.edit');
         Route::put('/categorias/{id}/update', 'updateCategory')->middleware('check.permissions:manage,actualizar')->name('categorias.update');
         Route::delete('/categorias/{id}', 'destroyCategory')->middleware('check.permissions:manage,eliminar')->name('categorias.destroy');
-        Route::get('/categorias/{id}/servicios', [ServiceController::class, 'getServiciosByCategoria']);
-        Route::get('/servicios/{id}/edit', [ServiceController::class, 'editServicio']);
-        Route::put('/servicios/{id}/update', [ServiceController::class, 'updateServicio']);
-        Route::delete('/servicios/{servicio}', [ServiceController::class, 'destroyServices'])->name('servicios.destroy');
-        Route::get('/categorias/{categoria}/servicios', [ServiceController::class, 'getServicios']);
+        Route::get('/categorias/{id}/servicios', 'getServiciosByCategoria')->middleware('check.permissions:manage,all');
+        Route::get('/servicios/{id}/edit', 'editServicio')->middleware('check.permissions:manage,actualizar');
+        Route::put('/servicios/{id}/update', 'updateServicio')->middleware('check.permissions:manage,actualizar');
+        Route::delete('/servicios/{servicio}', 'destroyServices')->middleware('check.permissions:manage,eliminar')->name('servicios.destroy');
+        Route::get('/categorias/{categoria}/servicios', 'getServicios')->middleware('check.permissions:manage,all');
         // Rutas para Planes
-        Route::get('/servicios/{servicio}/planes', [ServiceController::class, 'getPlanes']);
-        Route::get('/planes/{id}/edit', [ServiceController::class, 'editPlan']);
-        Route::put('/planes/{id}/update', [ServiceController::class, 'updatePlan']);
-        Route::delete('/planes/{plan}', [ServiceController::class, 'destroyPlan'])->name('planes.destroy');
+        Route::get('/servicios/{servicio}/planes', 'getPlanes')->middleware('check.permissions:manage,all');
+        Route::get('/planes/{id}/edit', 'editPlan')->middleware('check.permissions:manage,actualizar');
+        Route::put('/planes/{id}/update', 'updatePlan')->middleware('check.permissions:manage,actualizar');
+        Route::delete('/planes/{plan}', 'destroyPlan')->middleware('check.permissions:manage,eliminar')->name('planes.destroy');
     });
 
     // Contracts
@@ -128,6 +128,9 @@ Route::middleware('auth')->group(function () {
         Route::get('contracts', 'index')->middleware('check.permissions:manage,all')->name('contracts.index');
         Route::post('contracts', 'store')->middleware('check.permissions:manage,guardar')->name('contracts.store');
         Route::delete('contratos/{id}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('contratos.destroy');
+        Route::get('/categorias', 'getCategorias')->middleware('check.permissions:manage,all');
+        Route::get('/servicios/{categoriaId}', 'getServicios')->middleware('check.permissions:manage,all');
+        Route::get('/planes/{servicioId}', 'getPlanes')->middleware('check.permissions:manage,all');
     });
 
     // Months
@@ -138,6 +141,113 @@ Route::middleware('auth')->group(function () {
 
     // Database
     Route::get('/database', [DatabaseController::class, 'index'])->middleware('check.permissions:database,all')->name('database.index');
+
+    // Rutas de datos protegidas
+    Route::get('/contratos/{clientId}', function ($clientId) {
+        return response()->json(
+            Contrato::where('cliente_id', $clientId)
+                ->where('estado_contrato', 'activo')
+                ->get()
+        );
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicioId) {
+        $contratoServicio = DB::table('contrato_servicio')->find($contratoServicioId);
+
+        if (!$contratoServicio) {
+            return response()->json([]);
+        }
+
+        $fechaInicioServicio = $contratoServicio->fecha_servicio;
+        $planId = $contratoServicio->plan_id;
+        $precioPlan = DB::table('planes')->where('id', $planId)->value('precio') ?? 0;
+
+        $ultimaFechaPagada = DB::table('cobranza_contratoservicio')
+            ->where('contrato_servicio_id', $contratoServicioId)
+            ->max('mes_id');
+
+        $mesInicioDeuda = $ultimaFechaPagada
+            ? $ultimaFechaPagada + 1
+            : DB::table('meses')
+            ->where('fecha_inicio', '<=', $fechaInicioServicio)
+            ->where('fecha_fin', '>=', $fechaInicioServicio)
+            ->value('id');
+
+        if (!$mesInicioDeuda) {
+            return response()->json([]);
+        }
+
+        $mes = DB::table('meses')->find($mesInicioDeuda);
+        $montoProporcional = 0;
+
+        if ($mes && $fechaInicioServicio <= date('Y-m-d', strtotime($mes->fecha_fin . ' -5 days'))) {
+            $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
+            $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
+            $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
+        }
+
+        $mesesPendientes = DB::table('meses')
+            ->where('id', '>=', $mesInicioDeuda)
+            ->whereNotIn('id', function ($query) use ($contratoServicioId) {
+                $query->select('mes_id')
+                    ->from('cobranza_contratoservicio')
+                    ->where('contrato_servicio_id', $contratoServicioId);
+            })
+            ->orderBy('anio')
+            ->orderBy('numero')
+            ->get();
+
+        return response()->json([
+            'meses_pendientes' => $mesesPendientes,
+            'precio_plan' => (float) $precioPlan,
+            'monto_proporcional' => (float) $montoProporcional,
+        ]);
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/contratos/{id}/servicios', function ($id) {
+        return response()->json(
+            ContratoServicio::where('contrato_id', $id)
+                ->with(['servicio', 'plan'])
+                ->get()
+                ->map(function ($contratoServicio) {
+                    $nombreServicio = $contratoServicio->servicio->nombre;
+                    $nombrePlan = $contratoServicio->plan ? $contratoServicio->plan->nombre : 'Sin Plan';
+                    
+                    return [
+                        'contrato_servicio_id' => $contratoServicio->id,
+                        'id' => $contratoServicio->servicio->id,
+                        'nombre' => $nombreServicio,
+                        'plan_nombre' => $nombrePlan,
+                        'fecha_servicio' => $contratoServicio->fecha_servicio,
+                    ];
+                })
+        );
+    })->middleware('check.permissions:manage,all');
+
+    // Rutas de ubicación protegidas
+    Route::get('/provincias/{regionId}', function ($regionId) {
+        return response()->json(Provincia::where('region_id', $regionId)->get());
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/distritos/{provinciaId}', function ($provinciaId) {
+        return response()->json(Distrito::where('provincia_id', $provinciaId)->get());
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/pueblos/{distritoId}', function ($distritoId) {
+        return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/regiones/{regionId}/provincias', function ($regionId) {
+        return response()->json(Provincia::where('region_id', $regionId)->get());
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/provincias/{provinciaId}/distritos', function ($provinciaId) {
+        return response()->json(Distrito::where('provincia_id', $provinciaId)->get());
+    })->middleware('check.permissions:manage,all');
+
+    Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
+        return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
+    })->middleware('check.permissions:manage,all');
 });
 
 // Rutas que devuelven datos

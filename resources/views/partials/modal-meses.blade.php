@@ -38,8 +38,7 @@
                                         </div>
 
                                         <!-- Indicador de estado (activo) -->
-                                        <div
-                                            class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center"
+                                        <div class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center"
                                             data-field="estado-indicator">
                                             <i class="fas fa-check-circle text-white text-xs"></i>
                                         </div>
@@ -81,9 +80,10 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
+                                            <a :href="'tel:' + telefono"
+                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
                                                 data-field="telefono">
-                                                --</p>
+                                                --</a>
                                         </div>
                                     </div>
 
@@ -108,8 +108,15 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Ubicación</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm"
-                                                data-field="gps">--</p>
+                                            <template x-if="gpsCoordinates && gpsCoordinates !== '--'">
+                                                <a :href="getGoogleMapsUrl(gpsCoordinates)" target="_blank"
+                                                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
+                                                    data-field="gps" x-text="gpsCoordinates"></a>
+                                            </template>
+                                            <template x-if="!gpsCoordinates || gpsCoordinates === '--'">
+                                                <span class="text-gray-800 dark:text-white font-medium text-sm"
+                                                    data-field="gps">--</span>
+                                            </template>
                                         </div>
                                     </div>
 
@@ -194,7 +201,8 @@
                                             </div>
                                             <div>
                                                 <div class="flex items-center space-x-1">
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400" data-field="servicio">
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400"
+                                                        data-field="servicio">
                                                         --</p>
                                                 </div>
                                                 <p class="text-lg font-bold text-gray-800 dark:text-white"
@@ -205,7 +213,8 @@
                                         <div class="flex items-center space-x-3">
                                             <div
                                                 class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                                <i class="fas fa-check-circle text-green-500 dark:text-green-300" data-field="estado-icon"></i>
+                                                <i class="fas fa-check-circle text-green-500 dark:text-green-300"
+                                                    data-field="estado-icon"></i>
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-500 dark:text-gray-400">Estado</p>
@@ -365,6 +374,8 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('mesesModal', () => ({
+            telefono: '',
+            gpsCoordinates: '',
             init() {
                 window.addEventListener('open-meses-modal', () => {
                     this.openModal();
@@ -377,6 +388,13 @@
                     backdrop: 'static',
                     keyboard: false
                 });
+                
+                // Actualizamos las coordenadas desde el elemento
+                const gpsElement = modal.querySelector('[data-field="gps"]');
+                if (gpsElement) {
+                    this.gpsCoordinates = gpsElement.textContent || '--';
+                }
+                
                 modalInstance.show();
             },
 
@@ -384,6 +402,35 @@
                 const modal = document.getElementById('meses-modal');
                 const modalInstance = new Modal(modal);
                 modalInstance.hide();
+            },
+
+            getGoogleMapsUrl(coordinates) {
+                if (!coordinates || coordinates === '--') {
+                    return 'javascript:void(0)';
+                }
+
+                // Limpiamos la cadena de coordenadas
+                coordinates = coordinates.trim();
+                
+                // Separamos por '/'
+                const [lat, lng] = coordinates.split('/').map(coord => coord.trim());
+                
+                // Verificamos que tengamos ambas coordenadas
+                if (!lat || !lng) {
+                    return 'javascript:void(0)';
+                }
+
+                // Convertimos a números
+                const latitude = parseFloat(lat);
+                const longitude = parseFloat(lng);
+
+                // Verificamos que sean números válidos
+                if (isNaN(latitude) || isNaN(longitude)) {
+                    return 'javascript:void(0)';
+                }
+
+                // Retornamos la URL de Google Maps
+                return `https://www.google.com/maps?q=${latitude},${longitude}`;
             }
         }));
     });
