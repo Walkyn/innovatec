@@ -5,12 +5,31 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Session;
+use App\Models\HistorySession;
 
 class ProfileController extends Controller
 {
     public function index()
     {
-        return view('profile.index');
+        $user = Auth::user();
+        
+        // Obtener la sesión actual
+        $currentSession = $user->sessions()
+            ->orderBy('last_activity', 'desc')
+            ->first();
+            
+        // Obtener las 3 últimas sesiones del historial
+        $historySessions = $user->historySessions()
+            ->orderBy('login_at', 'desc')
+            ->take(3)
+            ->get();
+
+        return view('profile.index', [
+            'user' => $user,
+            'currentSession' => $currentSession,
+            'historySessions' => $historySessions
+        ]);
     }
 
     public function updateCover(Request $request)

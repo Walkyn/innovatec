@@ -50,6 +50,13 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
+            $table->string('device')->nullable(); // dispositivo
+            $table->string('browser')->nullable(); // navegador
+            $table->string('platform')->nullable(); // sistema operativo
+            $table->string('location')->nullable(); // ubicación aproximada
+            $table->boolean('login_successful')->default(false); // si el login fue exitoso
+            $table->timestamp('login_at')->nullable(); // cuando inició sesión
+            $table->timestamp('logout_at')->nullable(); // cuando cerró sesión
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });

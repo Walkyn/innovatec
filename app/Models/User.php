@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use App\Models\Session;
+use App\Models\HistorySession;
 
 class User extends Authenticatable
 {
@@ -114,5 +116,15 @@ class User extends Authenticatable
         else if ($accion === 'guardar') $acces = !!$usuarioModulo->guardar;
 
         return $acces;
+    }
+    
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
+    }
+
+    public function historySessions()
+    {
+        return $this->hasMany(HistorySession::class);
     }
 }

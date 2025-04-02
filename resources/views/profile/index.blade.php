@@ -109,7 +109,7 @@
                         </div>
                     </div>
 
-                    <div class="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
+                    <div class="px-4 pb-4 text-center">
                         <form id="profilePhotoForm" action="{{ route('profile.update.photo') }}" method="POST"
                             enctype="multipart/form-data">
                             @csrf
@@ -195,88 +195,120 @@
                         </div>
                     </div>
 
-                    <div class="max-w-4xl mx-auto space-y-4">
-
-                        <!-- Card de Bienvenida -->
-                        <div class="bg-white p-4 rounded-2xl shadow-md">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h2 class="text-lg font-semibold text-rose-600">&iexcl;Bienvenido!</h2>
-                                    <p class="text-xl font-bold">B***** C***</p>
-                                    <p class="text-gray-600 flex items-center"><span
-                                            class="material-icons mr-2">email</span>ID de Correo electrónico
-                                        walkyngami****@gmail.com</p>
+                    <div class="max-w-4xl mx-auto space-y-4 p-6">
+                        <!-- Sesión Actual -->
+                        <div class="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-semibold text-black dark:text-white flex items-center">
+                                        <i class="fas fa-user-clock mr-2 text-primary"></i>
+                                        Sesión Actual
+                                    </h3>
                                 </div>
-                                <button class="bg-gray-100 p-2 rounded-full">Cambiar</button>
+                                
+                                @if($currentSession)
+                                <div class="space-y-3">
+                                    <!-- Fecha y hora -->
+                                    <div class="flex items-start">
+                                        <i class="fas fa-calendar-alt mt-1 mr-2 text-gray-400 dark:text-gray-500"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Última actividad</p>
+                                            <p class="text-sm text-black dark:text-white">
+                                                {{ $currentSession->login_at->format('d/m/Y H:i') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Dispositivo y navegador -->
+                                    <div class="flex items-start">
+                                        <i class="fas fa-laptop mt-1 mr-2 text-gray-400 dark:text-gray-500"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Dispositivo</p>
+                                            <p class="text-sm text-black dark:text-white">
+                                                {{ $currentSession->device ?? 'Desconocido' }} | {{ $currentSession->browser ?? 'Navegador no detectado' }}
+                                                <span class="text-xs text-gray-400 ml-2">({{ $currentSession->platform ?? 'Sistema no detectado' }})</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Ubicación -->
+                                    <div class="flex items-start">
+                                        <i class="fas fa-map-marker-alt mt-1 mr-2 text-gray-400 dark:text-gray-500"></i>
+                                        <div>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Ubicación aproximada</p>
+                                            <p class="text-sm text-black dark:text-white">
+                                                {{ $currentSession->location ?? 'Ubicación no disponible' }}
+                                                <span class="text-xs text-gray-400 ml-2">(IP: {{ $currentSession->ip_address ?? 'No registrada' }})</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
+                                    <div class="text-center py-4">
+                                        <p class="text-gray-500 dark:text-gray-400">No hay sesión activa</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
-                        <!-- Grid de Opciones -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                            <!-- Cambiar Contraseña -->
-                            <div class="bg-white p-4 rounded-2xl shadow-md">
-                                <div class="flex justify-between items-center">
-                                    <h3 class="font-semibold flex items-center"><span
-                                            class="material-icons mr-2">lock</span>Cambiar contraseña</h3>
-                                    <span class="material-icons">chevron_right</span>
+                        <!-- Historial de Sesiones -->
+                        <div class="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-semibold text-black dark:text-white flex items-center">
+                                        <i class="fas fa-history mr-2 text-primary"></i>
+                                        Últimas sesiones
+                                    </h3>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">Mostrando las 3 últimas sesiones</span>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-2">&Uacute;ltima modificaci&oacute;n el 25.03.2025</p>
-                                <p class="text-sm text-gray-500">Recomendamos cambiar su contrase&ntilde;a cada tres meses.
-                                </p>
-                            </div>
-
-                            <!-- Historial de Inicio de Sesión -->
-                            <div class="bg-white p-4 rounded-2xl shadow-md">
-                                <div class="flex justify-between items-center">
-                                    <h3 class="font-semibold flex items-center"><span
-                                            class="material-icons mr-2">history</span>Historial de inicio de sesión</h3>
-                                    <span class="material-icons">chevron_right</span>
-                                </div>
-                                <p class="text-sm text-gray-500 mt-2">&Uacute;ltima historia</p>
-                                <p class="text-sm text-gray-500">LGE Members Site | Chrome</p>
-                                <p class="text-sm text-green-500">Inicio de sesi&oacute;n correcto</p>
-                                <p class="text-sm text-gray-500">&iquest;Iniciaste sesi&oacute;n? De lo contrario, cambie
-                                    su contrase&ntilde;a.</p>
-                            </div>
-
-                            <!-- Servicios en uso -->
-                            <div class="bg-white p-4 rounded-2xl shadow-md">
-                                <div class="flex justify-between items-center">
-                                    <h3 class="font-semibold flex items-center"><span
-                                            class="material-icons mr-2">apps</span>Servicios en uso</h3>
-                                    <span class="material-icons">chevron_right</span>
-                                </div>
-                                <div class="flex space-x-4 mt-4">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG.com
-                                    </div>
-                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
-                                    </div>
-                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG Dev
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Servicio Disponible -->
-                            <div class="bg-white p-4 rounded-2xl shadow-md">
-                                <div class="flex justify-between items-center">
-                                    <h3 class="font-semibold flex items-center"><span
-                                            class="material-icons mr-2">add_box</span>Servicio disponible</h3>
-                                    <span class="material-icons">chevron_right</span>
-                                </div>
-                                <div class="flex space-x-4 mt-4">
-                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
-                                        ThinQ</div>
-                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
-                                        Editor</div>
-                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">LG
-                                        Cloud</div>
+                                
+                                <div class="space-y-4">
+                                    @forelse($historySessions as $session)
+                                        <div class="border-b border-stroke dark:border-strokedark pb-4 last:border-b-0">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex items-start">
+                                                    <i class="fas fa-circle mt-1 mr-2 text-{{ $session->login_successful ? 'success' : 'danger' }}"></i>
+                                                    <div>
+                                                        <p class="text-sm text-black dark:text-white">
+                                                            {{ $session->login_at->format('d/m/Y H:i') }}
+                                                        </p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ $session->device ?? 'Desconocido' }} | {{ $session->browser ?? 'Navegador no detectado' }}
+                                                            <span class="text-xs text-gray-400 ml-2">({{ $session->platform ?? 'Sistema no detectado' }})</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs text-{{ $session->login_successful ? 'success' : 'danger' }}">
+                                                    @if($session->login_successful)
+                                                        <i class="fas fa-check-circle mr-1"></i>
+                                                        Correcto
+                                                    @else
+                                                        <i class="fas fa-times-circle mr-1"></i>
+                                                        Fallido
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <div class="mt-2 ml-7">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    IP: {{ $session->ip_address ?? 'No registrada' }}
+                                                    <span class="mx-2">|</span>
+                                                    {{ $session->location ?? 'Ubicación no disponible' }}
+                                                    @if($session->logout_at)
+                                                        <span class="mx-2">|</span>
+                                                        Cierre: {{ $session->logout_at->format('d/m/Y H:i') }}
+                                                    @endif
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4">
+                                            <p class="text-gray-500 dark:text-gray-400">No hay registros de sesiones anteriores</p>
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
-
                         </div>
                     </div>
-
                 </div>
                 <!-- ====== Profile Section End -->
             </div>
