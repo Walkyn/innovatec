@@ -22,9 +22,9 @@
             </div>
             <!-- Modal body -->
             <div id="ver-contrato" class="p-4 md:p-5 space-y-4">
-                <div class="flex flex-wrap -mx-3 mb-6">
+                <div class="flex flex-wrap -mx-3">
                     <!-- Campo de Datos del Cliente -->
-                    <div class="w-full md:w-2/3 px-3 mb-6">
+                    <div class="w-full px-3 mb-6">
                         <label
                             class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
                             Datos del Cliente
@@ -34,23 +34,12 @@
                                 <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
                             </div>
                             <input type="text" id="modal-input-cliente"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                class="bg-gray-50 border border-gray-300 text-gray-400 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-300"
                                 disabled />
                         </div>
                     </div>
 
-                    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                        <label
-                            class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
-                            Servicio
-                        </label>
-                        <div class="relative">
-                            <select id="servicio-seleccionado"
-                                class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                    <div class="w-full px-3">
                         <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
                             Observaciones
                         </label>
@@ -58,8 +47,8 @@
                             <div class="absolute top-2.5 left-2 flex items-start ps-1 pointer-events-none">
                                 <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
                             </div>
-                            <textarea id="input-observaciones" name="input-observaciones" rows="4"
-                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8" disabled></textarea>
+                            <textarea id="input-observaciones" name="input-observaciones" rows="3"
+                                class="block p-2.5 w-full text-sm text-gray-400 bg-gray-50 rounded-lg border focus:ring-blue-500 border-gray-300 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none" disabled></textarea>
                         </div>
                     </div>
                 </div>
@@ -103,14 +92,6 @@
                                                         document.getElementById("modal-input-cliente").value = cliente;
                                                         document.getElementById("input-observaciones").textContent = observaciones;
 
-                                                        const selectServicio = document.getElementById("servicio-seleccionado");
-                                                        selectServicio.innerHTML = "";
-                                                        servicios.forEach(servicio => {
-                                                            let option = document.createElement("option");
-                                                            option.textContent = servicio;
-                                                            selectServicio.appendChild(option);
-                                                        });
-
                                                         const tbody = document.querySelector("#detalle-contrato");
                                                         tbody.innerHTML = "";
                                                         let total = 0;
@@ -128,18 +109,30 @@
                                                                 "text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100";
 
                                                             let row = document.createElement("tr");
+                                                            const ipCell = document.createElement("td");
+                                                            ipCell.className = "px-4 py-3 text-sm";
+                                                            
+                                                            if (detalle.ip_servicio) {
+                                                                const ipLink = document.createElement("a");
+                                                                ipLink.href = `http://${detalle.ip_servicio}`;
+                                                                ipLink.target = "_blank";
+                                                                ipLink.className = "text-blue-500 hover:underline";
+                                                                ipLink.textContent = detalle.ip_servicio;
+                                                                ipLink.onclick = function(e) {
+                                                                    e.preventDefault();
+                                                                    window.open(`http://${detalle.ip_servicio}`, '_blank');
+                                                                    showToast(detalle.ip_servicio);
+                                                                };
+                                                                ipCell.appendChild(ipLink);
+                                                            } else {
+                                                                ipCell.textContent = 'N/A';
+                                                            }
+
                                                             row.innerHTML = `
                                                                 <td class="px-4 py-3">${index + 1}</td>
                                                                 <td class="px-4 py-3">${detalle.nombre}</td>
                                                                 <td class="px-4 py-3 text-sm">${detalle.plan || "N/A"}</td>
-                                                                <td class="px-4 py-3 text-sm">
-                                                                    ${detalle.ip_servicio ? 
-                                                                        `<a href="http://${detalle.ip_servicio}" target="_blank" class="text-blue-500 hover:underline">
-                                                                            ${detalle.ip_servicio}
-                                                                        </a>` : 
-                                                                        'N/A'
-                                                                    }
-                                                                </td>
+                                                                <td class="px-4 py-3 text-sm"></td>
                                                                 <td class="px-4 py-3 text-sm">${detalle.fecha || "N/A"}</td>
                                                                 <td class="px-4 py-3 text-xs">
                                                                     <span class="px-2 py-1 font-semibold leading-tight rounded-full ${estadoClaseAplicada}">
@@ -150,6 +143,10 @@
                                                                     S/ ${precio.toFixed(2)}
                                                                 </td>
                                                             `;
+                                                            
+                                                            // Reemplazar el td vacío con el td que contiene el enlace
+                                                            row.children[3].replaceWith(ipCell);
+                                                            
                                                             tbody.appendChild(row);
                                                         });
 
@@ -183,3 +180,78 @@
         </div>
     </div>
 </div>
+
+<script>
+function showToast(ip) {
+    // Intentar hacer una petición HEAD a la IP
+    fetch(`http://${ip}`, { method: 'HEAD', mode: 'no-cors' })
+        .then(() => {
+            // Si la IP responde, mostrar toast de éxito
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
+            toast.innerHTML = `
+                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                    </svg>
+                    <span class="sr-only">Check icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">Conexión exitosa con ${ip}</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            `;
+            document.body.appendChild(toast);
+            
+            // Animar entrada
+            setTimeout(() => {
+                toast.classList.remove('translate-y-full', 'opacity-0');
+            }, 100);
+            
+            // Animar salida y eliminar
+            setTimeout(() => {
+                toast.classList.add('translate-y-full', 'opacity-0');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 10000);
+        })
+        .catch(() => {
+            // Si la IP no responde, mostrar toast de error
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
+            toast.innerHTML = `
+                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                    </svg>
+                    <span class="sr-only">Error icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">No se pudo establecer conexión con ${ip}</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            `;
+            document.body.appendChild(toast);
+            
+            // Animar entrada
+            setTimeout(() => {
+                toast.classList.remove('translate-y-full', 'opacity-0');
+            }, 100);
+            
+            // Animar salida y eliminar
+            setTimeout(() => {
+                toast.classList.add('translate-y-full', 'opacity-0');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 5000);
+        });
+}
+</script>
