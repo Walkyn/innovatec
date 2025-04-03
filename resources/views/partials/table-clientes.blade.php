@@ -18,19 +18,27 @@
 
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 mb-4">
             <!-- Item Buscador Start -->
-            <form class="w-full md:w-2/3">
-                <label for="default-search" class="sr-only">Search</label>
+            <form action="{{ route('clients.index') }}" method="GET" class="w-full md:w-2/3">
+                <label for="search" class="sr-only">Search</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3">
+                        @if(request('search'))
+                            <a href="{{ route('clients.index') }}" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        @else
+                            <div class="pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
+                            </div>
+                        @endif
                     </div>
-                    <input type="search" id="default-search"
+                    <input type="search" id="search" name="search"
                         class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Buscar Clientes..." required />
+                        placeholder="Buscar por nombre, apellido o identificación..." value="{{ request('search') }}" required />
                     <button type="submit"
                         class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
                 </div>
@@ -40,15 +48,22 @@
             <!-- Campo de Estado Servicio -->
             <div class="w-full md:w-1/3">
                 <div class="relative">
-                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-white dark:bg-form-input">
-                        <select
-                            class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3.5 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                            :class="isOptionSelected && 'text-black dark:text-white'" @change="isOptionSelected = true">
-                            <option value="" class="text-body">Activo</option>
-                            <option value="" class="text-body">Inactivo</option>
-                            <option value="" class="text-body">Suspendido</option>
-                        </select>
-                    </div>
+                    <form action="{{ route('clients.index') }}" method="GET" class="w-full">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-white dark:bg-form-input">
+                            <select name="estado"
+                                class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3.5 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                :class="isOptionSelected && 'text-black dark:text-white'" 
+                                @change="isOptionSelected = true; $el.form.submit()">
+                                <option value="" class="text-body">Todos los estados</option>
+                                <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }} class="text-body">Activo</option>
+                                <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }} class="text-body">Inactivo</option>
+                                <option value="suspendido" {{ request('estado') == 'suspendido' ? 'selected' : '' }} class="text-body">Suspendido</option>
+                            </select>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

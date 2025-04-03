@@ -10,9 +10,24 @@ use App\Models\Pueblo;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clientes = Cliente::withCount('contratos')->paginate(8);
+        $query = Cliente::withCount('contratos');
+
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('nombres', 'like', "%{$searchTerm}%")
+                  ->orWhere('apellidos', 'like', "%{$searchTerm}%")
+                  ->orWhere('identificacion', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado_cliente', $request->estado);
+        }
+
+        $clientes = $query->paginate(8);
         $regiones = Region::with('provincias.distritos.pueblos')->get();
         return view('clients.index', compact('clientes', 'regiones'));
     }
