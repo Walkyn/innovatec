@@ -88,7 +88,9 @@
                                     @if ($ips->isEmpty())
                                         <span class="text-gray-500 dark:text-gray-400">No disponible</span>
                                     @elseif ($ips->count() == 1)
-                                        <a href="http://{{ $ips->first() }}" target="_blank" onclick="event.preventDefault(); window.open('http://{{ $ips->first() }}', '_blank'); showToast('{{ $ips->first() }}');" class="text-blue-500 hover:underline">
+                                        <a href="http://{{ $ips->first() }}" target="_blank"
+                                            onclick="event.preventDefault(); window.open('http://{{ $ips->first() }}', '_blank'); showToast('{{ $ips->first() }}');"
+                                            class="text-blue-500 hover:underline">
                                             {{ $ips->first() }}
                                         </a>
                                     @else
@@ -113,7 +115,9 @@
                                                 <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
                                                     @foreach ($ips as $ip)
                                                         <li>
-                                                            <a href="http://{{ $ip }}" target="_blank" onclick="event.preventDefault(); window.open('http://{{ $ip }}', '_blank'); showToast('{{ $ip }}');" class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                            <a href="http://{{ $ip }}" target="_blank"
+                                                                onclick="event.preventDefault(); window.open('http://{{ $ip }}', '_blank'); showToast('{{ $ip }}');"
+                                                                class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white">
                                                                 {{ $ip }}
                                                             </a>
                                                         </li>
@@ -183,76 +187,103 @@
 </main>
 
 <script>
-function showToast(ip) {
-    // Intentar hacer una petición HEAD a la IP
-    fetch(`http://${ip}`, { method: 'HEAD', mode: 'no-cors' })
-        .then(() => {
-            // Si la IP responde, mostrar toast de éxito
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
-            toast.innerHTML = `
-                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
-                    </svg>
-                    <span class="sr-only">Check icon</span>
-                </div>
-                <div class="ms-3 text-sm font-normal">Conexión exitosa con ${ip}</div>
-                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
-                </button>
-            `;
-            document.body.appendChild(toast);
-            
-            // Animar entrada
-            setTimeout(() => {
-                toast.classList.remove('translate-y-full', 'opacity-0');
-            }, 100);
-            
-            // Animar salida y eliminar
-            setTimeout(() => {
-                toast.classList.add('translate-y-full', 'opacity-0');
+    if (typeof window.pendingToast === 'undefined') {
+        window.pendingToast = null;
+    }
+
+    function showToast(ip) {
+        // Guardar la IP para mostrar el toast cuando regrese
+        window.pendingToast = ip;
+
+        // Abrir la IP en una nueva ventana
+        window.open(`http://${ip}`, '_blank');
+
+        // Agregar evento focus a la ventana
+        window.addEventListener('focus', function showToastOnFocus() {
+            if (window.pendingToast) {
+                const currentIp = window.pendingToast;
+
+                fetch(`http://${currentIp}`, {
+                        method: 'HEAD',
+                        mode: 'no-cors'
+                    })
+                    .then(() => {
+                        // Si la IP responde, mostrar toast de éxito
+                        const toast = document.createElement('div');
+                        toast.className =
+                            'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
+                        toast.innerHTML = `
+                        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                            </svg>
+                            <span class="sr-only">Check icon</span>
+                        </div>
+                        <div class="ms-3 text-sm font-normal">Conexión exitosa con ${currentIp}</div>
+                        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                            <span class="sr-only">Close</span>
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                        </button>
+                    `;
+                        document.body.appendChild(toast);
+
+                        // Animar entrada
+                        setTimeout(() => {
+                            toast.classList.remove('translate-y-full', 'opacity-0');
+                        }, 100);
+
+                        // Animar salida y eliminar
+                        setTimeout(() => {
+                            toast.classList.add('translate-y-full', 'opacity-0');
+                            setTimeout(() => {
+                                document.body.removeChild(toast);
+                            }, 300);
+                        }, 5000);
+                    })
+                    .catch(() => {
+                        // Si la IP no responde, mostrar toast de error
+                        const toast = document.createElement('div');
+                        toast.className =
+                            'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
+                        toast.innerHTML = `
+                        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                            </svg>
+                            <span class="sr-only">Error icon</span>
+                        </div>
+                        <div class="ms-3 text-sm font-normal">No se pudo establecer conexión con ${currentIp}</div>
+                        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                            <span class="sr-only">Close</span>
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                        </button>
+                    `;
+                        document.body.appendChild(toast);
+
+                        // Animar entrada
+                        setTimeout(() => {
+                            toast.classList.remove('translate-y-full', 'opacity-0');
+                        }, 100);
+
+                        // Animar salida y eliminar
+                        setTimeout(() => {
+                            toast.classList.add('translate-y-full', 'opacity-0');
+                            setTimeout(() => {
+                                document.body.removeChild(toast);
+                            }, 300);
+                        }, 5000);
+                    });
+
+                // Limpiar el toast
                 setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 10000);
-        })
-        .catch(() => {
-            // Si la IP no responde, mostrar toast de error
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
-            toast.innerHTML = `
-                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
-                    </svg>
-                    <span class="sr-only">Error icon</span>
-                </div>
-                <div class="ms-3 text-sm font-normal">No se pudo establecer conexión con ${ip}</div>
-                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
-                </button>
-            `;
-            document.body.appendChild(toast);
-            
-            // Animar entrada
-            setTimeout(() => {
-                toast.classList.remove('translate-y-full', 'opacity-0');
-            }, 100);
-            
-            // Animar salida y eliminar
-            setTimeout(() => {
-                toast.classList.add('translate-y-full', 'opacity-0');
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 5000);
+                    window.pendingToast = null;
+                    window.removeEventListener('focus', showToastOnFocus);
+                }, 5000);
+            }
         });
-}
+    }
 </script>

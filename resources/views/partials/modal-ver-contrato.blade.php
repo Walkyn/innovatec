@@ -40,7 +40,8 @@
                     </div>
 
                     <div class="w-full px-3">
-                        <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                        <label
+                            class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
                             Observaciones
                         </label>
                         <div class="relative">
@@ -48,7 +49,8 @@
                                 <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
                             </div>
                             <textarea id="input-observaciones" name="input-observaciones" rows="3"
-                                class="block p-2.5 w-full text-sm text-gray-400 bg-gray-50 rounded-lg border focus:ring-blue-500 border-gray-300 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none" disabled></textarea>
+                                class="block p-2.5 w-full text-sm text-gray-400 bg-gray-50 rounded-lg border focus:ring-blue-500 border-gray-300 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
+                                disabled></textarea>
                         </div>
                     </div>
                 </div>
@@ -111,7 +113,7 @@
                                                             let row = document.createElement("tr");
                                                             const ipCell = document.createElement("td");
                                                             ipCell.className = "px-4 py-3 text-sm";
-                                                            
+
                                                             if (detalle.ip_servicio) {
                                                                 const ipLink = document.createElement("a");
                                                                 ipLink.href = `http://${detalle.ip_servicio}`;
@@ -143,10 +145,10 @@
                                                                     S/ ${precio.toFixed(2)}
                                                                 </td>
                                                             `;
-                                                            
+
                                                             // Reemplazar el td vacío con el td que contiene el enlace
                                                             row.children[3].replaceWith(ipCell);
-                                                            
+
                                                             tbody.appendChild(row);
                                                         });
 
@@ -182,76 +184,103 @@
 </div>
 
 <script>
-function showToast(ip) {
-    // Intentar hacer una petición HEAD a la IP
-    fetch(`http://${ip}`, { method: 'HEAD', mode: 'no-cors' })
-        .then(() => {
-            // Si la IP responde, mostrar toast de éxito
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
-            toast.innerHTML = `
-                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
-                    </svg>
-                    <span class="sr-only">Check icon</span>
-                </div>
-                <div class="ms-3 text-sm font-normal">Conexión exitosa con ${ip}</div>
-                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
-                </button>
-            `;
-            document.body.appendChild(toast);
-            
-            // Animar entrada
-            setTimeout(() => {
-                toast.classList.remove('translate-y-full', 'opacity-0');
-            }, 100);
-            
-            // Animar salida y eliminar
-            setTimeout(() => {
-                toast.classList.add('translate-y-full', 'opacity-0');
+    // Definir la variable global si no existe
+    if (typeof window.pendingToast === 'undefined') {
+        window.pendingToast = null;
+    }
+
+    function showToast(ip) {
+        // Guardar la IP para mostrar el toast cuando regrese
+        window.pendingToast = ip;
+        
+        // Abrir la IP en una nueva ventana
+        window.open(`http://${ip}`, '_blank');
+        
+        // Agregar evento focus a la ventana
+        window.addEventListener('focus', function showToastOnFocus() {
+            if (window.pendingToast) {
+                const currentIp = window.pendingToast; // Guardar la IP actual
+                
+                // Intentar hacer una petición HEAD a la IP
+                fetch(`http://${currentIp}`, {
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                })
+                .then(() => {
+                    // Si la IP responde, mostrar toast de éxito
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
+                    toast.innerHTML = `
+                        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                            </svg>
+                            <span class="sr-only">Check icon</span>
+                        </div>
+                        <div class="ms-3 text-sm font-normal">Conexión exitosa con ${currentIp}</div>
+                        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                            <span class="sr-only">Close</span>
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                        </button>
+                    `;
+                    document.body.appendChild(toast);
+                    
+                    // Animar entrada
+                    setTimeout(() => {
+                        toast.classList.remove('translate-y-full', 'opacity-0');
+                    }, 100);
+                    
+                    // Animar salida y eliminar
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-full', 'opacity-0');
+                        setTimeout(() => {
+                            document.body.removeChild(toast);
+                        }, 300);
+                    }, 5000);
+                })
+                .catch(() => {
+                    // Si la IP no responde, mostrar toast de error
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
+                    toast.innerHTML = `
+                        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                            </svg>
+                            <span class="sr-only">Error icon</span>
+                        </div>
+                        <div class="ms-3 text-sm font-normal">No se pudo establecer conexión con ${currentIp}</div>
+                        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
+                            <span class="sr-only">Close</span>
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                        </button>
+                    `;
+                    document.body.appendChild(toast);
+                    
+                    // Animar entrada
+                    setTimeout(() => {
+                        toast.classList.remove('translate-y-full', 'opacity-0');
+                    }, 100);
+                    
+                    // Animar salida y eliminar
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-full', 'opacity-0');
+                        setTimeout(() => {
+                            document.body.removeChild(toast);
+                        }, 300);
+                    }, 5000);
+                });
+
+                // Limpiar el toast pendiente y remover el evento después de mostrar el mensaje
                 setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 10000);
-        })
-        .catch(() => {
-            // Si la IP no responde, mostrar toast de error
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 transform translate-y-full opacity-0 transition-all duration-300 z-50';
-            toast.innerHTML = `
-                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
-                    </svg>
-                    <span class="sr-only">Error icon</span>
-                </div>
-                <div class="ms-3 text-sm font-normal">No se pudo establecer conexión con ${ip}</div>
-                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.remove()">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                    </svg>
-                </button>
-            `;
-            document.body.appendChild(toast);
-            
-            // Animar entrada
-            setTimeout(() => {
-                toast.classList.remove('translate-y-full', 'opacity-0');
-            }, 100);
-            
-            // Animar salida y eliminar
-            setTimeout(() => {
-                toast.classList.add('translate-y-full', 'opacity-0');
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 5000);
+                    window.pendingToast = null;
+                    window.removeEventListener('focus', showToastOnFocus);
+                }, 5000);
+            }
         });
-}
+    }
 </script>
