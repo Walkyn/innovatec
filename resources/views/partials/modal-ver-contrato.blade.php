@@ -24,7 +24,7 @@
             <div id="ver-contrato" class="p-4 md:p-5 space-y-4">
                 <div class="flex flex-wrap -mx-3 mb-6">
                     <!-- Campo de Datos del Cliente -->
-                    <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                    <div class="w-full md:w-2/3 px-3 mb-6">
                         <label
                             class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
                             Datos del Cliente
@@ -50,6 +50,18 @@
                             </select>
                         </div>
                     </div>
+                    <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                        <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                            Observaciones
+                        </label>
+                        <div class="relative">
+                            <div class="absolute top-2.5 left-2 flex items-start ps-1 pointer-events-none">
+                                <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
+                            </div>
+                            <textarea id="input-observaciones" name="input-observaciones" rows="4"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-600 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8" disabled></textarea>
+                        </div>
+                    </div>
                 </div>
 
                 <main class="h-full overflow-y-auto">
@@ -70,6 +82,7 @@
                                             <th class="px-4 py-3">Item</th>
                                             <th class="px-4 py-3">Servicio</th>
                                             <th class="px-4 py-3">Plan</th>
+                                            <th class="px-4 py-3">IP</th>
                                             <th class="px-4 py-3">Fecha</th>
                                             <th class="px-4 py-3">Estado</th>
                                             <th class="px-4 py-3 text-right">Precio</th>
@@ -85,8 +98,10 @@
                                                         const cliente = this.getAttribute("data-cliente");
                                                         const servicios = this.getAttribute("data-servicios").split(",");
                                                         const detalles = JSON.parse(this.getAttribute("data-detalles"));
+                                                        const observaciones = this.getAttribute("data-observaciones");
 
                                                         document.getElementById("modal-input-cliente").value = cliente;
+                                                        document.getElementById("input-observaciones").textContent = observaciones;
 
                                                         const selectServicio = document.getElementById("servicio-seleccionado");
                                                         selectServicio.innerHTML = "";
@@ -117,6 +132,14 @@
                                                                 <td class="px-4 py-3">${index + 1}</td>
                                                                 <td class="px-4 py-3">${detalle.nombre}</td>
                                                                 <td class="px-4 py-3 text-sm">${detalle.plan || "N/A"}</td>
+                                                                <td class="px-4 py-3 text-sm">
+                                                                    ${detalle.ip_servicio ? 
+                                                                        `<a href="http://${detalle.ip_servicio}" target="_blank" class="text-blue-500 hover:underline">
+                                                                            ${detalle.ip_servicio}
+                                                                        </a>` : 
+                                                                        'N/A'
+                                                                    }
+                                                                </td>
                                                                 <td class="px-4 py-3 text-sm">${detalle.fecha || "N/A"}</td>
                                                                 <td class="px-4 py-3 text-xs">
                                                                     <span class="px-2 py-1 font-semibold leading-tight rounded-full ${estadoClaseAplicada}">

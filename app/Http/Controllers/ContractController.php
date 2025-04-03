@@ -18,11 +18,12 @@ class ContractController extends Controller
     {
         $clientes = Cliente::where('estado_cliente', 'activo')->get();
         $categorias = Categoria::with('servicios.planes')->get();
-        $contratos = Contrato::with(['cliente', 'servicios'])->paginate(7);
+        $contratos = Contrato::with(['cliente', 'servicios', 'contratoServicios'])->paginate(7);
     
         foreach ($contratos as $contrato) {
-            $contrato->detalles_servicios = $contrato->servicios->map(function ($servicio) {
+            $contrato->detalles_servicios = $contrato->servicios->map(function ($servicio) use ($contrato) {
                 $plan = $servicio->planes->where('id', $servicio->pivot->plan_id)->first();
+                $contratoServicio = $contrato->contratoServicios->where('servicio_id', $servicio->id)->first();
 
                 $fechaServicio = $servicio->pivot->fecha_servicio
                     ? \Carbon\Carbon::parse($servicio->pivot->fecha_servicio)->format("d/m/Y")
@@ -40,6 +41,7 @@ class ContractController extends Controller
                     'mes' => $mesServicio,
                     'plan' => optional($plan)->nombre ?? 'N/A',
                     'precio' => optional($plan)->precio ?? 0,
+                    'ip_servicio' => $contratoServicio->ip_servicio ?? null
                 ];
             });
         }
@@ -57,14 +59,12 @@ class ContractController extends Controller
             return response()->json(['error' => 'Contrato no encontrado'], 404);
         }
 
-        // Buscar el servicio en el contrato
         $contratoServicio = $contrato->contratoServicios->where('servicio_id', $servicioId)->first();
 
         if (!$contratoServicio) {
             return response()->json(['error' => 'Servicio no encontrado en el contrato'], 404);
         }
 
-        // Obtener el precio del plan asociado
         $precio = $contratoServicio->plan->precio ?? null;
 
         return response()->json(['precio' => $precio]);
