@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Business Manager - Agregar')
+@section('title', 'Nexus - Modificar cliente')
 
 @section('content')
 

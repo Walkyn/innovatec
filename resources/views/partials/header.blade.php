@@ -306,8 +306,7 @@
 
                     <span class="h-12 w-12 rounded-full overflow-hidden">
                         <img class="h-full w-full object-cover"
-                            src="{{ auth()->user()->profile_photo ? asset('storage/profiles/' . auth()->user()->profile_photo) : './images/user/profile.png' }}"
-                            alt="User" />
+                            src="{{ auth()->user()->profile_photo ? asset('storage/profiles/' . auth()->user()->profile_photo) : asset('images/user/profile.png') }}">
                     </span>
 
                     <svg :class="dropdownOpen && 'rotate-180'" class="hidden fill-current sm:block" width="12"

@@ -23,7 +23,7 @@
 
     <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
         <!-- Sidebar Menu -->
-        <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6" x-data="{ selected: localStorage.getItem('selected') || '', submenuSelected: localStorage.getItem('submenuSelected') || '', subSelected: localStorage.getItem('subSelected') || '' }">
+        <nav class="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
             <!-- Menu Group -->
             <div>
                 <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">Menu</h3>
@@ -36,16 +36,15 @@
                         } else {
                             $modulos = [];
                         }
+                        $currentRoute = request()->route()->getName();
                     @endphp
         
                     <!-- Menú Inicio -->
                     @if ($user && ($user->id_rol === 1 || in_array('home', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ $currentRoute === 'home.index' ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('home.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'home' }"
-                                @click="selected = 'home'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-home"></i>
                                 Inicio
@@ -57,10 +56,8 @@
                     @if ($user && ($user->id_rol === 1 || in_array('clients', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'clients.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('clients.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'clients' }"
-                                @click="selected = 'clients'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-users-cog"></i>
                                 Clientes
@@ -72,47 +69,39 @@
                     @if ($user && ($user->id_rol === 1 || in_array('manage', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'services.') || str_starts_with($currentRoute, 'contracts.') || str_starts_with($currentRoute, 'months.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="#"
-                                :class="{ 'bg-graydark dark:bg-meta-4': submenuSelected === 'manage' }"
-                                @click="submenuSelected = (submenuSelected === 'manage' ? '' : 'manage'); localStorage.setItem('submenuSelected', submenuSelected);"
+                                @click="$refs.manageSubmenu.classList.toggle('hidden')"
                             >
                                 <i class="fas fa-folder"></i>
                                 Administrar
                                 <i
-                                    class="fas fa-chevron-down text-xs absolute right-4 top-1/2 -translate-y-1/2 fill-current"
-                                    :class="{ 'rotate-180': submenuSelected === 'manage' }"
+                                    class="fas fa-chevron-down text-xs absolute right-4 top-1/2 -translate-y-1/2 fill-current {{ str_starts_with($currentRoute, 'services.') || str_starts_with($currentRoute, 'contracts.') || str_starts_with($currentRoute, 'months.') ? 'rotate-180' : '' }}"
                                     aria-hidden="true"
                                 ></i>
                             </a>
-                            <div class="translate transform overflow-hidden" :class="submenuSelected === 'manage' ? 'block' : 'hidden'">
+                            <div class="translate transform overflow-hidden {{ str_starts_with($currentRoute, 'services.') || str_starts_with($currentRoute, 'contracts.') || str_starts_with($currentRoute, 'months.') ? 'block' : 'hidden' }}" x-ref="manageSubmenu">
                                 <ul class="mb-3 mt-4 flex flex-col gap-2 pl-6">
                                     <li>
                                         <a
-                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'services.') ? 'text-white' : '' }}"
                                             href="{{ route('services.index') }}"
-                                            :class="{ 'text-white': subSelected === 'services' }"
-                                            @click="subSelected = 'services'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             <i class="fas fa-tools"></i> Servicios
                                         </a>
                                     </li>
                                     <li>
                                         <a
-                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'contracts.') ? 'text-white' : '' }}"
                                             href="{{ route('contracts.index') }}"
-                                            :class="{ 'text-white': subSelected === 'contracts' }"
-                                            @click="subSelected = 'contracts'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             <i class="fas fa-file-contract"></i> Contratos
                                         </a>
                                     </li>
                                     <li>
                                         <a
-                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'months.') ? 'text-white' : '' }}"
                                             href="{{ route('months.index') }}"
-                                            :class="{ 'text-white': subSelected === 'months' }"
-                                            @click="subSelected = 'months'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             <i class="fas fa-calendar-alt"></i> Meses
                                         </a>
@@ -126,10 +115,8 @@
                     @if ($user && ($user->id_rol === 1 || in_array('payments', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'payments.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('payments.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'payments' }"
-                                @click="selected = 'payments'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-credit-card"></i>
                                 Cobranzas
@@ -141,10 +128,8 @@
                     @if ($user && ($user->id_rol === 1 || in_array('calendar', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'calendar.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('calendar.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'calendar' }"
-                                @click="selected = 'calendar'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-calendar-alt"></i>
                                 Calendario
@@ -156,10 +141,8 @@
                     @if ($user && ($user->id_rol === 1 || in_array('profile', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'profile.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('profile.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'profile' }"
-                                @click="selected = 'profile'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-user"></i>
                                 Perfil
@@ -171,12 +154,10 @@
                     @if ($user && ($user->id_rol === 1 || in_array('settings', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'settings.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('settings.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'settings' }"
-                                @click="selected = 'settings'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
-                                <i :class="selected === 'settings' ? 'fas fa-cogs' : 'fas fa-wrench'"></i>
+                                <i class="fas fa-cogs"></i>
                                 Configuración
                             </a>
                         </li>
@@ -193,10 +174,8 @@
                     @if ($user && ($user->id_rol === 1 || in_array('charts', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'charts.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('charts.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'charts' }"
-                                @click="selected = 'charts'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fas fa-chart-pie"></i>
                                 Gráficos
@@ -208,10 +187,8 @@
                     @if ($user && ($user->id_rol === 1 || in_array('database', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-3.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-3.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'database.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="{{ route('database.index') }}"
-                                :class="{ 'bg-graydark dark:bg-meta-4': selected === 'database' }"
-                                @click="selected = 'database'; submenuSelected = ''; subSelected = ''; localStorage.setItem('selected', selected); localStorage.setItem('submenuSelected', submenuSelected); localStorage.setItem('subSelected', subSelected);"
                             >
                                 <i class="fa fa-database"></i>
                                 Database
@@ -223,48 +200,40 @@
                     @if ($user && ($user->id_rol === 1 || in_array('users', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
+                                class="group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'users.') || str_starts_with($currentRoute, 'password.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
                                 href="#"
-                                :class="{ 'bg-graydark dark:bg-meta-4': submenuSelected === 'users' }"
-                                @click="submenuSelected = (submenuSelected === 'users' ? '' : 'users'); localStorage.setItem('submenuSelected', submenuSelected);"
+                                @click="$refs.usersSubmenu.classList.toggle('hidden')"
                             >
                                 <i class="fa fa-user-shield"></i>
                                 Autenticación
                                 <i
-                                    class="fa fa-chevron-down text-xs absolute right-4 top-1/2 -translate-y-1/2 fill-current"
-                                    :class="{ 'rotate-180': submenuSelected === 'users' }"
+                                    class="fa fa-chevron-down text-xs absolute right-4 top-1/2 -translate-y-1/2 fill-current {{ str_starts_with($currentRoute, 'users.') || str_starts_with($currentRoute, 'password.') ? 'rotate-180' : '' }}"
                                     aria-hidden="true"
                                 ></i>
                             </a>
                             <!-- Dropdown Menu Start -->
-                            <div class="translate transform overflow-hidden" :class="submenuSelected === 'users' ? 'block' : 'hidden'">
+                            <div class="translate transform overflow-hidden {{ str_starts_with($currentRoute, 'users.') || str_starts_with($currentRoute, 'password.') ? 'block' : 'hidden' }}" x-ref="usersSubmenu">
                                 <ul class="mb-3 mt-4 flex flex-col gap-2 pl-8">
                                     <li>
                                         <a
-                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'users.index') ? 'text-white' : '' }}"
                                             href="{{ route('users.index') }}"
-                                            :class="{ 'text-white': subSelected === 'users.index' }"
-                                            @click="subSelected = 'users.index'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             Usuarios
                                         </a>
                                     </li>
                                     <li>
                                         <a
-                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'users.create') ? 'text-white' : '' }}"
                                             href="{{ route('users.create') }}"
-                                            :class="{ 'text-white': subSelected === 'users.create' }"
-                                            @click="subSelected = 'users.create'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             Registrar
                                         </a>
                                     </li>
                                     <li>
                                         <a
-                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'password.reset') ? 'text-white' : '' }}"
                                             href="{{ route('password.reset') }}"
-                                            :class="{ 'text-white': subSelected === 'password.reset' }"
-                                            @click="subSelected = 'password.reset'; selected = ''; localStorage.setItem('subSelected', subSelected); localStorage.setItem('selected', selected);"
                                         >
                                             Restablecer contraseña
                                         </a>

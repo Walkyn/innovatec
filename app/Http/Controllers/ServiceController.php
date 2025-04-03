@@ -10,10 +10,31 @@ use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Servicio::with('categoria');
+
+        // Búsqueda por nombre de servicio, categoría o plan
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('nombre', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('categoria', function($q) use ($searchTerm) {
+                      $q->where('nombre', 'like', "%{$searchTerm}%");
+                  })
+                  ->orWhereHas('planes', function($q) use ($searchTerm) {
+                      $q->where('nombre', 'like', "%{$searchTerm}%");
+                  });
+            });
+        }
+
+        // Filtro por estado
+        if ($request->has('estado') && $request->estado !== null && $request->estado !== '') {
+            $query->where('estado_servicio', $request->estado);
+        }
+
+        $servicios = $query->paginate(7);
         $categorias = Categoria::with('servicios')->get();
-        $servicios = Servicio::with('categoria')->paginate(7);
         $user = Auth::user();
 
         return view('services.index', compact('servicios', 'categorias', 'user'));

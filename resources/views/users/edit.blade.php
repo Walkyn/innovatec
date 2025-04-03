@@ -223,10 +223,11 @@
                                                     <label :for="'checkbox' + module.id"
                                                         class="flex cursor-pointer select-none items-center text-sm font-medium">
                                                         <div class="relative">
+                                                            <input type="hidden" :name="'modules[' + index + '][id]'" :value="module.id" />
                                                             <input type="checkbox" :id="'checkbox' + module.id"
                                                                 class="sr-only" x-model="module.active"
-                                                                :name="'modules[' + index + '][id]'"
-                                                                :value="module.id" />
+                                                                :name="'modules[' + index + '][active]'"
+                                                                :value="module.active" />
                                                             <div :class="module.active &&
                                                                 'border-primary bg-gray dark:bg-transparent'"
                                                                 class="mr-4 flex h-5 w-5 items-center justify-center rounded border">
@@ -295,10 +296,10 @@
             Alpine.data('app', () => ({
                 selectedRole: '{{ $user->id_rol === 1 ? 'admin' : 'empleado' }}',
                 modules: {!! json_encode(
-                    $allModulos->map(function ($modulo) use ($userModulos, $userPermisos) {
+                    $allModulos->map(function ($modulo) use ($userModulos, $userPermisos, $moduloTranslations) {
                         return [
                             'id' => $modulo->id_modulo,
-                            'name' => $modulo->nombre_modulo,
+                            'name' => $moduloTranslations[$modulo->nombre_modulo] ?? $modulo->nombre_modulo,
                             'active' => in_array($modulo->id_modulo, $userModulos),
                             'actions' => $userPermisos[$modulo->id_modulo] ?? [
                                 'eliminar' => false,
@@ -324,6 +325,7 @@
                 toggleModule(module) {
                     module.active = !module.active;
                     if (!module.active) {
+                        // Limpiar todas las acciones cuando se desmarca el módulo
                         module.actions = {
                             'eliminar': false,
                             'actualizar': false,
@@ -343,46 +345,49 @@
         const passwordConfirmation = document.getElementById('password_confirmation');
         const passwordError = document.getElementById('passwordError');
 
-        function validatePasswords() {
-            const passwordValue = password.value;
-            const confirmPasswordValue = passwordConfirmation.value;
+        // Solo ejecutar la validación si los elementos existen
+        if (password && passwordConfirmation && passwordError) {
+            function validatePasswords() {
+                const passwordValue = password.value;
+                const confirmPasswordValue = passwordConfirmation.value;
 
-            if (passwordValue.length < 8) {
-                passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
-                passwordError.classList.remove('hidden');
-                password.classList.add('border-red-500');
-                password.classList.remove('border-green-500');
-                return;
-            }
-
-            if (passwordValue && confirmPasswordValue) {
-                if (passwordValue !== confirmPasswordValue) {
-                    passwordError.textContent = 'Las contraseñas no coinciden';
+                if (passwordValue.length < 8) {
+                    passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
                     passwordError.classList.remove('hidden');
                     password.classList.add('border-red-500');
-                    passwordConfirmation.classList.add('border-red-500');
                     password.classList.remove('border-green-500');
-                    passwordConfirmation.classList.remove('border-green-500');
+                    return;
+                }
+
+                if (passwordValue && confirmPasswordValue) {
+                    if (passwordValue !== confirmPasswordValue) {
+                        passwordError.textContent = 'Las contraseñas no coinciden';
+                        passwordError.classList.remove('hidden');
+                        password.classList.add('border-red-500');
+                        passwordConfirmation.classList.add('border-red-500');
+                        password.classList.remove('border-green-500');
+                        passwordConfirmation.classList.remove('border-green-500');
+                    } else {
+                        passwordError.textContent = '';
+                        passwordError.classList.add('hidden');
+                        password.classList.remove('border-red-500');
+                        passwordConfirmation.classList.remove('border-red-500');
+                        password.classList.add('border-green-500');
+                        passwordConfirmation.classList.add('border-green-500');
+                    }
                 } else {
                     passwordError.textContent = '';
                     passwordError.classList.add('hidden');
                     password.classList.remove('border-red-500');
                     passwordConfirmation.classList.remove('border-red-500');
-                    password.classList.add('border-green-500');
-                    passwordConfirmation.classList.add('border-green-500');
+                    password.classList.remove('border-green-500');
+                    passwordConfirmation.classList.remove('border-green-500');
                 }
-            } else {
-                passwordError.textContent = '';
-                passwordError.classList.add('hidden');
-                password.classList.remove('border-red-500');
-                passwordConfirmation.classList.remove('border-red-500');
-                password.classList.remove('border-green-500');
-                passwordConfirmation.classList.remove('border-green-500');
             }
-        }
 
-        password.addEventListener('input', validatePasswords);
-        passwordConfirmation.addEventListener('input', validatePasswords);
+            password.addEventListener('input', validatePasswords);
+            passwordConfirmation.addEventListener('input', validatePasswords);
+        }
     </script>
 
     <!-- intlTelInput -->

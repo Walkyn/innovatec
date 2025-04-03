@@ -81,17 +81,26 @@
     </div>
 
     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        <form class="w-full md:w-2/3">
+        <form action="{{ route('services.index') }}" method="GET" class="w-full md:w-2/3">
             <label for="default-search" class="sr-only">Search</label>
             <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                    </svg>
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3">
+                    @if(request('search'))
+                        <a href="{{ route('services.index') }}" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    @else
+                        <div class="pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                            </svg>
+                        </div>
+                    @endif
                 </div>
-                <input type="search" id="default-search"
+                <input type="search" id="default-search" name="search"
+                    value="{{ request('search') }}"
                     class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Buscar Servicios, Categorias..." required />
                 <button type="submit"
@@ -103,13 +112,19 @@
 
         <div class="w-full md:w-1/3">
             <div class="relative">
-                <select
-                    class="block appearance-none w-full p-4 pr-8 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    id="servicio">
-                    <option>Activo</option>
-                    <option>Inactivo</option>
-                    <option>Suspendido</option>
-                </select>
+                <form action="{{ route('services.index') }}" method="GET" class="w-full">
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    <select name="estado"
+                        class="block appearance-none w-full p-4 pr-8 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        onchange="this.form.submit()">
+                        <option value="" class="text-gray-600 dark:text-gray-300">Todos los estados</option>
+                        <option value="activo" {{ request('estado') === 'activo' ? 'selected' : '' }} class="text-gray-600 dark:text-gray-300">Activo</option>
+                        <option value="inactivo" {{ request('estado') === 'inactivo' ? 'selected' : '' }} class="text-gray-600 dark:text-gray-300">Inactivo</option>
+                        <option value="suspendido" {{ request('estado') === 'suspendido' ? 'selected' : '' }} class="text-gray-600 dark:text-gray-300">Suspendido</option>
+                    </select>
+                </form>
             </div>
         </div>
     </div>

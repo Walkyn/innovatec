@@ -137,6 +137,20 @@ class UserController extends Controller
 
         $allModulos = Modulo::all();
 
+        // Traducciones de módulos
+        $moduloTranslations = [
+            'home' => 'Inicio',
+            'clients' => 'Clientes',
+            'manage' => 'Administrar',
+            'payments' => 'Cobranzas',
+            'calendar' => 'Calendario',
+            'profile' => 'Perfil',
+            'settings' => 'Configuración',
+            'charts' => 'Gráficos',
+            'database' => 'Base de Datos',
+            'users' => 'Usuarios'
+        ];
+
         // Organizar datos para la vista
         $user = (object) [
             'id' => $userData->first()->user_id,
@@ -160,7 +174,7 @@ class UserController extends Controller
             }
         }
 
-        return view('users.edit', compact('user', 'allModulos', 'userModulos', 'userPermisos'));
+        return view('users.edit', compact('user', 'allModulos', 'userModulos', 'userPermisos', 'moduloTranslations'));
     }
 
     public function update(Request $request, $id)
@@ -231,26 +245,29 @@ class UserController extends Controller
                 $modules = $request->input('modules', []);
 
                 foreach ($modules as $module) {
-                    $modulo = Modulo::find($module['id']);
-                    if ($modulo) {
-                        $actions = $module['actions'] ?? [];
+                    // Solo procesar módulos que estén activos
+                    if (isset($module['active']) && $module['active']) {
+                        $modulo = Modulo::find($module['id']);
+                        if ($modulo) {
+                            $actions = $module['actions'] ?? [];
 
-                        // Guardar en usuario_modulo
-                        DB::table('usuario_modulo')->insert([
-                            'id_usuario' => $user->id,
-                            'id_modulo' => $modulo->id_modulo,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
+                            // Guardar en usuario_modulo
+                            DB::table('usuario_modulo')->insert([
+                                'id_usuario' => $user->id,
+                                'id_modulo' => $modulo->id_modulo,
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
 
-                        // Guardar en permisos
-                        Permiso::create([
-                            'id_usuario' => $user->id,
-                            'id_modulo' => $modulo->id_modulo,
-                            'eliminar' => in_array('eliminar', $actions),
-                            'actualizar' => in_array('actualizar', $actions),
-                            'guardar' => in_array('guardar', $actions),
-                        ]);
+                            // Guardar en permisos
+                            Permiso::create([
+                                'id_usuario' => $user->id,
+                                'id_modulo' => $modulo->id_modulo,
+                                'eliminar' => in_array('eliminar', $actions),
+                                'actualizar' => in_array('actualizar', $actions),
+                                'guardar' => in_array('guardar', $actions),
+                            ]);
+                        }
                     }
                 }
             }
