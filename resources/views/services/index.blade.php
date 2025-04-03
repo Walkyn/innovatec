@@ -1,9 +1,7 @@
 @extends('layouts.app')
-@section('title', 'Business Manager - Servicios')
+@section('title', 'Nexus - Servicios')
 
 @section('content')
-
-    <!-- ===== Main Content Start ===== -->
     <main>
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
             <!-- Breadcrumb Start -->
@@ -21,7 +19,6 @@
                     </ol>
                 </nav>
             </div>
-            <!-- Breadcrumb End -->
 
             <!-- Success/Error message modal Index -->
             <div id="messageModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -99,6 +96,4 @@
             <!-- ====== Table Section End -->
         </div>
     </main>
-    <!-- ===== Main Content End ===== -->
-
 @endsection

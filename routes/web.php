@@ -106,6 +106,7 @@ Route::middleware('auth')->group(function () {
     // Services
     Route::controller(ServiceController::class)->group(function () {
         Route::get('services', 'index')->middleware('check.permissions:manage,all')->name('services.index');
+        Route::get('services/activos', 'getServiciosActivos')->middleware('check.permissions:manage,all');
         Route::post('services', 'store')->middleware('check.permissions:manage,guardar')->name('services.store');
         Route::post('services.store-plan', 'storePlan')->middleware('check.permissions:manage,guardar')->name('services.storePlan');
         Route::delete('services/{servicio}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('services.destroy');

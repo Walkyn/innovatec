@@ -45,16 +45,26 @@
             </div>
             <!-- Modal body -->
             <form action="{{ route('services.storePlan') }}" method="POST" x-data="{
-                categorias: @js($categorias),
+                categorias: [],
                 serviciosDisponibles: [],
                 categoriaId: '',
                 servicioId: '',
                 nombre: '',
                 precio: '',
-                init() {
+                async init() {
                     this.categoriaId = '{{ old('category') }}';
                     this.servicioId = '{{ old('servicio') }}';
-                    this.fetchServicios();
+                    await this.cargarServiciosActivos();
+                },
+                async cargarServiciosActivos() {
+                    try {
+                        const response = await fetch('/services/activos');
+                        if (!response.ok) throw new Error('Error al cargar servicios');
+                        this.categorias = await response.json();
+                        this.fetchServicios();
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
                 },
                 fetchServicios() {
                     this.serviciosDisponibles = this.categorias.find(c => c.id == this.categoriaId)?.servicios || [];

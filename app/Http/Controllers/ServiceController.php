@@ -19,6 +19,14 @@ class ServiceController extends Controller
         return view('services.index', compact('servicios', 'categorias', 'user'));
     }
 
+    public function getServiciosActivos()
+    {
+        $categorias = Categoria::with(['servicios' => function($query) {
+            $query->where('estado_servicio', 'activo');
+        }])->get();
+        return response()->json($categorias);
+    }
+
     // Métodos para Planes
     public function getPlanes(Servicio $servicio)
     {
