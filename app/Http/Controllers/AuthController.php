@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Session;
 use App\Models\HistorySession;
 use hisorange\BrowserDetect\Parser as Browser;
+use WhichBrowser\Parser;
 
 class AuthController extends Controller
 {
@@ -33,6 +34,9 @@ class AuthController extends Controller
             
             // Registrar la sesión exitosa
             $this->registerSuccessfulLogin($request, $user);
+
+            // Establecer la variable de sesión para mostrar el modal de ubicación
+            $request->session()->flash('login_successful', true);
 
             // Verificar si el usuario es administrador o empleado
             if ($user->id_rol === 1) {
@@ -88,6 +92,9 @@ class AuthController extends Controller
         if (!$sessionId) {
             $sessionId = uniqid('sess_', true);
         }
+
+        // Obtener información detallada del dispositivo
+        $deviceInfo = $this->getDeviceDetails($request);
         
         // Registrar en la tabla sessions (sesión actual)
         Session::updateOrCreate(
@@ -97,9 +104,9 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
-                'device' => Browser::deviceType(),
-                'browser' => Browser::browserName(),
-                'platform' => Browser::platformName(),
+                'device' => $deviceInfo['device'],
+                'browser' => $deviceInfo['browser'],
+                'platform' => $deviceInfo['platform'],
                 'location' => $this->getLocation($request->ip()),
                 'login_successful' => true,
                 'login_at' => now(),
@@ -113,9 +120,9 @@ class AuthController extends Controller
             'user_id' => $user->id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->header('User-Agent'),
-            'device' => Browser::deviceType(),
-            'browser' => Browser::browserName(),
-            'platform' => Browser::platformName(),
+            'device' => $deviceInfo['device'],
+            'browser' => $deviceInfo['browser'],
+            'platform' => $deviceInfo['platform'],
             'location' => $this->getLocation($request->ip()),
             'login_successful' => true,
             'login_at' => now()
@@ -135,6 +142,9 @@ class AuthController extends Controller
             if (!$sessionId) {
                 $sessionId = uniqid('sess_', true);
             }
+
+            // Obtener información detallada del dispositivo
+            $deviceInfo = $this->getDeviceDetails($request);
             
             // Registrar en la tabla sessions (sesión actual)
             Session::updateOrCreate(
@@ -144,9 +154,9 @@ class AuthController extends Controller
                     'user_id' => $user->id,
                     'ip_address' => $request->ip(),
                     'user_agent' => $request->header('User-Agent'),
-                    'device' => Browser::deviceType(),
-                    'browser' => Browser::browserName(),
-                    'platform' => Browser::platformName(),
+                    'device' => $deviceInfo['device'],
+                    'browser' => $deviceInfo['browser'],
+                    'platform' => $deviceInfo['platform'],
                     'location' => $this->getLocation($request->ip()),
                     'login_successful' => false,
                     'login_at' => now(),
@@ -160,9 +170,9 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->header('User-Agent'),
-                'device' => Browser::deviceType(),
-                'browser' => Browser::browserName(),
-                'platform' => Browser::platformName(),
+                'device' => $deviceInfo['device'],
+                'browser' => $deviceInfo['browser'],
+                'platform' => $deviceInfo['platform'],
                 'location' => $this->getLocation($request->ip()),
                 'login_successful' => false,
                 'login_at' => now()
@@ -230,5 +240,54 @@ class AuthController extends Controller
         }
         
         return 'Ubicación no disponible';
+    }
+
+    protected function getDeviceDetails(Request $request)
+    {
+        $result = new Parser($request->header('User-Agent'));
+        $deviceInfo = [];
+
+        // Obtener información del dispositivo
+        if ($result->device->type) {
+            $deviceInfo['type'] = ucfirst($result->device->type);
+        }
+        
+        if ($result->device->manufacturer) {
+            $deviceInfo['manufacturer'] = $result->device->manufacturer;
+        }
+        
+        if ($result->device->model) {
+            $deviceInfo['model'] = $result->device->model;
+        }
+
+        // Construir la cadena del dispositivo
+        $device = [];
+        if (!empty($deviceInfo['manufacturer'])) {
+            $device[] = $deviceInfo['manufacturer'];
+        }
+        if (!empty($deviceInfo['model'])) {
+            $device[] = $deviceInfo['model'];
+        }
+        if (!empty($deviceInfo['type']) && empty($device)) {
+            $device[] = $deviceInfo['type'];
+        }
+
+        // Obtener información del navegador
+        $browser = $result->browser->name . ' ' . $result->browser->version->toString();
+
+        // Obtener información detallada del sistema operativo
+        $platform = [];
+        if ($result->os->name) {
+            $platform[] = $result->os->name;
+        }
+        if ($result->os->version) {
+            $platform[] = $result->os->version->toString();
+        }
+
+        return [
+            'device' => !empty($device) ? implode(' ', $device) : 'Dispositivo desconocido',
+            'browser' => $browser ?: 'Navegador desconocido',
+            'platform' => !empty($platform) ? implode(' ', $platform) : 'Sistema operativo desconocido'
+        ];
     }
 }

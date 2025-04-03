@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('browser')->nullable();
             $table->string('platform')->nullable();
             $table->string('location')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->boolean('login_successful')->default(false);
             $table->timestamp('login_at');
             $table->timestamp('logout_at')->nullable();

@@ -21,6 +21,8 @@ class Session extends Model
         'browser',
         'platform',
         'location',
+        'latitude',
+        'longitude',
         'login_successful',
         'login_at',
         'logout_at',

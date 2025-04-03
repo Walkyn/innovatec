@@ -21,6 +21,7 @@ use App\Models\ContratoServicio;
 use App\Http\Controllers\DatabaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Http\Controllers\LocationController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -249,6 +250,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
         return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
     })->middleware('check.permissions:manage,all');
+
+    Route::post('/api/update-location', [LocationController::class, 'updateLocation'])->name('api.update-location');
 });
 
 // Rutas que devuelven datos

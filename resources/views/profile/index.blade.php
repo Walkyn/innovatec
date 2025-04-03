@@ -238,6 +238,9 @@
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Ubicación aproximada</p>
                                             <p class="text-sm text-black dark:text-white">
                                                 {{ $currentSession->location ?? 'Ubicación no disponible' }}
+                                                @if($currentSession->latitude && $currentSession->longitude)
+                                                    <span class="text-xs text-gray-400 ml-2">({{ $currentSession->latitude }}, {{ $currentSession->longitude }})</span>
+                                                @endif
                                                 <span class="text-xs text-gray-400 ml-2">(IP: {{ $currentSession->ip_address ?? 'No registrada' }})</span>
                                             </p>
                                         </div>
@@ -293,6 +296,10 @@
                                                     IP: {{ $session->ip_address ?? 'No registrada' }}
                                                     <span class="mx-2">|</span>
                                                     {{ $session->location ?? 'Ubicación no disponible' }}
+                                                    @if($session->latitude && $session->longitude)
+                                                        <span class="mx-2">|</span>
+                                                        Coordenadas: ({{ $session->latitude }}, {{ $session->longitude }})
+                                                    @endif
                                                     @if($session->logout_at)
                                                         <span class="mx-2">|</span>
                                                         Cierre: {{ $session->logout_at->format('d/m/Y H:i') }}
