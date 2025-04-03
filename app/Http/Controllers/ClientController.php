@@ -270,17 +270,15 @@ class ClientController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
+            return redirect()->route('clients.index')->with([
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Cliente eliminado con éxito'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
+            return redirect()->route('clients.index')->with([
                 'errorDetails' => 'Error: ' . $e->getMessage()
-            ], 500);
+            ]);
         }
     }
 

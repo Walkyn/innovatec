@@ -82,8 +82,8 @@
                                             <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
                                             <a :href="'tel:' + telefono"
                                                 class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm"
-                                                data-field="telefono">
-                                                --</a>
+                                                data-field="telefono" x-text="telefono || '--'">
+                                            </a>
                                         </div>
                                     </div>
 
@@ -393,6 +393,12 @@
                 const gpsElement = modal.querySelector('[data-field="gps"]');
                 if (gpsElement) {
                     this.gpsCoordinates = gpsElement.textContent || '--';
+                }
+                
+                // Actualizamos el teléfono desde el elemento
+                const telefonoElement = modal.querySelector('[data-field="telefono"]');
+                if (telefonoElement) {
+                    this.telefono = telefonoElement.textContent !== '--' ? telefonoElement.textContent : '';
                 }
                 
                 modalInstance.show();

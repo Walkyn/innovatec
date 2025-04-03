@@ -115,7 +115,9 @@
                                     {{ $cliente->created_at->format('d/m/Y') }}
                                 </td>
                                 <td class="px-4 py-3 text-sm">
-                                    {{ $cliente->telefono }}
+                                    <a href="tel:{{ $cliente->telefono }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                        {{ $cliente->telefono }}
+                                    </a>
                                 </td>
                                 <td class="px-4 py-3 text-sm">
                                     {{ $cliente->direccion }}
@@ -155,7 +157,8 @@
                                         </a>
 
                                         <!-- Botón Eliminar -->
-                                        <button onclick="eliminarCliente({{ $cliente->id }})"
+                                        <button data-modal-target="popup-modal" data-modal-toggle="popup-modal"
+                                            onclick="setClienteId({{ $cliente->id }})"
                                             class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
                                             aria-label="Delete">
                                             <i class="fas fa-trash-alt w-5 h-5"></i>
@@ -177,77 +180,98 @@
     </div>
 </main>
 
+<!-- Modal de Confirmación -->
+<div id="popup-modal" tabindex="-1" data-modal-target="popup-modal"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+            <button type="button"
+                class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                data-modal-hide="popup-modal">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+                <span class="sr-only">Cerrar modal</span>
+            </button>
+            <div class="p-4 md:p-5 text-center">
+                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">¿Está seguro de eliminar este cliente?
+                    <p class="text-base text-gray-500 dark:text-gray-400">
+                        Se perderá toda su información.
+                    </p>
+                </h3>
+                <button data-modal-hide="popup-modal" type="button" onclick="confirmarEliminacionCliente()"
+                    class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                    Sí, eliminar
+                </button>
+                <button data-modal-hide="popup-modal" type="button"
+                    class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">No,
+                    cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    function eliminarCliente(clienteId) {
-        Swal.fire({
-            title: "¿Estás seguro?",
-            text: "Esta acción eliminará el cliente y todos sus registros permanentemente",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "No, cancelar",
-            reverseButtons: true,
-            customClass: {
-                confirmButton: "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400",
-                cancelButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400",
-                actions: "flex justify-center gap-4"
-            },
-            buttonsStyling: false
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/clients/${clienteId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: data.successMessage,
-                                text: data.successDetails,
-                                icon: "success",
-                                customClass: {
-                                    confirmButton: "bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-green-400"
-                                },
-                                buttonsStyling: false
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.reload();
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                title: "Error",
-                                text: data.errorDetails,
-                                icon: "error",
-                                customClass: {
-                                    confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
-                                },
-                                buttonsStyling: false
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
+    let clienteIdAEliminar = null;
+
+    function setClienteId(id) {
+        clienteIdAEliminar = id;
+    }
+
+    function confirmarEliminacionCliente() {
+        if (clienteIdAEliminar === null) return;
+        
+        fetch(`/clients/${clienteIdAEliminar}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.json().then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
                         Swal.fire({
                             title: "Error",
-                            text: "Hubo un problema al eliminar el cliente.",
+                            text: data.errorDetails,
                             icon: "error",
                             customClass: {
                                 confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
                             },
                             buttonsStyling: false
                         });
-                    });
+                    }
+                });
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: "Error",
+                text: "Hubo un problema al eliminar el cliente.",
+                icon: "error",
+                customClass: {
+                    confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                },
+                buttonsStyling: false
+            });
         });
     }
 
     function verDetallesCliente(clienteId) {
-        // Realizar la petición AJAX para obtener los detalles del cliente
+        // Realizar la petición
         fetch(`/clients/${clienteId}/details`)
             .then(response => response.json())
             .then(data => {
@@ -304,7 +328,6 @@
                         'text-red-600 dark:text-red-400'
                     }`;
 
-                    // Función para obtener las clases según el estado
                     const getEstadoClasses = (estado) => {
                         const classes = {
                             activo: {
@@ -354,9 +377,21 @@
                     const fechaInstalacionElement = document.querySelector('#meses-modal [data-field="fecha-instalacion"]');
 
                     if (fechaInicioElement) {
+                        // Formatear la fecha para que sea más legible
+                        let fechaFormateada = 'No especificada';
+                        if (cliente.created_at) {
+                            const fecha = new Date(cliente.created_at);
+                            if (!isNaN(fecha.getTime())) {
+                                const dia = fecha.getDate();
+                                const mes = fecha.toLocaleString('es-ES', { month: 'long' });
+                                const anio = fecha.getFullYear();
+                                fechaFormateada = `el ${dia} de ${mes} de ${anio}`;
+                            }
+                        }
+                        
                         fechaInicioElement.innerHTML = `
                             <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                            Cliente activo desde ${cliente.created_at || 'No especificada'}
+                            Cliente activo desde ${fechaFormateada}
                         `;
                     }
 
