@@ -68,6 +68,20 @@ class ServiceController extends Controller
         ]);
 
         $plan = Plan::findOrFail($id);
+        
+        // Verificar si ya existe un plan con el mismo nombre en el mismo servicio
+        $existePlan = Plan::where('nombre', $request->nombre)
+            ->where('servicio_id', $plan->servicio_id)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($existePlan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya existe un plan con este nombre en el mismo servicio.',
+            ], 422);
+        }
+
         $plan->update([
             'nombre' => $request->nombre,
             'precio' => $request->precio,
@@ -111,19 +125,38 @@ class ServiceController extends Controller
 
     public function updateServicio(Request $request, $id)
     {
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-        ]);
-
-        $servicio = Servicio::findOrFail($id);
-        $servicio->update([
-            'nombre' => $request->nombre,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Servicio actualizado correctamente.',
-        ]);
+        try {
+            $servicio = Servicio::findOrFail($id);
+            
+            $servicioExistente = Servicio::where('nombre', $request->nombre)
+                ->where('categoria_id', $request->categoria_id)
+                ->where('id', '!=', $id)
+                ->first();
+                
+            if ($servicioExistente) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ya existe un servicio con ese nombre en la categoría seleccionada.'
+                ], 422);
+            }
+            
+            $servicio->update([
+                'nombre' => $request->nombre,
+                'descripcion' => $request->descripcion,
+                'estado_servicio' => $request->estado_servicio,
+                'categoria_id' => $request->categoria_id
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Servicio actualizado correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el servicio: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroyServices($id)
@@ -298,5 +331,62 @@ class ServiceController extends Controller
             'successMessage' => 'Éxito',
             'successDetails' => 'El servicio ha sido dado de baja exitosamente.',
         ]);
+    }
+
+    public function edit($id)
+    {
+        try {
+            $servicio = Servicio::findOrFail($id);
+            return response()->json($servicio);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los datos del servicio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateAllServicio(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'nombre' => 'required|string|max:255',
+                'descripcion' => 'nullable|string',
+                'estado_servicio' => 'required|in:activo,inactivo,suspendido',
+                'categoria_id' => 'required|exists:categorias,id'
+            ]);
+
+            $servicio = Servicio::findOrFail($id);
+            
+            // Verificar si ya existe un servicio con el mismo nombre en la misma categoría
+            $servicioExistente = Servicio::where('nombre', $request->nombre)
+                ->where('categoria_id', $request->categoria_id)
+                ->where('id', '!=', $id)
+                ->first();
+                
+            if ($servicioExistente) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ya existe un servicio con ese nombre en la categoría seleccionada.'
+                ], 422);
+            }
+            
+            $servicio->update([
+                'nombre' => $request->nombre,
+                'descripcion' => $request->descripcion ?? '',
+                'estado_servicio' => $request->estado_servicio,
+                'categoria_id' => $request->categoria_id
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Servicio actualizado correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el servicio: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

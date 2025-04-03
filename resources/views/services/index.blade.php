@@ -80,6 +80,10 @@
                 @include('partials.modal-plans-edit')
                 <!-- ====== Modal Plans Edit End -->
 
+                <!-- ====== Modal Edit All Service Start -->
+                @include('partials.modal-edit-all-service')
+                <!-- ====== Modal Edit All Service End -->
+
                 <!-- ====== Table Services Start -->
                 @include('partials.table-services')
                 <!-- ====== Table Services End -->

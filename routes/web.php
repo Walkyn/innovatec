@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/categorias/{id}/servicios', 'getServiciosByCategoria')->middleware('check.permissions:manage,all');
         Route::get('/servicios/{id}/edit', 'editServicio')->middleware('check.permissions:manage,actualizar');
         Route::put('/servicios/{id}/update', 'updateServicio')->middleware('check.permissions:manage,actualizar');
+        Route::put('/servicios/{id}/update-all', 'updateAllServicio')->middleware('check.permissions:manage,actualizar');
         Route::delete('/servicios/{servicio}', 'destroyServices')->middleware('check.permissions:manage,eliminar')->name('servicios.destroy');
         Route::get('/categorias/{categoria}/servicios', 'getServicios')->middleware('check.permissions:manage,all');
         // Rutas para Planes
@@ -124,6 +125,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/planes/{id}/edit', 'editPlan')->middleware('check.permissions:manage,actualizar');
         Route::put('/planes/{id}/update', 'updatePlan')->middleware('check.permissions:manage,actualizar');
         Route::delete('/planes/{plan}', 'destroyPlan')->middleware('check.permissions:manage,eliminar')->name('planes.destroy');
+        Route::get('/servicios/{id}/edit', [ServiceController::class, 'edit'])->name('servicios.edit');
+        Route::post('/servicios/{id}/update', [ServiceController::class, 'updateServicio'])->name('servicios.update');
     });
 
     // Contracts

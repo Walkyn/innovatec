@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('servicios', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->text('descripcion');
-            $table->enum('estado_servicio', ['activo', 'inactivo', 'eliminado'])->default('activo');
+            $table->text('descripcion')->nullable();
+            $table->enum('estado_servicio', ['activo', 'inactivo', 'suspendido', 'eliminado'])->default('activo');
             $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->timestamps();
         });
