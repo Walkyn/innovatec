@@ -49,6 +49,97 @@ class ContractController extends Controller
         return view('contracts.index', compact('clientes', 'categorias', 'contratos'));
     }
 
+    public function edit($id)
+    {
+        $contrato = Contrato::with(['cliente', 'contratoServicios.servicio', 'contratoServicios.plan', 'contratoServicios.categoria'])->findOrFail($id);
+        
+        $detalles = $contrato->contratoServicios->map(function ($servicio) {
+            return [
+                'id' => $servicio->id,
+                'categoria_id' => $servicio->categoria_id,
+                'servicio_id' => $servicio->servicio_id,
+                'plan_id' => $servicio->plan_id,
+                'ip_servicio' => $servicio->ip_servicio,
+                'precio' => $servicio->plan->precio,
+                'categoria_nombre' => $servicio->categoria->nombre,
+                'servicio_nombre' => $servicio->servicio->nombre,
+                'plan_nombre' => $servicio->plan->nombre
+            ];
+        });
+
+        return response()->json([
+            'contrato' => $contrato,
+            'detalles' => $detalles,
+            'categorias' => Categoria::with('servicios.planes')->get()
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        DB::beginTransaction();
+    
+        try {
+            // Validación de los datos
+            $validatedData = $request->validate([
+                'cliente_id' => 'required|exists:clientes,id',
+                'fecha' => 'required|date',
+                'servicio_id' => 'required|array',
+                'servicio_id.*' => 'exists:servicios,id',
+                'plan_id' => 'required|array',
+                'plan_id.*' => 'exists:planes,id',
+                'categoria_id' => 'required|array',
+                'categoria_id.*' => 'exists:categorias,id',
+                'estado' => 'required|string',
+                'observaciones' => 'nullable|string|max:500',
+                'ip_servicio' => 'nullable|array',
+                'ip_servicio.*' => 'nullable|string|max:20',
+            ]);
+    
+            // Actualización del contrato
+            $contrato = Contrato::findOrFail($id);
+            $contrato->update([
+                'cliente_id' => $request->cliente_id,
+                'fecha_contrato' => $request->fecha,
+                'estado_contrato' => $request->estado,
+                'observaciones' => $request->observaciones,
+            ]);
+    
+            // Eliminar servicios antiguos
+            $contrato->contratoServicios()->delete();
+    
+            // Asignación de nuevos servicios, planes, categorías y IP
+            foreach ($request->servicio_id as $index => $servicio_id) {
+                ContratoServicio::create([
+                    'contrato_id' => $contrato->id,
+                    'servicio_id' => $servicio_id,
+                    'plan_id' => $request->plan_id[$index],
+                    'categoria_id' => $request->categoria_id[$index],
+                    'ip_servicio' => $request->ip_servicio[$index],
+                    'fecha_servicio' => now(),
+                    'estado_servicio_cliente' => $request->estado,
+                ]);
+            }
+    
+            DB::commit();
+    
+            return redirect()->route('contracts.index')->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Contrato actualizado con éxito'
+            ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            return redirect()->route('contracts.index')
+                ->withErrors($e->errors())
+                ->withInput()
+                ->with('errorDetails', 'Error en la validación. Por favor, complete todos los campos.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('contracts.index')
+                ->withInput()
+                ->with('errorDetails', 'Error inesperado: ' . $e->getMessage());
+        }
+    }
+    
     public function obtenerPrecioPlan($contratoId, $servicioId)
     {
         $contrato = Contrato::with(['contratoServicios.plan'])

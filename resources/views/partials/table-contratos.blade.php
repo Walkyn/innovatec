@@ -147,7 +147,27 @@
                                 <td class="px-4 py-3">
                                     <div class="flex items-center text-sm">
                                         <button data-modal-target="modificar-modal" data-modal-toggle="modificar-modal"
-                                            class="px-2 py-2 text-yellow-600">
+                                            data-id="{{ $contrato->id }}"
+                                            data-cliente="{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}"
+                                            data-identificacion="{{ $contrato->cliente->identificacion }}"
+                                            data-observaciones="{{ $contrato->observaciones }}"
+                                            data-estado="{{ $contrato->estado_contrato }}"
+                                            data-fecha="{{ $contrato->fecha_contrato->format('Y-m-d') }}"
+                                            data-servicios="{{ implode(',', $contrato->servicios->pluck('nombre')->toArray()) }}"
+                                            data-detalles='<?php echo json_encode($contrato->contratoServicios->map(function($cs) {
+                                                $fecha = $cs->fecha_servicio;
+                                                $fechaObj = $fecha ? \Carbon\Carbon::parse($fecha) : null;
+                                                return [
+                                                    'nombre' => $cs->servicio->nombre,
+                                                    'plan' => $cs->plan ? $cs->plan->nombre : 'N/A',
+                                                    'ip_servicio' => $cs->ip_servicio,
+                                                    'fecha' => $fechaObj ? $fechaObj->format('d-m-Y') : null,
+                                                    'mes' => $fechaObj ? $fechaObj->format('F') : null,
+                                                    'estado' => $cs->estado_servicio_cliente,
+                                                    'precio' => $cs->plan ? $cs->plan->precio : 0
+                                                ];
+                                            })); ?>'
+                                            class="px-2 py-2 text-yellow-600 open-modal-edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button data-modal-target="ver-contrato" data-modal-toggle="ver-contrato"
