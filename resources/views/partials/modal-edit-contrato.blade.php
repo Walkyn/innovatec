@@ -2,7 +2,17 @@
 <div id="modificar-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 py-20 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-2xl max-h-full">
-        <form>
+        <form id="editContractForm" action="" method="POST">
+            @csrf
+            @method('PUT')
+            <!-- Campos ocultos para datos principales del contrato -->
+            <input type="hidden" name="contrato_id" id="contrato-id">
+            <input type="hidden" name="cliente_id" id="cliente-id">
+            <input type="hidden" name="fecha" id="fecha-input">
+            <input type="hidden" name="estado" id="estado-input">
+            <input type="hidden" name="observaciones" id="observaciones-input">
+            <input type="hidden" name="form_url" id="form-url">
+
             <!-- Modal content -->
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
                 <!-- Modal header -->
@@ -39,7 +49,6 @@
                                 <input type="text" id="modal-input-cliente" value=""
                                     class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                     readonly disabled />
-                                <input type="hidden" id="contrato-id" name="contrato_id">
                             </div>
                         </div>
 
@@ -53,7 +62,7 @@
                             <div class="relative">
                                 <input type="text" id="client-identification" value=""
                                     class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                    readonly />
+                                    readonly disabled />
                             </div>
                         </div>
                     </div>
@@ -68,7 +77,8 @@
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Categoría</label>
                                 <div class="relative">
                                     <select x-model="categoriaId" @change="fetchServicios()"
-                                        class="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-900 dark:text-gray-300 text-sm py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                        class="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-900 dark:text-gray-300 text-sm py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        >
                                         <option value="">Seleccionar</option>
                                         <template x-for="categoria in categorias" :key="categoria.id">
                                             <option :value="categoria.id" x-text="categoria.nombre"></option>
@@ -83,7 +93,8 @@
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Servicio</label>
                                 <div class="relative">
                                     <select x-model="servicioId" @change="fetchPlanes(); verificarServicio()"
-                                        class="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-900 dark:text-gray-300 text-sm py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                        class="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-900 dark:text-gray-300 text-sm py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        >
                                         <option value="">Seleccionar</option>
                                         <template x-for="servicio in serviciosDisponibles" :key="servicio.id">
                                             <option :value="servicio.id" x-text="servicio.nombre"></option>
@@ -137,7 +148,8 @@
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Plan</label>
                                 <div class="relative">
                                     <select x-model="planId" @change="actualizarPrecio()"
-                                        class="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-900 dark:text-gray-300 text-sm py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                        class="block appearance-none w-full bg-gray-100 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-900 dark:text-gray-300 text-sm py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        >
                                         <option value="">Seleccionar</option>
                                         <template x-for="plan in planesDisponibles" :key="plan.id">
                                             <option :value="plan.id" x-text="plan.nombre"></option>
@@ -155,7 +167,7 @@
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Precio</label>
                                 <div class="relative">
                                     <input x-model="precioPlan"
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-2 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 px-4 pr-2 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
                                         placeholder="0.00" disabled>
                                 </div>
                             </div>
@@ -164,10 +176,8 @@
                             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0" x-init="init()">
                                 <label
                                     class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Fecha</label>
-                                <input type="date" name="fecha" id="fecha-contrato" x-model="fecha"
-                                    class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
-                                    border border-gray-200 dark:border-gray-600 rounded py-3 px-4 leading-tight 
-                                    focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                <input type="date" id="fecha-contrato" x-model="fecha"
+                                    class="appearance-none block w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
                                     required>
                             </div>
 
@@ -178,8 +188,9 @@
                                     Estado
                                 </label>
                                 <div class="relative">
-                                    <select name="estado" id="estado-contrato"
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                    <select id="estado-contrato" x-model="estadoContrato"
+                                        class="block appearance-none w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
+                                        required>
                                         <option value="activo">Activo</option>
                                         <option value="suspendido">Suspendido</option>
                                     </select>
@@ -199,9 +210,9 @@
                                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                         <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
                                     </div>
-                                    <input type="text" id="observaciones" name="observaciones"
+                                    <input type="text" id="observaciones" x-model="observaciones"
                                         class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Ingrese observaciones">
+                                        placeholder="Ingrese observaciones" required>
                                 </div>
                             </div>
 
@@ -214,6 +225,30 @@
                             </div>
                         </div>
 
+                        <!-- Alerta Datos-->
+                        <div id="modal-edit-alert" x-data="{ showAlert: false }">
+                            <!-- Contenido del modal -->
+                            <div x-show="showAlert" x-transition:enter="transition transform ease-out duration-500"
+                                x-transition:enter-start="translate-x-full opacity-0"
+                                x-transition:enter-end="translate-x-0 opacity-100"
+                                x-transition:leave="transition transform ease-in duration-500"
+                                x-transition:leave-start="opacity-100 translate-x-0"
+                                x-transition:leave-end="translate-x-full opacity-0"
+                                class="flex w-full border-l-6 border-[#D0915C] bg-[#D0915C] bg-opacity-[15%] px-7 py-4 shadow-md dark:bg-[#051224] dark:bg-opacity-30 md:p-4">
+                                <div
+                                    class="mr-5 flex h-9 w-9 items-center justify-center rounded-lg bg-[#D0915C] bg-opacity-30">
+                                    <i class="fas fa-exclamation-triangle text-[#D0915C]"></i>
+                                </div>
+                                <div class="w-full">
+                                    <p class="text-base dark:text-[#D0915C] pt-1 leading-relaxed text-body">
+                                        <span id="alert-edit-message">Por favor, complete todos los campos
+                                            requeridos.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ====== Tabla de Detalles Section Start -->
                         <main class="h-full overflow-y-auto">
                             <div>
                                 <div class="flex justify-start items-center mb-4">
@@ -240,15 +275,64 @@
                                             </thead>
                                             <tbody id="detalle-contrato-edit"
                                                 class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                                <template x-for="detalle in detalles" :key="detalle.id">
+                                                    <tr class="text-gray-700 dark:text-gray-400">
+                                                        <td class="px-4 py-3">
+                                                            <div class="flex items-center space-x-4 text-sm">
+                                                                <button @click="eliminarDetalle(detalle.id)" class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-red-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray" aria-label="Eliminar">
+                                                                    <i class="fas fa-trash-alt w-5 h-5"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                        <!-- Campos ocultos para enviar los datos al controlador -->
+                                                        <input type="hidden" name="detalles[]" :value="JSON.stringify({
+                                                            categoria_id: detalle.categoriaId,
+                                                            servicio_id: detalle.servicioId,
+                                                            plan_id: detalle.planId,
+                                                            ip_servicio: detalle.ip,
+                                                            precio: detalle.precio,
+                                                            estado: detalle.estado
+                                                        })">
+                                                        <!-- Campos visibles -->
+                                                        <td class="px-4 py-3 text-sm" x-text="detalle.servicio"></td>
+                                                        <td class="px-4 py-3 text-sm" x-text="detalle.plan"></td>
+                                                        <td class="px-4 py-3">
+                                                            <div class="relative inline-block text-left w-full">
+                                                                <input type="text" 
+                                                                    x-model="detalle.ip" 
+                                                                    placeholder="Ingrese IP"
+                                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                                    style="min-width: 80px; width: auto;">
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-sm" style="white-space: nowrap;" x-text="fecha"></td>
+                                                        <td class="px-4 py-3 text-sm">
+                                                            <div class="relative inline-block text-left w-full">
+                                                                <div>
+                                                                    <button type="button" 
+                                                                        @click="detalle.estado = detalle.estado === 'activo' ? 'suspendido' : 'activo'"
+                                                                        class="px-2 py-1 font-semibold leading-tight rounded-full"
+                                                                        :class="detalle.estado === 'activo' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100'"
+                                                                        style="min-width: 80px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: space-between;">
+                                                                        <span x-text="detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1)"></span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-sm text-right" style="white-space: nowrap;">
+                                                            S/ <span x-text="parseFloat(detalle.precio).toFixed(2)"></span>
+                                                        </td>
+                                                    </tr>
+                                                </template>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <!-- Total alineado a la derecha fuera de la tabla -->
+
                                     <div
                                         class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                                         <span
                                             class="col-span-5 sm:col-span-4 sm:col-start-6 flex justify-end text-right text-sm font-semibold text-gray-600 dark:text-gray-400">
-                                            Total: S/ <span id="total-contrato-edit">0.00</span>
+                                            Total: S/ <span x-text="total.toFixed(2)">0.00</span>
                                         </span>
                                     </div>
                                 </div>
@@ -258,12 +342,13 @@
                 </div>
                 <!-- Modal footer -->
                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <button data-modal-hide="modificar-modal" type="button"
+                    <button type="submit"
                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         Modificar Contrato</button>
                     <button data-modal-hide="modificar-modal" type="button"
                         class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Cancelar</button>
                 </div>
+            </div>
         </form>
     </div>
 </div>
@@ -305,128 +390,96 @@
             });
         });
 
-        // Objeto para mapear estados a clases
-        const estadoClase = {
-            'activo': 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100',
-            'suspendido': 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100'
-        };
-
         document.querySelectorAll('.open-modal-edit').forEach(button => {
             button.addEventListener('click', function() {
                 try {
+                    // Obtener el ID del contrato del botón
+                    const contratoId = this.getAttribute('data-id');
+                    console.log("ID del contrato (raw):", contratoId);
+                    console.log("Tipo de ID del contrato:", typeof contratoId);
+                    
+                    // Verificar todos los atributos del botón
+                    console.log("Todos los atributos del botón:", {
+                        'data-id': this.getAttribute('data-id'),
+                        'data-cliente': this.getAttribute('data-cliente'),
+                        'data-cliente-id': this.getAttribute('data-cliente-id'),
+                        'data-observaciones': this.getAttribute('data-observaciones'),
+                        'data-estado': this.getAttribute('data-estado'),
+                        'data-fecha': this.getAttribute('data-fecha')
+                    });
+                    
+                    if (!contratoId) {
+                        console.error("No se encontró el ID del contrato");
+                        return;
+                    }
+                    
+                    // Establecer el ID del contrato en el campo oculto
+                    document.getElementById('contrato-id').value = contratoId;
+                    console.log("Valor establecido en campo oculto:", document.getElementById('contrato-id').value);
+                    
+                    // Establecer la URL del formulario con el ID del contrato
+                    const form = document.getElementById('editContractForm');
+                    const formUrl = `/contracts/${contratoId}/update`;
+                    form.action = formUrl;
+                    console.log("URL del formulario (actual):", form.action);
+                    console.log("URL relativa esperada:", formUrl);
+                    
+                    // Verificar que la URL del formulario termine con la ruta esperada
+                    if (!form.action.endsWith(formUrl)) {
+                        console.log("Corrigiendo URL del formulario");
+                        form.action = formUrl;
+                        console.log("URL del formulario corregida:", form.action);
+                    }
+                    
                     const detalles = JSON.parse(this.getAttribute('data-detalles'));
                     console.log("Detalles completos:", detalles);
 
-                    // Limpiar la tabla antes de agregar nuevos datos
-                    const tbody = document.getElementById('detalle-contrato-edit');
-                    tbody.innerHTML = '';
-
-                    let total = 0;
-
-                    detalles.forEach((detalle, index) => {
-                        const precio = parseFloat(detalle.precio) || 0;
-                        total += precio;
-
-                        console.log("IP del servicio:", detalle.ip_servicio);
-
-                        let estadoClaseAplicada = estadoClase[detalle.estado] ||
-                            "text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100";
-
-                        let row = document.createElement("tr");
-                        row.className = "text-gray-700 dark:text-gray-400";
-                        row.innerHTML = `
-                            <td class="px-4 py-3">
-                                <div class="flex items-center space-x-4 text-sm">
-                                    <button class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-red-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray" aria-label="Eliminar">
-                                        <i class="fas fa-trash-alt w-5 h-5"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-sm">${detalle.nombre}</td>
-                            <td class="px-4 py-3 text-sm">${detalle.plan || "N/A"}</td>
-                            <td class="px-4 py-3">
-                                <div class="relative inline-block text-left w-full">
-                                    <input type="text" 
-                                        value="${detalle.ip_servicio || ''}" 
-                                        placeholder="Ingrese IP"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        style="min-width: 80px; width: auto;">
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-sm" style="white-space: nowrap;">${detalle.fecha || "N/A"}</td>
-                            <td class="px-4 py-3 text-sm" x-data="{ open: false, estado: '${detalle.estado}' }">
-                                <div class="relative inline-block text-left w-full">
-                                    <div>
-                                        <button type="button" 
-                                            @click="open = !open"
-                                            class="px-2 py-1 font-semibold leading-tight rounded-full ${detalle.estado === 'activo' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100'}"
-                                            style="min-width: 80px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: space-between;">
-                                            <span x-text="estado.charAt(0).toUpperCase() + estado.slice(1)"></span>
-                                            <svg class="w-4 h-4 ml-1" :class="open ? 'rotate-180 transform' : ''" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                        @click.away="open = false"
-                                        class="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700"
-                                        role="menu" 
-                                        aria-orientation="vertical" 
-                                        aria-labelledby="menu-button" 
-                                        tabindex="-1">
-                                        <div class="py-1" role="none">
-                                            <button @click="estado = 'activo'; open = false" 
-                                                class="text-gray-700 dark:text-gray-300 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600" 
-                                                role="menuitem" 
-                                                tabindex="-1">
-                                                Activo
-                                            </button>
-                                            <button @click="estado = 'suspendido'; open = false"
-                                                class="text-gray-700 dark:text-gray-300 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600" 
-                                                role="menuitem" 
-                                                tabindex="-1">
-                                                Suspendido
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-right" style="white-space: nowrap;">
-                                S/ ${precio.toFixed(2)}
-                            </td>
-                        `;
-
-                        tbody.appendChild(row);
+                    // Obtener la instancia de Alpine.js
+                    const alpineData = Alpine.$data(document.querySelector('[x-data="editarContratoData()"]'));
+                    
+                    // Limpiar los detalles existentes
+                    alpineData.detalles = [];
+                    
+                    // Agregar los nuevos detalles
+                    detalles.forEach(detalle => {
+                        alpineData.detalles.push({
+                            id: Date.now() + Math.random(),
+                            categoriaId: parseInt(detalle.categoria_id),
+                            categoria: detalle.categoria,
+                            servicioId: parseInt(detalle.servicio_id),
+                            servicio: detalle.nombre,
+                            planId: parseInt(detalle.plan_id),
+                            plan: detalle.plan,
+                            estado: detalle.estado,
+                            precio: detalle.precio,
+                            ip: detalle.ip_servicio || ''
+                        });
                     });
-
+                    
                     // Actualizar el total
-                    document.getElementById('total-contrato-edit').textContent = total.toFixed(
-                        2);
+                    alpineData.actualizarTotal();
 
                     // Cargar datos del cliente y observaciones
-                    document.getElementById('modal-input-cliente').value = this.getAttribute(
-                        'data-cliente');
-                    document.getElementById('client-identification').value = this.getAttribute(
-                        'data-identificacion');
-                    document.getElementById('contrato-id').value = this.getAttribute('data-id');
+                    document.getElementById('modal-input-cliente').value = this.getAttribute('data-cliente');
+                    document.getElementById('client-identification').value = this.getAttribute('data-identificacion');
+                    document.getElementById('cliente-id').value = this.getAttribute('data-cliente-id');
 
                     // Cargar observaciones en el input
                     const observaciones = this.getAttribute('data-observaciones');
                     document.getElementById('observaciones').value = observaciones || '';
+                    alpineData.observaciones = observaciones || '';
 
                     // Cargar estado del contrato en el select
                     const estadoContrato = this.getAttribute('data-estado');
                     document.getElementById('estado-contrato').value = estadoContrato || 'activo';
+                    alpineData.estadoContrato = estadoContrato || 'activo';
 
                     // Cargar fecha del contrato en el input
                     const fechaContrato = this.getAttribute('data-fecha');
                     const fechaInput = document.getElementById('fecha-contrato');
                     if (fechaInput) {
                         fechaInput.value = fechaContrato || '';
-                        // Actualizar el modelo de Alpine.js para la fecha
-                        if (fechaContrato) {
-                            fechaInput.dispatchEvent(new Event('input', { bubbles: true }));
-                        }
+                        alpineData.fecha = fechaContrato || '';
                     }
 
                     // Mostrar el modal
@@ -435,6 +488,53 @@
                     console.error('Error al procesar los datos:', error);
                 }
             });
+        });
+        
+        // Agregar un manejador para el envío del formulario
+        document.getElementById('editContractForm').addEventListener('submit', function(e) {
+            const contratoId = document.getElementById('contrato-id').value;
+            console.log("ID del contrato al enviar el formulario:", contratoId);
+            console.log("Tipo de ID del contrato al enviar:", typeof contratoId);
+            console.log("URL del formulario antes del envío:", this.action);
+            
+            if (!contratoId) {
+                e.preventDefault();
+                console.error("Error: No se encontró el ID del contrato al enviar el formulario");
+                return;
+            }
+            
+            // Asegurarse de que la URL del formulario sea correcta
+            const formUrl = `/contracts/${contratoId}/update`;
+            if (!this.action.endsWith(formUrl)) {
+                console.log("Corrigiendo URL del formulario de:", this.action, "a:", formUrl);
+                this.action = formUrl;
+            }
+            
+            // Validación del formulario de edición
+            const alpineData = Alpine.$data(document.querySelector('[x-data="editarContratoData()"]'));
+            
+            if (alpineData.detalles.length === 0) {
+                e.preventDefault();
+                
+                const alertEdit = document.getElementById('modal-edit-alert');
+                const alertMessage = document.getElementById('alert-edit-message');
+
+                if (alertEdit && alertMessage) {
+                    alertMessage.textContent = 'Por favor, agregue al menos un detalle al contrato.';
+
+                    const alpineAlertData = Alpine.$data(alertEdit);
+                    alpineAlertData.showAlert = true;
+
+                    setTimeout(() => {
+                        alpineAlertData.showAlert = false;
+                    }, 2500);
+                }
+            } else {
+                // Actualizar los campos ocultos con los valores de Alpine.js
+                document.getElementById('fecha-input').value = alpineData.fecha;
+                document.getElementById('estado-input').value = alpineData.estadoContrato;
+                document.getElementById('observaciones-input').value = alpineData.observaciones;
+            }
         });
     });
 
@@ -456,7 +556,6 @@
             observaciones: '',
 
             init() {
-                // Inicializar la fecha con el valor del input si existe
                 const fechaInput = document.getElementById('fecha-contrato');
                 if (fechaInput && fechaInput.value) {
                     this.fecha = fechaInput.value;
@@ -466,8 +565,7 @@
             fetchServicios() {
                 const categoriaSeleccionada = this.categorias.find(c => c.id == this.categoriaId);
                 if (categoriaSeleccionada) {
-                    this.serviciosDisponibles = categoriaSeleccionada.servicios.filter(servicio => servicio
-                        .estado_servicio === 'activo');
+                    this.serviciosDisponibles = categoriaSeleccionada.servicios.filter(servicio => servicio.estado_servicio === 'activo');
                 } else {
                     this.serviciosDisponibles = [];
                 }
@@ -493,6 +591,119 @@
                 if (servicioSeleccionado && servicioSeleccionado.nombre.toLowerCase() === 'internet') {
                     this.mostrarModalIp = true;
                 }
+            },
+
+            validarIP(event) {
+                this.ip = event.target.value.replace(/[^0-9.]/g, '');
+            },
+
+            agregarDetalle() {
+                if (!this.validarCampos()) return;
+        
+                const categoria = this.categorias.find(c => c.id == this.categoriaId);
+                const servicio = this.serviciosDisponibles.find(s => s.id == this.servicioId);
+                const plan = this.planesDisponibles.find(p => p.id == this.planId);
+        
+                if (categoria && servicio && plan) {
+                    // Verificar si existe el mismo servicio y plan
+                    const servicioExistente = this.detalles.find(detalle => 
+                        detalle.servicio.toLowerCase() === servicio.nombre.toLowerCase() && 
+                        detalle.plan.toLowerCase() === plan.nombre.toLowerCase()
+                    );
+
+                    if (servicioExistente) {
+                        // Si el servicio existe y está activo, no permitir agregarlo
+                        if (servicioExistente.estado === 'activo') {
+                            this.mostrarAlerta('Este servicio ya existe y está activo en el contrato. No se puede agregar nuevamente.');
+                            return;
+                        }
+                        // Si está suspendido, permitir agregarlo
+                        if (servicioExistente.estado === 'suspendido') {
+                            console.log('Servicio existente suspendido, permitiendo agregar uno nuevo');
+                        }
+                    }
+
+                    const nuevoDetalle = {
+                        id: Date.now(),
+                        categoriaId: parseInt(categoria.id),
+                        categoria: categoria.nombre,
+                        servicioId: parseInt(servicio.id),
+                        servicio: servicio.nombre,
+                        planId: parseInt(plan.id),
+                        plan: plan.nombre,
+                        estado: 'activo',
+                        precio: this.precioPlan,
+                        ip: this.ip
+                    };
+
+                    console.log('Agregando nuevo detalle:', {
+                        servicio: nuevoDetalle.servicio,
+                        plan: nuevoDetalle.plan,
+                        estado: nuevoDetalle.estado
+                    });
+        
+                    this.detalles.push(nuevoDetalle);
+                    console.log('Detalles actualizados:', this.detalles);
+        
+                    this.actualizarTotal();
+                    this.reset();
+                }
+            },
+        
+            validarCampos() {
+                if (!this.categoriaId) {
+                    this.mostrarAlerta('Seleccione una categoría.');
+                    return false;
+                }
+                if (!this.servicioId) {
+                    this.mostrarAlerta('Seleccione un servicio.');
+                    return false;
+                }
+                if (!this.planId) {
+                    this.mostrarAlerta('Seleccione un plan.');
+                    return false;
+                }
+                if (!this.precioPlan) {
+                    this.mostrarAlerta('Por favor, ingrese el precio.');
+                    return false;
+                }
+                return true;
+            },
+        
+            mostrarAlerta(mensaje) {
+                const alertEdit = document.getElementById('modal-edit-alert');
+                if (alertEdit) {
+                    const alpineData = Alpine.$data(alertEdit);
+                    alpineData.showAlert = true;
+        
+                    const alertMessage = document.getElementById('alert-edit-message');
+                    if (alertMessage) {
+                        alertMessage.textContent = mensaje;
+                    }
+        
+                    setTimeout(() => {
+                        alpineData.showAlert = false;
+                    }, 2500);
+                }
+            },
+        
+            actualizarTotal() {
+                this.total = this.detalles.reduce((sum, detalle) => sum + parseFloat(detalle.precio || 0), 0);
+            },
+        
+            reset() {
+                this.categoriaId = '';
+                this.servicioId = '';
+                this.planId = '';
+                this.precioPlan = '';
+                this.serviciosDisponibles = [];
+                this.planesDisponibles = [];
+                this.ip = '';
+            },
+        
+            eliminarDetalle(id) {
+                this.detalles = this.detalles.filter(detalle => detalle.id !== id);
+                this.actualizarTotal();
             }
         }
     }

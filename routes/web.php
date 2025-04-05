@@ -133,6 +133,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(ContractController::class)->group(function () {
         Route::get('contracts', 'index')->middleware('check.permissions:manage,all')->name('contracts.index');
         Route::post('contracts', 'store')->middleware('check.permissions:manage,guardar')->name('contracts.store');
+        Route::put('contracts/{id}/update', 'update')->middleware('check.permissions:manage,actualizar')->name('contracts.update');
         Route::delete('contratos/{id}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('contratos.destroy');
         Route::get('/categorias', 'getCategorias')->middleware('check.permissions:manage,all');
         Route::get('/servicios/{categoriaId}', 'getServicios')->middleware('check.permissions:manage,all');

@@ -21,27 +21,18 @@ class ContractController extends Controller
         $contratos = Contrato::with(['cliente', 'servicios', 'contratoServicios'])->paginate(7);
     
         foreach ($contratos as $contrato) {
-            $contrato->detalles_servicios = $contrato->servicios->map(function ($servicio) use ($contrato) {
-                $plan = $servicio->planes->where('id', $servicio->pivot->plan_id)->first();
-                $contratoServicio = $contrato->contratoServicios->where('servicio_id', $servicio->id)->first();
-
-                $fechaServicio = $servicio->pivot->fecha_servicio
-                    ? \Carbon\Carbon::parse($servicio->pivot->fecha_servicio)->format("d/m/Y")
-                    : 'N/A';
-
-                $mesServicio = $servicio->pivot->fecha_servicio
-                    ? \Carbon\Carbon::parse($servicio->pivot->fecha_servicio)->locale('es')->isoFormat('MMMM')
-                    : 'N/A';
-    
+            $contrato->detalles_servicios = $contrato->contratoServicios->map(function ($contratoServicio) {
+                $fecha = $contratoServicio->fecha_servicio;
+                $fechaObj = $fecha ? \Carbon\Carbon::parse($fecha) : null;
+                
                 return [
-                    'id' => $servicio->id,
-                    'nombre' => $servicio->nombre,
-                    'fecha' => $fechaServicio,
-                    'estado' => $servicio->pivot->estado_servicio_cliente ?? 'Desconocido',
-                    'mes' => $mesServicio,
-                    'plan' => optional($plan)->nombre ?? 'N/A',
-                    'precio' => optional($plan)->precio ?? 0,
-                    'ip_servicio' => $contratoServicio->ip_servicio ?? null
+                    'nombre' => $contratoServicio->servicio->nombre,
+                    'plan' => $contratoServicio->plan ? $contratoServicio->plan->nombre : 'N/A',
+                    'ip_servicio' => $contratoServicio->ip_servicio,
+                    'fecha' => $fechaObj ? $fechaObj->format('d-m-Y') : null,
+                    'mes' => $fechaObj ? $fechaObj->format('F') : null,
+                    'estado' => $contratoServicio->estado_servicio_cliente,
+                    'precio' => $contratoServicio->plan ? $contratoServicio->plan->precio : 0
                 ];
             });
         }
@@ -76,64 +67,102 @@ class ContractController extends Controller
 
     public function update(Request $request, $id)
     {
-        DB::beginTransaction();
-    
         try {
-            // Validación de los datos
-            $validatedData = $request->validate([
-                'cliente_id' => 'required|exists:clientes,id',
+            // Validar los datos de entrada
+            $request->validate([
                 'fecha' => 'required|date',
-                'servicio_id' => 'required|array',
-                'servicio_id.*' => 'exists:servicios,id',
-                'plan_id' => 'required|array',
-                'plan_id.*' => 'exists:planes,id',
-                'categoria_id' => 'required|array',
-                'categoria_id.*' => 'exists:categorias,id',
-                'estado' => 'required|string',
-                'observaciones' => 'nullable|string|max:500',
-                'ip_servicio' => 'nullable|array',
-                'ip_servicio.*' => 'nullable|string|max:20',
+                'estado' => 'required|in:activo,suspendido',
+                'observaciones' => 'nullable|string',
+                'detalles' => 'required|array',
+                'detalles.*.servicio_id' => 'required|exists:servicios,id',
+                'detalles.*.plan_id' => 'required|exists:planes,id',
+                'detalles.*.categoria_id' => 'required|exists:categorias,id',
+                'detalles.*.ip_servicio' => 'nullable|string',
+                'detalles.*.estado' => 'required|in:activo,suspendido',
+                'detalles.*.precio' => 'required|numeric'
             ]);
-    
-            // Actualización del contrato
+
+            // Obtener el contrato
             $contrato = Contrato::findOrFail($id);
+
+            // Actualizar el contrato con los datos validados
             $contrato->update([
-                'cliente_id' => $request->cliente_id,
                 'fecha_contrato' => $request->fecha,
                 'estado_contrato' => $request->estado,
+                'observaciones' => $request->observaciones
+            ]);
+
+            // Registrar los datos recibidos para depuración
+            \Illuminate\Support\Facades\Log::info('Datos recibidos en update:', [
+                'fecha' => $request->fecha,
+                'estado' => $request->estado,
                 'observaciones' => $request->observaciones,
+                'detalles' => $request->detalles
             ]);
-    
-            // Eliminar servicios antiguos
-            $contrato->contratoServicios()->delete();
-    
-            // Asignación de nuevos servicios, planes, categorías y IP
-            foreach ($request->servicio_id as $index => $servicio_id) {
-                ContratoServicio::create([
-                    'contrato_id' => $contrato->id,
-                    'servicio_id' => $servicio_id,
-                    'plan_id' => $request->plan_id[$index],
-                    'categoria_id' => $request->categoria_id[$index],
-                    'ip_servicio' => $request->ip_servicio[$index],
-                    'fecha_servicio' => now(),
-                    'estado_servicio_cliente' => $request->estado,
+
+            // Iniciar transacción para asegurar la integridad de los datos
+            DB::beginTransaction();
+
+            try {
+                // Eliminar todos los servicios existentes del contrato
+                ContratoServicio::where('contrato_id', $id)->delete();
+
+                // Crear nuevos registros para cada detalle
+                foreach ($request->detalles as $detalle) {
+                    // Asegurarse de que el detalle sea un array
+                    $detalleData = is_array($detalle) ? $detalle : json_decode($detalle, true);
+                    
+                    // Registrar el detalle para depuración
+                    \Illuminate\Support\Facades\Log::info('Procesando detalle:', $detalleData);
+                    
+                    // Verificar que el detalle tenga los campos necesarios
+                    if (!isset($detalleData['servicio_id']) || !isset($detalleData['plan_id']) || !isset($detalleData['categoria_id'])) {
+                        \Illuminate\Support\Facades\Log::warning('Detalle incompleto:', $detalleData);
+                        continue;
+                    }
+
+                    // Crear nuevo registro de ContratoServicio
+                    ContratoServicio::create([
+                        'contrato_id' => $id,
+                        'servicio_id' => $detalleData['servicio_id'],
+                        'plan_id' => $detalleData['plan_id'],
+                        'categoria_id' => $detalleData['categoria_id'],
+                        'ip_servicio' => $detalleData['ip_servicio'] ?? null,
+                        'estado_servicio_cliente' => $detalleData['estado'] ?? 'activo',
+                        'fecha_servicio' => now()
+                    ]);
+                    
+                    // Registrar la creación para depuración
+                    \Illuminate\Support\Facades\Log::info('Servicio creado:', [
+                        'servicio_id' => $detalleData['servicio_id'],
+                        'plan_id' => $detalleData['plan_id'],
+                        'categoria_id' => $detalleData['categoria_id'],
+                        'ip_servicio' => $detalleData['ip_servicio'] ?? null,
+                        'estado' => $detalleData['estado'] ?? 'activo'
+                    ]);
+                }
+
+                // Confirmar la transacción
+                DB::commit();
+
+                return redirect()->route('contracts.index')->with([
+                    'successMessage' => 'Éxito',
+                    'successDetails' => 'Contrato actualizado con éxito'
                 ]);
+
+            } catch (\Exception $e) {
+                // Revertir la transacción en caso de error
+                DB::rollBack();
+                throw $e;
             }
-    
-            DB::commit();
-    
-            return redirect()->route('contracts.index')->with([
-                'successMessage' => 'Éxito',
-                'successDetails' => 'Contrato actualizado con éxito'
-            ]);
+
         } catch (ValidationException $e) {
-            DB::rollBack();
             return redirect()->route('contracts.index')
                 ->withErrors($e->errors())
                 ->withInput()
                 ->with('errorDetails', 'Error en la validación. Por favor, complete todos los campos.');
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Error al actualizar el contrato: ' . $e->getMessage());
             return redirect()->route('contracts.index')
                 ->withInput()
                 ->with('errorDetails', 'Error inesperado: ' . $e->getMessage());

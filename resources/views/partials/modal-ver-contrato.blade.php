@@ -22,22 +22,43 @@
             </div>
             <!-- Modal body -->
             <div id="ver-contrato" class="p-4 md:p-5 space-y-4">
-                <div class="flex flex-wrap -mx-3">
-                    <!-- Campo de Datos del Cliente -->
-                    <div class="w-full px-3 mb-6">
-                        <label
-                            class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
-                            Datos del Cliente
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
+
+                    <!-- ====== Datos del Cliente Section Start -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Campo de Datos del Cliente -->
+                        <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
+                            <label
+                                class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
+                                for="ver-modal-input-cliente">
+                                Datos del Cliente
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <input type="text" id="ver-modal-input-cliente" value=""
+                                    class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    readonly disabled />
                             </div>
-                            <input type="text" id="modal-input-cliente"
-                                class="bg-gray-50 border border-gray-300 text-gray-400 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-300"
-                                disabled />
+                        </div>
+
+                        <!-- Campo de Identificación -->
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label
+                                class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
+                                for="ver-client-identification">
+                                Identificación
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="ver-client-identification" value=""
+                                    class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    readonly disabled />
+                            </div>
                         </div>
                     </div>
+                    <!-- ====== Datos del Cliente Section End -->
+                <div class="flex flex-wrap -mx-3">
+
 
                     <div class="w-full px-3">
                         <label
@@ -48,8 +69,8 @@
                             <div class="absolute top-2.5 left-2 flex items-start ps-1 pointer-events-none">
                                 <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
                             </div>
-                            <textarea id="input-observaciones" name="input-observaciones" rows="3"
-                                class="block p-2.5 w-full text-sm text-gray-400 bg-gray-50 rounded-lg border focus:ring-blue-500 border-gray-300 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
+                            <textarea id="ver-input-observaciones" name="ver-input-observaciones" rows="3"
+                                class="block p-2.5 w-full text-sm bg-gray-100 border border-gray-100 text-gray-900 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
                                 disabled></textarea>
                         </div>
                     </div>
@@ -84,15 +105,34 @@
                                         <!-- Obtener datos -->
                                         <script>
                                             document.addEventListener("DOMContentLoaded", function() {
+                                                console.log("DOMContentLoaded - Modal Ver Contrato");
                                                 document.querySelectorAll(".open-modal").forEach(button => {
+                                                    console.log("Botón encontrado:", button);
                                                     button.addEventListener("click", function() {
+                                                        console.log("Click en botón open-modal");
                                                         const cliente = this.getAttribute("data-cliente");
+                                                        const identificacion = this.getAttribute("data-identificacion");
                                                         const servicios = this.getAttribute("data-servicios").split(",");
                                                         const detalles = JSON.parse(this.getAttribute("data-detalles"));
                                                         const observaciones = this.getAttribute("data-observaciones");
 
-                                                        document.getElementById("modal-input-cliente").value = cliente;
-                                                        document.getElementById("input-observaciones").textContent = observaciones;
+                                                        console.log("Datos recibidos:", {
+                                                            cliente: cliente,
+                                                            identificacion: identificacion,
+                                                            servicios: servicios,
+                                                            observaciones: observaciones,
+                                                            detalles: detalles
+                                                        });
+
+                                                        document.getElementById("ver-modal-input-cliente").value = cliente;
+                                                        document.getElementById("ver-client-identification").value = identificacion;
+                                                        document.getElementById("ver-input-observaciones").value = observaciones || '';
+
+                                                        console.log("Valores asignados a los campos:", {
+                                                            "ver-modal-input-cliente": document.getElementById("ver-modal-input-cliente").value,
+                                                            "ver-client-identification": document.getElementById("ver-client-identification").value,
+                                                            "ver-input-observaciones": document.getElementById("ver-input-observaciones").value
+                                                        });
 
                                                         const tbody = document.querySelector("#detalle-contrato");
                                                         tbody.innerHTML = "";

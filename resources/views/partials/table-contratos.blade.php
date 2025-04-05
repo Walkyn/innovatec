@@ -150,6 +150,7 @@
                                             data-id="{{ $contrato->id }}"
                                             data-cliente="{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}"
                                             data-identificacion="{{ $contrato->cliente->identificacion }}"
+                                            data-cliente-id="{{ $contrato->cliente->id }}"
                                             data-observaciones="{{ $contrato->observaciones }}"
                                             data-estado="{{ $contrato->estado_contrato }}"
                                             data-fecha="{{ $contrato->fecha_contrato->format('Y-m-d') }}"
@@ -173,6 +174,7 @@
                                         <button data-modal-target="ver-contrato" data-modal-toggle="ver-contrato"
                                             data-id="{{ $contrato->id }}"
                                             data-cliente="{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}"
+                                            data-identificacion="{{ $contrato->cliente->identificacion }}"
                                             data-observaciones="{{ $contrato->observaciones }}"
                                             data-servicios="{{ implode(',', $contrato->servicios->pluck('nombre')->toArray()) }}"
                                             data-detalles='@json($contrato->detalles_servicios)'
