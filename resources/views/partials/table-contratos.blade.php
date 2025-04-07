@@ -72,7 +72,7 @@
                         @foreach ($contratos as $contrato)
                             <tr class="text-gray-700 dark:text-gray-400">
                                 <td class="px-4 py-3 text-sm font-mono">
-                                    {{ 'CTR-' . str_pad($contrato->id, 6, '0', STR_PAD_LEFT) }}
+                                    {{ 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="px-4 py-3 text-sm">
                                     <p class="font-semibold">{{ $contrato->cliente->nombres }}

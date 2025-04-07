@@ -125,38 +125,43 @@
 
         .payment-info {
             clear: both;
-            padding-top: 30px;
+            padding-top: 20px;
+            margin-bottom: 60px;
         }
 
         .signature-section {
             margin-top: 50px;
-            page-break-inside: avoid;
-            width: 45%;
+            width: 100%;
         }
 
-        .signature-box {
-            margin-bottom: 30px;
+        .signature-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 30px 0;
+        }
+
+        .signature-table td {
+            width: 50%;
+            vertical-align: top;
+            padding-top: 20px;
+            text-align: center;
         }
 
         .signature-line {
             border-top: 1px solid #000;
             width: 100%;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .signature-info {
+            font-size: 11px;
+            line-height: 1.5;
+            text-align: center;
         }
 
         .signature-title {
-            margin-bottom: 2px;
-            font-weight: normal;
-        }
-
-        .signature-name {
-            margin-bottom: 2px;
-        }
-
-        .signature-id {
-            color: #4a4a4a;
-            font-size: 11px;
-            margin-bottom: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .footer {
@@ -210,11 +215,16 @@
                 <div class="section-title">INFORMACIÓN DEL CONTRATO</div>
                 <p><strong>N° Contrato:</strong> CTR-{{ str_pad($contrato->id, 6, '0', STR_PAD_LEFT) }}</p>
                 <p><strong>Fecha:</strong> {{ $contrato->fecha_contrato ? $contrato->fecha_contrato->format('d-m-Y') : 'N/A' }}</p>
+                <p><strong>Servicios:</strong> {{ $contrato->contratoServicios->count() }}</p>
+                <p><strong>Estado:</strong> <span style="text-transform: capitalize;">{{ $contrato->estado_contrato }}</span></p>
             </div>
             <div class="invoice-to">
                 <div class="section-title">DATOS DEL CLIENTE</div>
                 <p><strong>Nombre:</strong> {{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}</p>
-                <p><strong>DNI:</strong> {{ $contrato->cliente->identificacion }}</p>
+                <p><strong>{{ 
+                    strlen($contrato->cliente->identificacion) === 8 ? 'DNI' : 
+                    (preg_match('/^(10|20)/', $contrato->cliente->identificacion) ? 'RUC' : 'DNI') 
+                }}:</strong> {{ $contrato->cliente->identificacion }}</p>
                 <p><strong>Teléfono:</strong> {{ $contrato->cliente->telefono }}</p>
                 <p><strong>Dirección:</strong> {{ $contrato->cliente->direccion }}</p>
             </div>
@@ -265,19 +275,28 @@
         </div>
 
         <div class="signature-section">
-            <div class="signature-box">
-                <div class="signature-line"></div>
-                <div class="signature-title">Cliente</div>
-                <div class="signature-name">{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}
-                </div>
-                <div class="signature-id">DNI: {{ $contrato->cliente->identificacion }}</div>
-            </div>
-            <div class="signature-box">
-                <div class="signature-line"></div>
-                <div class="signature-title">Representante Legal</div>
-                <div class="signature-name">{{ $configuracion->nombre ?? 'Nombre de la Empresa' }}</div>
-                <div class="signature-id">RUC: {{ $configuracion->ruc ?? 'RUC' }}</div>
-            </div>
+            <table class="signature-table">
+                <tr>
+                    <td>
+                        <div class="signature-line"></div>
+                        <div class="signature-info">
+                            <div class="signature-title">Cliente</div>
+                            {{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}<br>
+                            {{ strlen($contrato->cliente->identificacion) === 8 ? 'DNI' : 
+                               (preg_match('/^(10|20)/', $contrato->cliente->identificacion) ? 'RUC' : 'DNI') 
+                            }}: {{ $contrato->cliente->identificacion }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="signature-line"></div>
+                        <div class="signature-info">
+                            <div class="signature-title">Representante Legal</div>
+                            {{ $configuracion->nombre ?? 'Nombre de la Empresa' }}<br>
+                            RUC: {{ $configuracion->ruc ?? 'RUC' }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 

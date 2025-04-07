@@ -22,6 +22,10 @@ class ContratoPDFController extends Controller
 
         $pdf = PDF::loadView('pdf.contrato', $data);
         
-        return $pdf->stream('contrato-' . $contrato->id . '.pdf');
+        $codigoContrato = 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT);
+        $nombreCliente = strtoupper($contrato->cliente->nombres . ' ' . $contrato->cliente->apellidos);
+        $nombreArchivo = $codigoContrato . ' - ' . $nombreCliente . '.pdf';
+        
+        return $pdf->stream($nombreArchivo);
     }
 } 
