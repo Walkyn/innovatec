@@ -181,9 +181,11 @@
                                             class="px-2 py-2 text-blue-600 open-modal">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="px-2 py-2 text-green-600">
-                                            <i class="fas fa-print"></i>
-                                        </button>
+                                        <a href="{{ route('contratos.pdf', $contrato->id) }}" 
+                                           class="px-2 py-2 text-green-600"
+                                           target="_blank">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
                                         <button data-modal-target="popup-modal" data-modal-toggle="popup-modal"
                                             onclick="setContratoId({{ $contrato->id }})"
                                             class="px-2 py-2 text-red-600">

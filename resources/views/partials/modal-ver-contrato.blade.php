@@ -37,7 +37,7 @@
                                     <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
                                 </div>
                                 <input type="text" id="ver-modal-input-cliente" value=""
-                                    class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    class="border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                     readonly disabled />
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                             </label>
                             <div class="relative">
                                 <input type="text" id="ver-client-identification" value=""
-                                    class="bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    class="border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                     readonly disabled />
                             </div>
                         </div>
@@ -70,7 +70,7 @@
                                 <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
                             </div>
                             <textarea id="ver-input-observaciones" name="ver-input-observaciones" rows="3"
-                                class="block p-2.5 w-full text-sm bg-gray-100 border border-gray-100 text-gray-900 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
+                                class="block p-2.5 w-full text-sm border border-gray-100 text-gray-900 rounded border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
                                 disabled></textarea>
                         </div>
                     </div>

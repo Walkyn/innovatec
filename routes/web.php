@@ -22,6 +22,7 @@ use App\Http\Controllers\DatabaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ContratoPDFController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -139,6 +140,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/servicios/{categoriaId}', 'getServicios')->middleware('check.permissions:manage,all');
         Route::get('/planes/{servicioId}', 'getPlanes')->middleware('check.permissions:manage,all');
     });
+
+    // Contrato PDF
+    Route::get('contratos/{id}/pdf', [ContratoPDFController::class, 'generatePDF'])
+        ->middleware('check.permissions:manage,all')
+        ->name('contratos.pdf');
 
     // Months
     Route::controller(MesController::class)->group(function () {
