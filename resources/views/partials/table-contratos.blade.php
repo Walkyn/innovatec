@@ -175,6 +175,9 @@
                                             data-id="{{ $contrato->id }}"
                                             data-cliente="{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}"
                                             data-identificacion="{{ $contrato->cliente->identificacion }}"
+                                            data-telefono="{{ $contrato->cliente->telefono }}"
+                                            data-fecha="{{ $contrato->fecha_contrato ? $contrato->fecha_contrato->format('d-m-Y') : '' }}"
+                                            data-estado="{{ $contrato->estado_contrato }}"
                                             data-observaciones="{{ $contrato->observaciones }}"
                                             data-servicios="{{ implode(',', $contrato->servicios->pluck('nombre')->toArray()) }}"
                                             data-detalles='@json($contrato->detalles_servicios)'

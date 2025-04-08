@@ -306,14 +306,14 @@
                                                             </div>
                                                         </td>
                                                         <td class="px-4 py-3 text-sm" style="white-space: nowrap;" x-text="fecha"></td>
-                                                        <td class="px-4 py-3 text-sm">
+                                                        <td class="px-4 py-3 text-xs">
                                                             <div class="relative inline-block text-left w-full">
                                                                 <div>
                                                                     <button type="button" 
                                                                         @click="detalle.estado = detalle.estado === 'activo' ? 'suspendido' : 'activo'"
                                                                         class="px-2 py-1 font-semibold leading-tight rounded-full"
                                                                         :class="detalle.estado === 'activo' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100'"
-                                                                        style="min-width: 80px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: space-between;">
+                                                                        style="min-width: 80px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;">
                                                                         <span x-text="detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1)"></span>
                                                                     </button>
                                                                 </div>

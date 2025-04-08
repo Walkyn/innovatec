@@ -17,6 +17,13 @@ class ContratoServicio extends Model
         'plan_id',
         'ip_servicio',
         'fecha_servicio',
+        'estado_servicio_cliente',
+        'fecha_suspension_servicio',
+    ];
+
+    protected $casts = [
+        'fecha_servicio' => 'datetime',
+        'fecha_suspension_servicio' => 'date',
     ];
 
     public function meses()

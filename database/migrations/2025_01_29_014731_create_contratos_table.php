@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('observaciones', 500)->nullable();
             $table->date('fecha_contrato');
             $table->enum('estado_contrato', ['activo', 'suspendido']);
+            $table->date('fecha_suspension_contrato')->nullable();
             $table->timestamps();
         });        
     }

@@ -57,6 +57,55 @@
                         </div>
                     </div>
                     <!-- ====== Datos del Cliente Section End -->
+
+                    <!-- Nueva sección para Teléfono, Fecha y Estado -->
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <!-- Campo de Teléfono -->
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="ver-client-telefono">
+                                Teléfono
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <i class="fa fa-phone text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <input type="text" id="ver-client-telefono" value=""
+                                    class="border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    readonly disabled />
+                            </div>
+                        </div>
+
+                        <!-- Campo de Fecha del Contrato -->
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="ver-fecha-contrato">
+                                Fecha del Contrato
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <i class="fa fa-calendar text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <input type="text" id="ver-fecha-contrato" value=""
+                                    class="border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    readonly disabled />
+                            </div>
+                        </div>
+
+                        <!-- Campo de Estado del Contrato -->
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="ver-estado-contrato">
+                                Estado
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <i id="estado-icon" class="text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <input type="text" id="ver-estado-contrato" value=""
+                                    class="border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    readonly disabled />
+                            </div>
+                        </div>
+                    </div>
+
                 <div class="flex flex-wrap -mx-3">
 
 
@@ -95,7 +144,7 @@
                                             <th class="px-4 py-3">Servicio</th>
                                             <th class="px-4 py-3">Plan</th>
                                             <th class="px-4 py-3">IP</th>
-                                            <th class="px-4 py-3">Fecha</th>
+                                            <th class="px-4 py-3 whitespace-nowrap">Fecha</th>
                                             <th class="px-4 py-3">Estado</th>
                                             <th class="px-4 py-3 text-right">Precio</th>
                                         </tr>
@@ -112,6 +161,9 @@
                                                         console.log("Click en botón open-modal");
                                                         const cliente = this.getAttribute("data-cliente");
                                                         const identificacion = this.getAttribute("data-identificacion");
+                                                        const telefono = this.getAttribute("data-telefono");
+                                                        const fechaContrato = this.getAttribute("data-fecha");
+                                                        const estadoContrato = this.getAttribute("data-estado");
                                                         const servicios = this.getAttribute("data-servicios").split(",");
                                                         const detalles = JSON.parse(this.getAttribute("data-detalles"));
                                                         const observaciones = this.getAttribute("data-observaciones");
@@ -119,6 +171,9 @@
                                                         console.log("Datos recibidos:", {
                                                             cliente: cliente,
                                                             identificacion: identificacion,
+                                                            telefono: telefono,
+                                                            fechaContrato: fechaContrato,
+                                                            estadoContrato: estadoContrato,
                                                             servicios: servicios,
                                                             observaciones: observaciones,
                                                             detalles: detalles
@@ -126,11 +181,17 @@
 
                                                         document.getElementById("ver-modal-input-cliente").value = cliente;
                                                         document.getElementById("ver-client-identification").value = identificacion;
+                                                        document.getElementById("ver-client-telefono").value = telefono || 'N/A';
+                                                        document.getElementById("ver-fecha-contrato").value = fechaContrato || 'N/A';
+                                                        document.getElementById("ver-estado-contrato").value = estadoContrato || 'N/A';
                                                         document.getElementById("ver-input-observaciones").value = observaciones || '';
 
                                                         console.log("Valores asignados a los campos:", {
                                                             "ver-modal-input-cliente": document.getElementById("ver-modal-input-cliente").value,
                                                             "ver-client-identification": document.getElementById("ver-client-identification").value,
+                                                            "ver-client-telefono": document.getElementById("ver-client-telefono").value,
+                                                            "ver-fecha-contrato": document.getElementById("ver-fecha-contrato").value,
+                                                            "ver-estado-contrato": document.getElementById("ver-estado-contrato").value,
                                                             "ver-input-observaciones": document.getElementById("ver-input-observaciones").value
                                                         });
 
@@ -147,8 +208,7 @@
                                                             const precio = parseFloat(detalle.precio) || 0;
                                                             total += precio;
 
-                                                            let estadoClaseAplicada = estadoClase[detalle.estado] ||
-                                                                "text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100";
+                                                            let estadoClaseAplicada = estadoClase[detalle.estado] || "text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100";
 
                                                             let row = document.createElement("tr");
                                                             const ipCell = document.createElement("td");
@@ -175,10 +235,10 @@
                                                                 <td class="px-4 py-3">${detalle.nombre}</td>
                                                                 <td class="px-4 py-3 text-sm">${detalle.plan || "N/A"}</td>
                                                                 <td class="px-4 py-3 text-sm"></td>
-                                                                <td class="px-4 py-3 text-sm">${detalle.fecha || "N/A"}</td>
+                                                                <td class="px-4 py-3 text-sm whitespace-nowrap">${detalle.fecha || "N/A"}</td>
                                                                 <td class="px-4 py-3 text-xs">
                                                                     <span class="px-2 py-1 font-semibold leading-tight rounded-full ${estadoClaseAplicada}">
-                                                                        ${detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1)}
+                                                                        ${detalle.estado ? detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1) : 'N/A'}
                                                                     </span>
                                                                 </td>
                                                                 <td class="px-4 py-3 text-sm text-right" style="white-space: nowrap;">
@@ -192,8 +252,17 @@
                                                             tbody.appendChild(row);
                                                         });
 
-                                                        document.getElementById("total-contrato").textContent =
-                                                            `Total: S/ ${total.toFixed(2)}`;
+                                                        document.getElementById("total-contrato").textContent = `Total: S/ ${total.toFixed(2)}`;
+
+                                                        // Actualizar el ícono según el estado
+                                                        const estadoIcon = document.getElementById("estado-icon");
+                                                        if (estadoContrato === 'activo') {
+                                                            estadoIcon.className = 'fa fa-check-circle text-green-500 dark:text-green-400';
+                                                        } else if (estadoContrato === 'suspendido') {
+                                                            estadoIcon.className = 'fa fa-times-circle text-red-500 dark:text-red-400';
+                                                        } else {
+                                                            estadoIcon.className = 'fa fa-question-circle text-gray-500 dark:text-gray-400';
+                                                        }
                                                     });
                                                 });
                                             });

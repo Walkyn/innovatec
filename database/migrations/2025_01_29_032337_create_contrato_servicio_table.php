@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('ip_servicio', 20)->nullable();
             $table->timestamp('fecha_servicio')->useCurrent();
             $table->enum('estado_servicio_cliente', ['activo', 'suspendido']);
+            $table->date('fecha_suspension_servicio')->nullable();
             $table->timestamps();
         });
         

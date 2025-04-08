@@ -16,10 +16,12 @@ class Contrato extends Model
         'observaciones',
         'fecha_contrato',
         'estado_contrato',
+        'fecha_suspension_contrato',
     ];
 
     protected $casts = [
         'fecha_contrato' => 'date',
+        'fecha_suspension_contrato' => 'date',
     ];
 
     public function cliente()
