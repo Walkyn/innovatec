@@ -15,6 +15,7 @@ class ContratoServicio extends Model
         'contrato_id',
         'servicio_id',
         'plan_id',
+        'categoria_id',
         'ip_servicio',
         'fecha_servicio',
         'estado_servicio_cliente',

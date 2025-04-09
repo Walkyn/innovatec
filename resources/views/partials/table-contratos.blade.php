@@ -127,7 +127,7 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-sm">{{ number_format($contrato->totalPago(), 2) }}</td>
+                                <td class="px-4 py-3 text-sm">{{ number_format($contrato->total, 2) }}</td>
                                 <td class="px-4 py-3 text-sm w-32 whitespace-nowrap">
                                     {{ $contrato->fecha_contrato ? $contrato->fecha_contrato->format('d-m-Y') : 'N/A' }}
                                 </td>
@@ -159,6 +159,11 @@
                                                 $fecha = $cs->fecha_servicio;
                                                 $fechaObj = $fecha ? \Carbon\Carbon::parse($fecha) : null;
                                                 return [
+                                                    'id' => $cs->id,
+                                                    'categoria_id' => $cs->categoria_id,
+                                                    'categoria' => $cs->categoria ? $cs->categoria->nombre : 'N/A',
+                                                    'servicio_id' => $cs->servicio_id,
+                                                    'plan_id' => $cs->plan_id,
                                                     'nombre' => $cs->servicio->nombre,
                                                     'plan' => $cs->plan ? $cs->plan->nombre : 'N/A',
                                                     'ip_servicio' => $cs->ip_servicio,
@@ -176,7 +181,8 @@
                                             data-cliente="{{ $contrato->cliente->nombres }} {{ $contrato->cliente->apellidos }}"
                                             data-identificacion="{{ $contrato->cliente->identificacion }}"
                                             data-telefono="{{ $contrato->cliente->telefono }}"
-                                            data-fecha="{{ $contrato->fecha_contrato ? $contrato->fecha_contrato->format('d-m-Y') : '' }}"
+                                            data-fecha="{{ $contrato->estado_contrato === 'suspendido' ? ($contrato->fecha_suspension_contrato ? $contrato->fecha_suspension_contrato->format('Y-m-d') : '') : ($contrato->fecha_contrato ? $contrato->fecha_contrato->format('Y-m-d') : '') }}"
+                                            data-fecha-suspension="{{ $contrato->fecha_suspension_contrato ? $contrato->fecha_suspension_contrato->format('Y-m-d') : '' }}"
                                             data-estado="{{ $contrato->estado_contrato }}"
                                             data-observaciones="{{ $contrato->observaciones }}"
                                             data-servicios="{{ implode(',', $contrato->servicios->pluck('nombre')->toArray()) }}"

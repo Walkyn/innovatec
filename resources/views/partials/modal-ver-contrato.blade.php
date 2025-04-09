@@ -78,7 +78,7 @@
                         <!-- Campo de Fecha del Contrato -->
                         <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                             <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="ver-fecha-contrato">
-                                Fecha del Contrato
+                                <span id="ver-fecha-label">FECHA CONTRATO</span>
                             </label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -167,6 +167,7 @@
                                                         const servicios = this.getAttribute("data-servicios").split(",");
                                                         const detalles = JSON.parse(this.getAttribute("data-detalles"));
                                                         const observaciones = this.getAttribute("data-observaciones");
+                                                        const fechaSuspension = this.getAttribute("data-fecha-suspension");
 
                                                         console.log("Datos recibidos:", {
                                                             cliente: cliente,
@@ -176,7 +177,8 @@
                                                             estadoContrato: estadoContrato,
                                                             servicios: servicios,
                                                             observaciones: observaciones,
-                                                            detalles: detalles
+                                                            detalles: detalles,
+                                                            fechaSuspension: fechaSuspension
                                                         });
 
                                                         document.getElementById("ver-modal-input-cliente").value = cliente;
@@ -206,7 +208,10 @@
 
                                                         detalles.forEach((detalle, index) => {
                                                             const precio = parseFloat(detalle.precio) || 0;
-                                                            total += precio;
+                                                            // Solo sumar al total si el servicio está activo
+                                                            if (detalle.estado === 'activo') {
+                                                                total += precio;
+                                                            }
 
                                                             let estadoClaseAplicada = estadoClase[detalle.estado] || "text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100";
 
@@ -235,7 +240,11 @@
                                                                 <td class="px-4 py-3">${detalle.nombre}</td>
                                                                 <td class="px-4 py-3 text-sm">${detalle.plan || "N/A"}</td>
                                                                 <td class="px-4 py-3 text-sm"></td>
-                                                                <td class="px-4 py-3 text-sm whitespace-nowrap">${detalle.fecha || "N/A"}</td>
+                                                                <td class="px-4 py-3 text-sm whitespace-nowrap">
+                                                                    <span class="${detalle.estado === 'suspendido' ? 'text-red-700' : ''}">
+                                                                        ${detalle.estado === 'suspendido' ? (detalle.fecha_suspension_servicio || "N/A") : (detalle.fecha_servicio || "N/A")}
+                                                                    </span>
+                                                                </td>
                                                                 <td class="px-4 py-3 text-xs">
                                                                     <span class="px-2 py-1 font-semibold leading-tight rounded-full ${estadoClaseAplicada}">
                                                                         ${detalle.estado ? detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1) : 'N/A'}
@@ -262,6 +271,28 @@
                                                             estadoIcon.className = 'fa fa-times-circle text-red-500 dark:text-red-400';
                                                         } else {
                                                             estadoIcon.className = 'fa fa-question-circle text-gray-500 dark:text-gray-400';
+                                                        }
+
+                                                        // Actualizar la fecha según el estado
+                                                        const fechaLabel = document.getElementById("ver-fecha-label");
+                                                        const fechaInput = document.getElementById("ver-fecha-contrato");
+                                                        
+                                                        if (estadoContrato === 'suspendido') {
+                                                            fechaLabel.textContent = 'FECHA SUSPENSIÓN';
+                                                            if (fechaSuspension) {
+                                                                const [year, month, day] = fechaSuspension.split('-');
+                                                                fechaInput.value = `${day}/${month}/${year}`;
+                                                            } else {
+                                                                fechaInput.value = 'N/A';
+                                                            }
+                                                        } else {
+                                                            fechaLabel.textContent = 'FECHA CONTRATO';
+                                                            if (fechaContrato) {
+                                                                const [year, month, day] = fechaContrato.split('-');
+                                                                fechaInput.value = `${day}/${month}/${year}`;
+                                                            } else {
+                                                                fechaInput.value = 'N/A';
+                                                            }
                                                         }
                                                     });
                                                 });
