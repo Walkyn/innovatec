@@ -172,7 +172,7 @@
                         <div class="w-full md:w-1/3 px-3 md:mb-0 flex items-end">
                             <button type="button" @click="agregarServicio"
                                 class="w-full bg-slate-500 dark:bg-slate-900 border border-slate-500 dark:border-slate-700 text-white dark:text-gray-300 py-3 px-4 rounded leading-tight focus:outline-none focus:bg-slate-600 dark:focus:bg-slate-800 flex items-center justify-center">
-                                <i class="fa fa-plus text-sm mr-2"></i> Agregar
+                                <i class="fa fa-plus text-sm mr-2"></i>
                             </button>
                         </div>
                     </div>
@@ -412,7 +412,7 @@
                     plan_nombre: plan.nombre,
                     precio: this.precio || '0.00',
                     ip: this.ip || '',
-                    estado: 'activo' // Siempre se agrega como activo
+                    estado: 'activo'
                 };
 
                 // Agregar el nuevo detalle
@@ -430,14 +430,14 @@
 
             eliminarDetalle(index, event) {
                 if (event) {
-                    event.preventDefault(); // Prevenir cualquier comportamiento por defecto
-                    event.stopPropagation(); // Detener la propagación del evento
+                    event.preventDefault();
+                    event.stopPropagation();
                 }
 
                 const detalle = this.detalles[index];
                 if (detalle.id) {
-                    // Marcar el servicio para eliminación
-                    detalle.paraEliminar = !detalle.paraEliminar; // Alternar estado
+                    
+                    detalle.paraEliminar = !detalle.paraEliminar;   
 
                     // Actualizar la lista de servicios a eliminar
                     if (detalle.paraEliminar) {
@@ -449,7 +449,7 @@
                             detalle.id);
                     }
                 } else {
-                    // Si no tiene ID (es un nuevo servicio), simplemente lo eliminamos del array
+                    // Si no tiene ID (es un nuevo servicio)
                     this.detalles.splice(index, 1);
                 }
 

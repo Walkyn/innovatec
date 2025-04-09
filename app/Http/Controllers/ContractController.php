@@ -70,7 +70,8 @@ class ContractController extends Controller
             $contrato->update([
                 'fecha_contrato' => $validated['fecha'],
                 'estado_contrato' => $validated['estado'],
-                'observaciones' => $validated['observaciones']
+                'observaciones' => $validated['observaciones'],
+                'fecha_suspension_contrato' => $validated['estado'] === 'suspendido' ? now() : null
             ]);
 
             // Decodificar detalles JSON
@@ -215,6 +216,7 @@ class ContractController extends Controller
                 'fecha_contrato' => $request->fecha,
                 'estado_contrato' => $request->estado,
                 'observaciones' => $request->observaciones,
+                'fecha_suspension_contrato' => $request->estado === 'suspendido' ? now() : null
             ]);
     
             // Asignación de servicios, planes, categorías y IP
