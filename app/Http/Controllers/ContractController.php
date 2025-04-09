@@ -108,9 +108,14 @@ class ContractController extends Controller
 
                     if ($servicioExistente) {
                         if ($detalle['estado'] === 'suspendido') {
+                            // Solo actualizar la fecha si no existe una previa
+                            $fechaSuspension = $servicioExistente->fecha_suspension_servicio ? 
+                                $servicioExistente->fecha_suspension_servicio : 
+                                now();
+
                             $servicioExistente->update([
                                 'estado_servicio_cliente' => 'suspendido',
-                                'fecha_suspension_servicio' => $detalle['fecha_suspension_servicio'] ?? now(),
+                                'fecha_suspension_servicio' => $fechaSuspension,
                                 'ip_servicio' => $detalle['ip_servicio'] ?? null
                             ]);
                         } else if ($detalle['estado'] === 'activo') {

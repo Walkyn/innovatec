@@ -265,7 +265,7 @@
                     }
                     const nuevosServicios = await response.json();
 
-                    // Actualizar los servicios manteniendo los de otras categorías
+                    // Actualizar los servicios manteniendo
                     this.services = [
                         ...this.services.filter(s => s.categoria_id != categoriaId),
                         ...nuevosServicios

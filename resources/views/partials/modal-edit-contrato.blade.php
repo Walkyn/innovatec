@@ -142,7 +142,7 @@
                         <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                             <label
                                 class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Fecha</label>
-                            <input type="date" name="fecha" x-model="fecha"
+                            <input type="date" name="fecha" x-model="fechaActual"
                                 class="appearance-none block w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
                                 required>
                         </div>
@@ -151,7 +151,7 @@
                         <div class="w-full md:w-1/3 px-3 mb-2 md:mb-0">
                             <label
                                 class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Estado</label>
-                            <select name="estado" x-model="estado"
+                            <select name="estado" x-model="estado" @change="cambiarEstado($event)"
                                 class="block appearance-none w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
                                 required>
                                 <option value="activo">Activo</option>
@@ -291,42 +291,55 @@
             planId: '',
             precio: '0.00',
             fecha: '',
+            fechaSuspension: '',
             estado: 'activo',
             observaciones: '',
             total: 0,
             mostrarModalIp: false,
             ip: '',
 
+            get fechaActual() {
+                if (this.estado === 'suspendido') {
+                    return this.fechaSuspension || new Date().toISOString().split('T')[0];
+                }
+                return this.fecha || new Date().toISOString().split('T')[0];
+            },
+
+            set fechaActual(value) {
+                if (this.estado === 'suspendido') {
+                    this.fechaSuspension = value;
+                } else {
+                    this.fecha = value;
+                }
+            },
+
             init() {
                 // Configurar fecha por defecto
-                this.fecha = new Date().toISOString().split('T')[0];
+                const fechaActual = new Date().toISOString().split('T')[0];
+                this.fecha = fechaActual;
+                this.fechaSuspension = fechaActual;
 
                 // Escuchar eventos para abrir el modal
                 document.querySelectorAll('.open-modal-edit').forEach(button => {
                     button.addEventListener('click', () => {
                         const contratoId = button.getAttribute('data-id');
                         const clienteNombre = button.getAttribute('data-cliente');
-                        const clienteIdentificacion = button.getAttribute(
-                            'data-identificacion');
+                        const clienteIdentificacion = button.getAttribute('data-identificacion');
                         const clienteId = button.getAttribute('data-cliente-id');
-                        const detalles = JSON.parse(button.getAttribute(
-                            'data-detalles'));
+                        const detalles = JSON.parse(button.getAttribute('data-detalles'));
+                        const estadoContrato = button.getAttribute('data-estado') || 'activo';
 
                         // Actualizar formulario
                         document.getElementById('contrato-id').value = contratoId;
                         document.getElementById('cliente-id').value = clienteId;
-                        document.getElementById('modal-input-cliente').value =
-                            clienteNombre;
-                        document.getElementById('client-identification').value =
-                            clienteIdentificacion;
+                        document.getElementById('modal-input-cliente').value = clienteNombre;
+                        document.getElementById('client-identification').value = clienteIdentificacion;
 
                         // Actualizar datos del contrato
-                        this.fecha = button.getAttribute('data-fecha') || this
-                        .fecha;
-                        this.estado = button.getAttribute('data-estado') ||
-                        'activo';
-                        this.observaciones = button.getAttribute(
-                            'data-observaciones') || '';
+                        this.fecha = button.getAttribute('data-fecha') || fechaActual;
+                        this.fechaSuspension = button.getAttribute('data-fecha-suspension') || fechaActual;
+                        this.estado = estadoContrato;
+                        this.observaciones = button.getAttribute('data-observaciones') || '';
 
                         // Cargar detalles existentes
                         this.detalles = detalles.map(detalle => ({
@@ -526,7 +539,8 @@
                             ip_servicio: detalle.ip_servicio || detalle.ip || '',
                             estado: detalle.estado || 'activo',
                             precio: detalle.precio || '0.00',
-                            fecha_suspension_servicio: detalle.estado === 'suspendido' ? new Date().toISOString().split('T')[0] : null
+                            // No enviar fecha de suspensión, el controlador la manejará
+                            fecha_suspension_servicio: null
                         };
 
                         // Solo agregar el ID si existe
@@ -550,6 +564,77 @@
                 console.log('Datos a enviar:', datosParaEnviar);
                 
                 return this.detalles.length > 0;
+            },
+
+            cambiarEstado(event) {
+                const nuevoEstado = event.target.value;
+                if (nuevoEstado === 'suspendido') {
+                    this.mostrarConfirmacionSuspension();
+                }
+            },
+
+            mostrarConfirmacionSuspension() {
+                const modal = document.createElement('div');
+                modal.className = 'relative z-[100]';
+                modal.setAttribute('aria-labelledby', 'modal-title');
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                
+                modal.innerHTML = `
+                    <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity" aria-hidden="true"></div>
+                    <div class="fixed inset-0 z-[100] w-screen overflow-y-auto">
+                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                            <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-700 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                <div class="bg-white dark:bg-gray-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:size-10">
+                                            <svg class="size-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                            </svg>
+                                        </div>
+                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                            <h3 class="text-base font-semibold text-gray-900 dark:text-white" id="modal-title">Confirmar suspensión</h3>
+                                            <div class="mt-2">
+                                                <p class="text-sm text-gray-500 dark:text-gray-300">¿Está seguro que desea suspender el contrato? Todos los servicios activos serán suspendidos y se registrará la fecha de suspensión. Los servicios suspendidos no generarán cargos.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-600 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button type="button" id="confirmar-suspension" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 dark:hover:bg-red-700 sm:ml-3 sm:w-auto">Suspender</button>
+                                    <button type="button" id="cancelar-suspension" class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 ring-1 shadow-xs ring-gray-300 dark:ring-gray-600 ring-inset hover:bg-gray-50 dark:hover:bg-gray-600 sm:mt-0 sm:w-auto">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // Agregar eventos a los botones
+                document.getElementById('confirmar-suspension').addEventListener('click', () => {
+                    // Establecer fecha de suspensión
+                    this.fechaSuspension = new Date().toISOString().split('T')[0];
+                    
+                    // Suspender todos los servicios activos
+                    this.detalles.forEach(detalle => {
+                        if (!detalle.paraEliminar && detalle.estado === 'activo') {
+                            detalle.estado = 'suspendido';
+                        }
+                    });
+                    
+                    // Recalcular el total
+                    this.calcularTotal();
+                    
+                    // Remover el modal
+                    document.body.removeChild(modal);
+                });
+
+                document.getElementById('cancelar-suspension').addEventListener('click', () => {
+                    // Si se cancela, volver al estado activo
+                    this.estado = 'activo';
+                    document.body.removeChild(modal);
+                });
             }
         }));
     });
