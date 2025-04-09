@@ -517,16 +517,25 @@
                 // Preparar los detalles para enviar al servidor, excluyendo los marcados para eliminación
                 const detallesParaEnviar = this.detalles
                     .filter(detalle => !detalle.paraEliminar)
-                    .map(detalle => ({
-                        id: detalle.id,
-                        categoria_id: detalle.categoria_id,
-                        servicio_id: detalle.servicio_id,
-                        plan_id: detalle.plan_id,
-                        ip_servicio: detalle.ip_servicio || detalle.ip || '', // Priorizar ip_servicio sobre ip
-                        estado: detalle.estado || 'activo',
-                        precio: detalle.precio || '0.00',
-                        fecha_suspension_servicio: detalle.estado === 'suspendido' ? new Date().toISOString().split('T')[0] : null
-                    }));
+                    .map(detalle => {
+                        // Solo incluir el ID si existe
+                        const detalleParaEnviar = {
+                            categoria_id: detalle.categoria_id,
+                            servicio_id: detalle.servicio_id,
+                            plan_id: detalle.plan_id,
+                            ip_servicio: detalle.ip_servicio || detalle.ip || '',
+                            estado: detalle.estado || 'activo',
+                            precio: detalle.precio || '0.00',
+                            fecha_suspension_servicio: detalle.estado === 'suspendido' ? new Date().toISOString().split('T')[0] : null
+                        };
+
+                        // Solo agregar el ID si existe
+                        if (detalle.id) {
+                            detalleParaEnviar.id = detalle.id;
+                        }
+
+                        return detalleParaEnviar;
+                    });
 
                 // Agregar los IDs de servicios a eliminar al JSON
                 const datosParaEnviar = {

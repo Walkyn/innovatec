@@ -99,26 +99,39 @@ class ContractController extends Controller
                     continue;
                 }
 
-                // Buscar el servicio específico por su ID
-                $servicioExistente = ContratoServicio::where('id', $detalle['id'])
-                                                   ->where('contrato_id', $id)
-                                                   ->first();
+                if (isset($detalle['id'])) {
+                    // Actualizar servicio existente
+                    $servicioExistente = ContratoServicio::where('id', $detalle['id'])
+                                                       ->where('contrato_id', $id)
+                                                       ->first();
 
-                if ($servicioExistente) {
-                    // Si el estado ha cambiado a suspendido
-                    if ($detalle['estado'] === 'suspendido') {
-                        $servicioExistente->update([
-                            'estado_servicio_cliente' => 'suspendido',
-                            'fecha_suspension_servicio' => $detalle['fecha_suspension_servicio'] ?? now(),
-                            'ip_servicio' => $detalle['ip_servicio'] ?? null
-                        ]);
-                    } else if ($detalle['estado'] === 'activo') {
-                        $servicioExistente->update([
-                            'estado_servicio_cliente' => 'activo',
-                            'fecha_suspension_servicio' => null,
-                            'ip_servicio' => $detalle['ip_servicio'] ?? null
-                        ]);
+                    if ($servicioExistente) {
+                        if ($detalle['estado'] === 'suspendido') {
+                            $servicioExistente->update([
+                                'estado_servicio_cliente' => 'suspendido',
+                                'fecha_suspension_servicio' => $detalle['fecha_suspension_servicio'] ?? now(),
+                                'ip_servicio' => $detalle['ip_servicio'] ?? null
+                            ]);
+                        } else if ($detalle['estado'] === 'activo') {
+                            $servicioExistente->update([
+                                'estado_servicio_cliente' => 'activo',
+                                'fecha_suspension_servicio' => null,
+                                'ip_servicio' => $detalle['ip_servicio'] ?? null
+                            ]);
+                        }
                     }
+                } else {
+                    // Crear nuevo servicio
+                    ContratoServicio::create([
+                        'contrato_id' => $id,
+                        'categoria_id' => $detalle['categoria_id'],
+                        'servicio_id' => $detalle['servicio_id'],
+                        'plan_id' => $detalle['plan_id'],
+                        'ip_servicio' => $detalle['ip_servicio'] ?? null,
+                        'estado_servicio_cliente' => $detalle['estado'] ?? 'activo',
+                        'fecha_servicio' => now(),
+                        'fecha_suspension_servicio' => $detalle['estado'] === 'suspendido' ? now() : null
+                    ]);
                 }
             }
 
