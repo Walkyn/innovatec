@@ -15,11 +15,7 @@ return new class extends Migration
             // Claves foráneas
             $table->unsignedBigInteger('id_usuario');
             $table->unsignedBigInteger('id_modulo');
-
-            // Timestamps (opcional)
             $table->timestamps();
-
-            // Definir claves foráneas
             $table->foreign('id_usuario')
                 ->references('id')
                 ->on('users')

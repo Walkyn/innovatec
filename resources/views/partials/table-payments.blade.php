@@ -17,9 +17,9 @@
 
         </div>
 
-        <div class="flex items-center justify-between space-x-4 mb-4">
+        <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 mb-4">
             <!-- Item Buscador Start -->
-            <form class="w-2/3">
+            <form class="w-full md:w-2/3">
                 <label for="default-search" class="sr-only">Search</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -39,7 +39,7 @@
             <!-- Item Buscador End -->
 
             <!-- Campo de Estado Servicio -->
-            <div class="w-1/3">
+            <div class="w-full md:w-1/3">
                 <div class="relative">
                     <select id="large" class="block w-full px-4 py-3.5 text-base text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500">
                       <option selected>Buscar tipo de pago</option>

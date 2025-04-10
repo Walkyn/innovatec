@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('contrato_servicio_id')->constrained('contrato_servicio')->onDelete('cascade');
             $table->foreignId('mes_id')->constrained('meses')->onDelete('cascade');
             $table->decimal('monto_pagado', 10, 2);
-            $table->enum('estado_pago', ['pendiente', 'pagado', 'anulado'])->default('pendiente');
+            $table->enum('estado_pago', ['pendiente', 'pagado', 'anulado', 'no_aplica'])->default('pendiente');
             $table->timestamps();
         });
     }

@@ -168,7 +168,13 @@ Route::middleware('auth')->group(function () {
         $contratoServicio = DB::table('contrato_servicio')->find($contratoServicioId);
 
         if (!$contratoServicio) {
-            return response()->json([]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Contrato de servicio no encontrado',
+                'meses_pendientes' => [],
+                'precio_plan' => 0,
+                'monto_proporcional' => 0
+            ]);
         }
 
         $fechaInicioServicio = $contratoServicio->fecha_servicio;
@@ -179,6 +185,19 @@ Route::middleware('auth')->group(function () {
             ->where('contrato_servicio_id', $contratoServicioId)
             ->max('mes_id');
 
+        // Verificar si existe la tabla meses
+        $tablaMesesExiste = Schema::hasTable('meses');
+
+        if (!$tablaMesesExiste) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tabla de meses no existe en la base de datos',
+                'meses_pendientes' => [],
+                'precio_plan' => $precioPlan,
+                'monto_proporcional' => 0
+            ]);
+        }
+
         $mesInicioDeuda = $ultimaFechaPagada
             ? $ultimaFechaPagada + 1
             : DB::table('meses')
@@ -187,15 +206,34 @@ Route::middleware('auth')->group(function () {
             ->value('id');
 
         if (!$mesInicioDeuda) {
-            return response()->json([]);
+            return response()->json([
+                'success' => false,
+                'message' => 'No hay meses generados para el cálculo',
+                'meses_pendientes' => [],
+                'precio_plan' => $precioPlan,
+                'monto_proporcional' => 0
+            ]);
         }
 
         $mes = DB::table('meses')->find($mesInicioDeuda);
         $montoProporcional = 0;
 
-        if ($mes && $fechaInicioServicio <= date('Y-m-d', strtotime($mes->fecha_fin . ' -5 days'))) {
+        // Calcular días del mes
+        $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
+        $diaInstalacion = date('j', strtotime($fechaInicioServicio));
+        $ultimosDiasMes = date('j', strtotime($mes->fecha_fin)) - 5;
+
+        // Lógica de cálculo proporcional
+        if ($diaInstalacion <= 5) {
+            // Si se instala en los primeros 5 días, se cobra el mes completo
+            $montoProporcional = $precioPlan;
+        } elseif ($diaInstalacion > $ultimosDiasMes) {
+            // Si se instala en los últimos 5 días, se omite el mes y se pasa al siguiente
+            $mesInicioDeuda = $mesInicioDeuda + 1;
+            $montoProporcional = $precioPlan;
+        } else {
+            // Si se instala entre el día 6 y los últimos 5 días, se calcula proporcionalmente
             $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
-            $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
             $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
         }
 
@@ -211,15 +249,17 @@ Route::middleware('auth')->group(function () {
             ->get();
 
         return response()->json([
+            'success' => true,
             'meses_pendientes' => $mesesPendientes,
-            'precio_plan' => (float) $precioPlan,
-            'monto_proporcional' => (float) $montoProporcional,
+            'precio_plan' => $precioPlan,
+            'monto_proporcional' => round($montoProporcional, 2)
         ]);
     })->middleware('check.permissions:manage,all');
 
     Route::get('/contratos/{id}/servicios', function ($id) {
         return response()->json(
             ContratoServicio::where('contrato_id', $id)
+                ->where('estado_servicio_cliente', 'activo')
                 ->with(['servicio', 'plan'])
                 ->get()
                 ->map(function ($contratoServicio) {
@@ -333,9 +373,22 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
     $mes = DB::table('meses')->find($mesInicioDeuda);
     $montoProporcional = 0;
 
-    if ($mes && $fechaInicioServicio <= date('Y-m-d', strtotime($mes->fecha_fin . ' -5 days'))) {
+    // Calcular días del mes
+    $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
+    $diaInstalacion = date('j', strtotime($fechaInicioServicio));
+    $ultimosDiasMes = date('j', strtotime($mes->fecha_fin)) - 5;
+
+    // Lógica de cálculo proporcional
+    if ($diaInstalacion <= 5) {
+        // Si se instala en los primeros 5 días, se cobra el mes completo
+        $montoProporcional = $precioPlan;
+    } elseif ($diaInstalacion > $ultimosDiasMes) {
+        // Si se instala en los últimos 5 días, se omite el mes y se pasa al siguiente
+        $mesInicioDeuda = $mesInicioDeuda + 1;
+        $montoProporcional = $precioPlan;
+    } else {
+        // Si se instala entre el día 6 y los últimos 5 días, se calcula proporcionalmente
         $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
-        $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
         $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
     }
 
@@ -352,16 +405,16 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
 
     return response()->json([
         'success' => true,
-        'message' => $mesesPendientes->isEmpty() ? 'No hay meses pendientes de pago' : 'Meses pendientes obtenidos',
         'meses_pendientes' => $mesesPendientes,
-        'precio_plan' => (float) $precioPlan,
-        'monto_proporcional' => (float) $montoProporcional
+        'precio_plan' => $precioPlan,
+        'monto_proporcional' => round($montoProporcional, 2)
     ]);
 });
 
 Route::get('/contratos/{id}/servicios', function ($id) {
     return response()->json(
         ContratoServicio::where('contrato_id', $id)
+            ->where('estado_servicio_cliente', 'activo')
             ->with(['servicio', 'plan'])
             ->get()
             ->map(function ($contratoServicio) {

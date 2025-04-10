@@ -285,6 +285,7 @@
                                                     <th class="px-4 py-3">Servicio</th>
                                                     <th class="px-4 py-3">Fecha</th>
                                                     <th class="px-4 py-3">Mes</th>
+                                                    <th class="px-4 py-3">Estado</th>
                                                     <th class="px-4 py-3 text-right">Subtotal</th>
                                                 </tr>
                                             </thead>
@@ -481,6 +482,24 @@
                 <td class="px-4 py-3">${servicio}</td>
                 <td class="px-4 py-3 text-sm">${fechaActual}</td>
                 <td class="px-4 py-3 text-sm">${mesText}</td> <!-- Mes y año -->
+                <td class="px-4 py-3">
+                    <div class="flex items-center space-x-2">
+                        <select class="block w-full px-2 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600">
+                            <option value="pendiente" class="flex items-center">
+                                <i class="fas fa-clock text-yellow-500 mr-1"></i> Pendiente
+                            </option>
+                            <option value="pagado" class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-1"></i> Pagado
+                            </option>
+                            <option value="anulado" class="flex items-center">
+                                <i class="fas fa-times-circle text-red-500 mr-1"></i> Anulado
+                            </option>
+                            <option value="no_aplica" class="flex items-center">
+                                <i class="fas fa-ban text-gray-500 mr-1"></i> No Aplica
+                            </option>
+                        </select>
+                    </div>
+                </td>
                 <td class="px-4 py-3 text-sm text-right">${precio}</td> <!-- Precio -->
             `;
 
@@ -498,9 +517,11 @@
             let total = 0;
 
             filas.forEach(fila => {
-                const precio = parseFloat(fila.querySelector('td:nth-child(6)').textContent.replace(
+                const precio = parseFloat(fila.querySelector('td:nth-child(7)').textContent.replace(
                     'S/ ', ''));
-                total += precio;
+                if (!isNaN(precio)) {
+                    total += precio;
+                }
             });
 
             // Mostrar el total
@@ -601,6 +622,9 @@
             elements.selectedClientIdInput.value = clientId;
             elements.identificacionInput.value = identificacion;
             elements.telefonoInput.value = telefono;
+
+            // Cerrar el dropdown después de seleccionar
+            elements.dropdown.classList.add('hidden');
 
             limpiarTablaDetalles();
 

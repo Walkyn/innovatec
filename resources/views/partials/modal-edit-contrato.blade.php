@@ -414,6 +414,11 @@
             },
 
             agregarServicio() {
+                if (this.estado === 'suspendido') {
+                    this.mostrarAlerta('Active el contrato para agregar servicios');
+                    return;
+                }
+
                 if (!this.validarCampos()) return;
 
                 const categoria = this.categorias.find(c => c.id == this.categoriaId);
