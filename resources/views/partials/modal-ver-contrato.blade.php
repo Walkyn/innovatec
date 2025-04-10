@@ -246,7 +246,8 @@
                                                                     </span>
                                                                 </td>
                                                                 <td class="px-4 py-3 text-xs">
-                                                                    <span class="px-2 py-1 font-semibold leading-tight rounded-full ${estadoClaseAplicada}">
+                                                                    <span class="px-2 py-1 font-semibold leading-tight rounded-full ${estadoClaseAplicada} flex items-center gap-1 whitespace-nowrap">
+                                                                        <i class="fas ${detalle.estado === 'activo' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                                                                         ${detalle.estado ? detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1) : 'N/A'}
                                                                     </span>
                                                                 </td>

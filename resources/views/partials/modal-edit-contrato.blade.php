@@ -151,12 +151,19 @@
                         <div class="w-full md:w-1/3 px-3 mb-2 md:mb-0">
                             <label
                                 class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Estado</label>
-                            <select name="estado" x-model="estado" @change="cambiarEstado($event)"
-                                class="block appearance-none w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
-                                required>
-                                <option value="activo">Activo</option>
-                                <option value="suspendido">Suspendido</option>
-                            </select>
+                            <div class="relative">
+                                <select name="estado" x-model="estado" @change="cambiarEstado($event)"
+                                    class="block appearance-none w-full bg-gray-100 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 py-3 pl-10 pr-8 leading-tight focus:outline-none focus:bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:focus:bg-gray-800"
+                                    required>
+                                    <option value="activo">Activo</option>
+                                    <option value="suspendido">Suspendido</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                </div>
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i :class="estado === 'activo' ? 'fas fa-check-circle text-green-500' : 'fas fa-times-circle text-red-500'"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -211,7 +218,7 @@
                                             <th class="px-4 py-3 w-16">Acción</th>
                                             <th class="px-4 py-3">Servicio</th>
                                             <th class="px-4 py-3">Plan</th>
-                                            <th class="px-4 py-3 w-40">IP</th>
+                                            <th class="px-4 py-3 w-32">IP</th>
                                             <th class="px-4 py-3">Estado</th>
                                             <th class="px-4 py-3 text-right w-28">Precio</th>
                                         </tr>
@@ -230,20 +237,21 @@
                                                 <td class="px-4 py-3 text-sm" x-text="detalle.plan_nombre"></td>
                                                 <td class="px-4 py-3">
                                                     <input type="text" x-model="detalle.ip"
-                                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                        class="min-w-[120px] bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                                 </td>
                                                 <td class="px-4 py-3 text-xs">
                                                     <button type="button"
-                                                        @click="detalle.estado = detalle.estado === 'activo' ? 'suspendido' : 'activo'"
-                                                        class="px-2 py-1 font-semibold leading-tight rounded-full"
+                                                        @click="if (detalle.estado_original === 'activo') detalle.estado = detalle.estado === 'activo' ? 'suspendido' : 'activo'"
+                                                        class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center gap-1 whitespace-nowrap"
                                                         :class="detalle.estado === 'activo' ?
                                                             'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' :
                                                             'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100'">
+                                                        <i :class="detalle.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
                                                         <span
                                                             x-text="detalle.estado.charAt(0).toUpperCase() + detalle.estado.slice(1)"></span>
                                                     </button>
                                                 </td>
-                                                <td class="px-4 py-3 text-sm text-right">
+                                                <td class="px-4 py-3 text-sm text-right whitespace-nowrap">
                                                     S/ <span x-text="parseFloat(detalle.precio).toFixed(2)"></span>
                                                 </td>
                                             </tr>
@@ -266,7 +274,7 @@
                 <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
                     <button type="submit"
                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        Guardar Cambios
+                        Modificar
                     </button>
                     <button type="button" data-modal-hide="modificar-modal"
                         class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
@@ -324,22 +332,30 @@
                     button.addEventListener('click', () => {
                         const contratoId = button.getAttribute('data-id');
                         const clienteNombre = button.getAttribute('data-cliente');
-                        const clienteIdentificacion = button.getAttribute('data-identificacion');
+                        const clienteIdentificacion = button.getAttribute(
+                            'data-identificacion');
                         const clienteId = button.getAttribute('data-cliente-id');
-                        const detalles = JSON.parse(button.getAttribute('data-detalles'));
-                        const estadoContrato = button.getAttribute('data-estado') || 'activo';
+                        const detalles = JSON.parse(button.getAttribute(
+                            'data-detalles'));
+                        const estadoContrato = button.getAttribute('data-estado') ||
+                            'activo';
 
                         // Actualizar formulario
                         document.getElementById('contrato-id').value = contratoId;
                         document.getElementById('cliente-id').value = clienteId;
-                        document.getElementById('modal-input-cliente').value = clienteNombre;
-                        document.getElementById('client-identification').value = clienteIdentificacion;
+                        document.getElementById('modal-input-cliente').value =
+                            clienteNombre;
+                        document.getElementById('client-identification').value =
+                            clienteIdentificacion;
 
                         // Actualizar datos del contrato
-                        this.fecha = button.getAttribute('data-fecha') || fechaActual;
-                        this.fechaSuspension = button.getAttribute('data-fecha-suspension') || fechaActual;
+                        this.fecha = button.getAttribute('data-fecha') ||
+                            fechaActual;
+                        this.fechaSuspension = button.getAttribute(
+                            'data-fecha-suspension') || fechaActual;
                         this.estado = estadoContrato;
-                        this.observaciones = button.getAttribute('data-observaciones') || '';
+                        this.observaciones = button.getAttribute(
+                            'data-observaciones') || '';
 
                         // Cargar detalles existentes
                         this.detalles = detalles.map(detalle => ({
@@ -351,7 +367,8 @@
                             plan_nombre: detalle.plan,
                             precio: detalle.precio,
                             ip: detalle.ip_servicio || '',
-                            estado: detalle.estado || 'activo'
+                            estado: detalle.estado || 'activo',
+                            estado_original: detalle.estado || 'activo'
                         }));
 
                         this.calcularTotal();
@@ -449,8 +466,8 @@
 
                 const detalle = this.detalles[index];
                 if (detalle.id) {
-                    
-                    detalle.paraEliminar = !detalle.paraEliminar;   
+
+                    detalle.paraEliminar = !detalle.paraEliminar;
 
                     // Actualizar la lista de servicios a eliminar
                     if (detalle.paraEliminar) {
@@ -539,7 +556,6 @@
                             ip_servicio: detalle.ip_servicio || detalle.ip || '',
                             estado: detalle.estado || 'activo',
                             precio: detalle.precio || '0.00',
-                            // No enviar fecha de suspensión, el controlador la manejará
                             fecha_suspension_servicio: null
                         };
 
@@ -559,10 +575,7 @@
 
                 // Actualizar el campo oculto con los detalles
                 document.getElementById('detalles-json').value = JSON.stringify(datosParaEnviar);
-                
-                // Log para debugging
-                console.log('Datos a enviar:', datosParaEnviar);
-                
+
                 return this.detalles.length > 0;
             },
 
@@ -579,7 +592,7 @@
                 modal.setAttribute('aria-labelledby', 'modal-title');
                 modal.setAttribute('role', 'dialog');
                 modal.setAttribute('aria-modal', 'true');
-                
+
                 modal.innerHTML = `
                     <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity" aria-hidden="true"></div>
                     <div class="fixed inset-0 z-[100] w-screen overflow-y-auto">
@@ -595,7 +608,7 @@
                                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                             <h3 class="text-base font-semibold text-gray-900 dark:text-white" id="modal-title">Confirmar suspensión</h3>
                                             <div class="mt-2">
-                                                <p class="text-sm text-gray-500 dark:text-gray-300">¿Está seguro que desea suspender el contrato? Todos los servicios activos serán suspendidos y se registrará la fecha de suspensión. Los servicios suspendidos no generarán cargos.</p>
+                                                <p class="text-sm text-gray-500 dark:text-gray-300">¿Está seguro que desea suspender el contrato? <p class="text-sm text-gray-500 dark:text-gray-300"> Todos los servicios activos serán suspendidos.</p></p>
                                             </div>
                                         </div>
                                     </div>
@@ -615,17 +628,17 @@
                 document.getElementById('confirmar-suspension').addEventListener('click', () => {
                     // Establecer fecha de suspensión
                     this.fechaSuspension = new Date().toISOString().split('T')[0];
-                    
+
                     // Suspender todos los servicios activos
                     this.detalles.forEach(detalle => {
                         if (!detalle.paraEliminar && detalle.estado === 'activo') {
                             detalle.estado = 'suspendido';
                         }
                     });
-                    
+
                     // Recalcular el total
                     this.calcularTotal();
-                    
+
                     // Remover el modal
                     document.body.removeChild(modal);
                 });

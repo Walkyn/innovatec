@@ -14,11 +14,34 @@ use Illuminate\Validation\ValidationException;
 
 class ContractController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $clientes = Cliente::where('estado_cliente', 'activo')->get();
         $categorias = Categoria::with('servicios.planes')->get();
-        $contratos = Contrato::with(['cliente', 'servicios', 'contratoServicios'])->paginate(7);
+        
+        $search = $request->input('search');
+        $estado = $request->input('estado');
+        $query = Contrato::with(['cliente', 'servicios', 'contratoServicios']);
+
+        if ($search) {
+            // Extraer el número después del prefijo CTR- si existe
+            $searchId = preg_replace('/^CTR-0*/', '', $search);
+            
+            $query->where(function($q) use ($search, $searchId) {
+                $q->where('id', 'LIKE', '%' . $searchId . '%')
+                  ->orWhereHas('cliente', function($query) use ($search) {
+                      $query->where(DB::raw("CONCAT(nombres, ' ', apellidos)"), 'LIKE', '%' . $search . '%')
+                            ->orWhere('nombres', 'LIKE', '%' . $search . '%')
+                            ->orWhere('apellidos', 'LIKE', '%' . $search . '%');
+                  });
+            });
+        }
+
+        if ($estado && $estado !== 'todos') {
+            $query->where('estado_contrato', $estado);
+        }
+
+        $contratos = $query->paginate(7);
     
         foreach ($contratos as $contrato) {
             $contrato->detalles_servicios = $contrato->contratoServicios->map(function ($contratoServicio) {
@@ -46,7 +69,7 @@ class ContractController extends Controller
                 });
         }
     
-        return view('contracts.index', compact('clientes', 'categorias', 'contratos'));
+        return view('contracts.index', compact('clientes', 'categorias', 'contratos', 'estado'));
     }
 
 
@@ -107,6 +130,12 @@ class ContractController extends Controller
                                                        ->first();
 
                     if ($servicioExistente) {
+                        // Si el servicio ya está suspendido en la BD, no permitir cambiar a activo
+                        if ($servicioExistente->estado_servicio_cliente === 'suspendido' && 
+                            $detalle['estado'] === 'activo') {
+                            continue; // Saltar este servicio
+                        }
+
                         if ($detalle['estado'] === 'suspendido') {
                             // Solo actualizar la fecha si no existe una previa
                             $fechaSuspension = $servicioExistente->fecha_suspension_servicio ? 

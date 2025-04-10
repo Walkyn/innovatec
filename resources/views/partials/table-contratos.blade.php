@@ -19,7 +19,7 @@
         <div
             class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4 mb-4">
             <!-- Item Buscador Start -->
-            <form class="w-full md:w-2/3">
+            <form class="w-full md:w-2/3" method="GET" action="{{ route('contracts.index') }}">
                 <label for="default-search" class="sr-only">Search</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -29,9 +29,10 @@
                                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                         </svg>
                     </div>
-                    <input type="search" id="default-search"
+                    <input type="search" id="default-search" name="search"
+                        value="{{ request('search') }}"
                         class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Buscar Contratos, Clientes..." required />
+                        placeholder="Buscar por contrato o nombre del cliente..." />
                     <button type="submit"
                         class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
                 </div>
@@ -40,16 +41,21 @@
 
             <!-- Campo de Estado Servicio -->
             <div class="w-full md:w-1/3">
-                <div class="relative">
-                    <select
-                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-4 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
-                        id="servicio">
-                        <option>Activo</option>
-                        <option>Inactivo</option>
-                        <option>Suspendido</option>
+                <form method="GET" action="{{ route('contracts.index') }}" class="relative">
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    <select name="estado" onchange="this.form.submit()"
+                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-4 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                        <option value="todos" {{ !$estado ? 'selected' : '' }}>Todos los estados</option>
+                        <option value="activo" {{ $estado === 'activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="suspendido" {{ $estado === 'suspendido' ? 'selected' : '' }}>Suspendido</option>
                     </select>
-                </div>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    </div>
+                </form>
             </div>
+            <!-- Campo de Estado Servicio End -->
         </div>
 
         <div class="w-full overflow-hidden rounded-lg shadow-xs">
@@ -140,8 +146,9 @@
                                         ];
                                     @endphp
                                     <span
-                                        class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$contrato->estado_contrato] ?? 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100' }}">
-                                        {{ ucfirst($contrato->estado_contrato) }}
+                                        class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$contrato->estado_contrato] ?? 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100' }} flex items-center gap-1 whitespace-nowrap w-fit">
+                                        <i class="fas {{ $contrato->estado_contrato === 'activo' ? 'fa-check-circle' : 'fa-times-circle' }} text-xs"></i>
+                                        <span class="text-xs">{{ ucfirst($contrato->estado_contrato) }}</span>
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
