@@ -114,7 +114,7 @@
                                 <td class="px-4 py-3 text-sm">
                                     {{ $cliente->created_at->format('d/m/Y') }}
                                 </td>
-                                <td class="px-4 py-3 text-sm">
+                                <td class="px-4 py-3 text-sm whitespace-nowrap">
                                     <a href="tel:{{ $cliente->telefono }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                         {{ $cliente->telefono }}
                                     </a>
@@ -134,8 +134,9 @@
                                     @endphp
 
                                     <span
-                                        class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$cliente->estado_cliente] ?? 'text-gray-700 bg-gray-100' }}">
-                                        {{ ucfirst($cliente->estado_cliente) }}
+                                        class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$cliente->estado_cliente] ?? 'text-gray-700 bg-gray-100' }} flex items-center gap-1 whitespace-nowrap w-fit">
+                                        <i class="fas {{ $cliente->estado_cliente === 'activo' ? 'fa-check-circle' : ($cliente->estado_cliente === 'inactivo' ? 'fa-minus-circle' : 'fa-times-circle') }} text-xs"></i>
+                                        <span class="text-xs">{{ ucfirst($cliente->estado_cliente) }}</span>
                                     </span>
                                 </td>
 

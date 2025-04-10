@@ -218,8 +218,9 @@
                                 <span
                                     class="px-2 py-1 font-semibold leading-tight 
                                         {{ $servicio->estado_servicio == 'activo' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : ($servicio->estado_servicio == 'inactivo' ? 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100') }} 
-                                        rounded-full">
-                                    {{ ucfirst($servicio->estado_servicio) }}
+                                        rounded-full flex items-center gap-1 whitespace-nowrap w-fit">
+                                    <i class="fas {{ $servicio->estado_servicio === 'activo' ? 'fa-check-circle' : ($servicio->estado_servicio === 'inactivo' ? 'fa-minus-circle' : 'fa-times-circle') }} text-xs"></i>
+                                    <span class="text-xs">{{ ucfirst($servicio->estado_servicio) }}</span>
                                 </span>
                             </td>
 

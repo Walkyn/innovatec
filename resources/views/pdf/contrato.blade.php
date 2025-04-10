@@ -92,11 +92,19 @@
             padding: 10px;
             border-bottom: 1px solid #ddd;
             vertical-align: top;
+            white-space: nowrap;
         }
 
         .services-table .text-right {
             text-align: right;
             padding-right: 20px;
+            white-space: nowrap;
+        }
+
+        .services-table td:nth-child(4),
+        .services-table td:nth-child(5) {
+            white-space: nowrap;
+            min-width: 100px;
         }
 
         .totals {
@@ -213,7 +221,7 @@
         <div class="clearfix">
             <div class="invoice-details">
                 <div class="section-title">INFORMACIÓN DEL CONTRATO</div>
-                <p><strong>N° Contrato:</strong> CTR-{{ str_pad($contrato->id, 6, '0', STR_PAD_LEFT) }}</p>
+                <p><strong>N° Contrato:</strong> CTR-{{ str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}</p>
                 <p><strong>Fecha:</strong> {{ $contrato->fecha_contrato ? $contrato->fecha_contrato->format('d-m-Y') : 'N/A' }}</p>
                 <p><strong>Servicios:</strong> {{ $contrato->contratoServicios->count() }}</p>
                 <p><strong>Estado:</strong> <span style="text-transform: capitalize;">{{ $contrato->estado_contrato }}</span></p>
@@ -237,9 +245,10 @@
                     <th style="width: 5%;">Item</th>
                     <th style="width: 25%;">Servicio</th>
                     <th style="width: 20%;">Plan</th>
-                    <th style="width: 15%;">Fecha</th>
-                    <th style="width: 15%;">Estado</th>
-                    <th style="width: 20%;" class="text-right">Precio</th>
+                    <th style="width: 15%;">Fecha Inicio</th>
+                    <th style="width: 15%;">Fecha Fin</th>
+                    <th style="width: 10%;">Estado</th>
+                    <th style="width: 10%;" class="text-right">Precio</th>
                 </tr>
             </thead>
             <tbody>
@@ -249,6 +258,13 @@
                         <td>{{ $contratoServicio->servicio->nombre }}</td>
                         <td>{{ $contratoServicio->plan->nombre }}</td>
                         <td>{{ $contratoServicio->fecha_servicio ? \Carbon\Carbon::parse($contratoServicio->fecha_servicio)->format('d-m-Y') : 'N/A' }}</td>
+                        <td>
+                            @if($contratoServicio->estado_servicio_cliente === 'suspendido' && $contratoServicio->fecha_suspension_servicio)
+                                {{ \Carbon\Carbon::parse($contratoServicio->fecha_suspension_servicio)->format('d-m-Y') }}
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>{{ ucfirst($contratoServicio->estado_servicio_cliente) }}</td>
                         <td class="text-right">S/. {{ number_format($contratoServicio->plan->precio, 2) }}</td>
                     </tr>
@@ -260,11 +276,11 @@
             <table>
                 <tr>
                     <td>Subtotal</td>
-                    <td>S/. {{ number_format($contrato->totalPago(), 2) }}</td>
+                    <td>S/. {{ number_format($total, 2) }}</td>
                 </tr>
                 <tr class="total-line">
                     <td><strong>Total</strong></td>
-                    <td><strong>S/. {{ number_format($contrato->totalPago(), 2) }}</strong></td>
+                    <td><strong>S/. {{ number_format($total, 2) }}</strong></td>
                 </tr>
             </table>
         </div>
