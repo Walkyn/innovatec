@@ -14,7 +14,7 @@ class PaymentController extends Controller
     {
         $clientes = Cliente::where('estado_cliente', '!=', 'inactivo')->get();
         
-        $cobranzas = Cobranza::with('cliente')
+        $cobranzas = Cobranza::with(['cliente', 'usuario'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
     
@@ -43,6 +43,7 @@ class PaymentController extends Controller
             // Crear la cobranza
             $cobranza = Cobranza::create([
                 'cliente_id' => $request->cliente_id,
+                'usuario_id' => auth()->id(),
                 'monto_total' => $request->monto_total,
                 'monto_pago_efectivo' => $request->monto_pago_efectivo,
                 'monto_cambio_efectivo' => $request->monto_pago_efectivo - $request->monto_total,
@@ -93,6 +94,7 @@ class PaymentController extends Controller
         try {
             $cobranza = Cobranza::with([
                 'cliente',
+                'usuario',
                 'cobranzaContratoServicios.contratoServicio.servicio',
                 'cobranzaContratoServicios.contratoServicio.plan',
                 'cobranzaContratoServicios.mes'
@@ -112,7 +114,10 @@ class PaymentController extends Controller
                         'estado_cobro' => $cobranza->estado_cobro,
                         'monto_total' => number_format($cobranza->monto_total, 2),
                         'monto_pago_efectivo' => number_format($cobranza->monto_pago_efectivo, 2),
-                        'monto_cambio_efectivo' => number_format($cobranza->monto_cambio_efectivo, 2)
+                        'monto_cambio_efectivo' => number_format($cobranza->monto_cambio_efectivo, 2),
+                        'usuario' => [
+                            'name' => $cobranza->usuario->name
+                        ]
                     ],
                     'cliente' => [
                         'nombres' => $cobranza->cliente->nombres . ' ' . $cobranza->cliente->apellidos,
@@ -148,9 +153,41 @@ class PaymentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $cobranza = Cobranza::findOrFail($id);
+            
+            // Verificar si el pago ya está anulado
+            if ($cobranza->estado_cobro === 'anulado') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El pago ya se encuentra anulado.'
+                ], 400);
+            }
+
+            // Actualizar el estado del pago a anulado
+            $cobranza->estado_cobro = 'anulado';
+            $cobranza->save();
+
+            // Actualizar el estado de los detalles del pago
+            $cobranza->cobranzaContratoServicios()->update(['estado_pago' => 'anulado']);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pago anulado correctamente.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al anular el pago: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

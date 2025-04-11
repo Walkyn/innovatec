@@ -11,6 +11,7 @@ class Cobranza extends Model
 
     protected $fillable = [
         'cliente_id',
+        'usuario_id',
         'monto_total',
         'monto_pago_efectivo',
         'monto_cambio_efectivo',
@@ -67,5 +68,10 @@ class Cobranza extends Model
     public function mes()
     {
         return $this->belongsTo(Mes::class);
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 }

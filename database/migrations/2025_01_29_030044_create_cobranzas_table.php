@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('numero_boleta')->unique();
             $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->decimal('monto_total', 10, 2)->comment('Monto total de todos los servicios cobrados');
             $table->decimal('monto_pago_efectivo', 10, 2);
             $table->decimal('monto_cambio_efectivo', 10, 2);

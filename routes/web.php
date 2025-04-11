@@ -103,13 +103,15 @@ Route::middleware('auth')->group(function () {
     Route::get('charts', [ChartController::class, 'index'])->middleware('check.permissions:charts,all')->name('charts.index');
 
     // Payments
-    Route::get('payments', [PaymentController::class, 'index'])->middleware('check.permissions:payments,all')->name('payments.index');
-    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
-    Route::resource('payments', PaymentController::class);
-    Route::put('/payments/{id}/anular', [PaymentController::class, 'anular'])->name('payments.anular');
-    Route::get('payments/{id}/pdf', [PaymentPDFController::class, 'generatePDF'])
-        ->middleware('check.permissions:manage,all')
-        ->name('payments.pdf');
+    Route::controller(PaymentController::class)->group(function () {
+        Route::get('payments', 'index')->middleware('check.permissions:payments,all')->name('payments.index');
+        Route::post('payments', 'store')->middleware('check.permissions:payments,guardar')->name('payments.store');
+        Route::get('payments/{id}', 'show')->middleware('check.permissions:payments,all')->name('payments.show');
+        Route::put('payments/{id}', 'update')->middleware('check.permissions:payments,actualizar')->name('payments.update');
+        Route::get('payments/{id}/pdf', [PaymentPDFController::class, 'generatePDF'])
+            ->middleware('check.permissions:payments,all')
+            ->name('payments.pdf');
+    });
 
     // Services
     Route::controller(ServiceController::class)->group(function () {

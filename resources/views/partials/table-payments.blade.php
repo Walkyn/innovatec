@@ -206,7 +206,7 @@
             // Manejar la confirmación
             document.getElementById('confirmar-anulacion').addEventListener('click', async () => {
                 try {
-                    const response = await fetch(`/payments/${cobranzaId}/anular`, {
+                    const response = await fetch(`/payments/${cobranzaId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -217,15 +217,47 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        window.location.reload();
+                        document.body.removeChild(modal);
+                        // Mostrar mensaje de éxito
+                        const successModal = document.createElement('div');
+                        successModal.innerHTML = `
+                            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                    <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                                        <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                                            <div class="sm:flex sm:items-start">
+                                                <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                    <i class="fas fa-check text-green-600"></i>
+                                                </div>
+                                                <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                                    <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" id="modal-title">Éxito</h3>
+                                                    <div class="mt-2">
+                                                        <p class="text-sm text-gray-500 dark:text-gray-400">${data.message}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                            <button type="button" id="aceptar-anulacion" class="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">Aceptar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(successModal);
+
+                        // Manejar el botón de aceptar
+                        document.getElementById('aceptar-anulacion').addEventListener('click', () => {
+                            document.body.removeChild(successModal);
+                            window.location.reload();
+                        });
                     } else {
                         throw new Error(data.message);
                     }
                 } catch (error) {
-                    console.error('Error:', error);
-                    alert('Error al anular el cobro: ' + error.message);
-                } finally {
                     document.body.removeChild(modal);
+                    alert(error.message);
                 }
             });
 

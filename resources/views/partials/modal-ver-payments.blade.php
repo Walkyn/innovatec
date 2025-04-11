@@ -24,7 +24,7 @@
                 <!-- Modal body -->
                 <div class="p-4 md:p-5 space-y-4">
                     <div class="flex flex-wrap -mx-3 mb-6">
-                        <!-- Campo de Datos del Cliente -->
+                        <!-- Campo de Datos del Cliente y Identificación -->
                         <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
                             <label
                                 class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
@@ -42,6 +42,20 @@
                         </div>
 
                         <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-identificacion">
+                                Identificación
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <i class="fas fa-id-card text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <input class="bg-white border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" id="cliente-identificacion" disabled>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap -mx-3 mb-6">
+                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                             <label
                                 class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
                                 for="tipo-pago">
@@ -54,21 +68,6 @@
                                 <input type="text" id="tipo-pago"
                                     class="border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                     disabled />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Identificación, Teléfono y Estado -->
-                    <div class="flex flex-wrap -mx-3 mb-6">
-                        <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-identificacion">
-                                Identificación
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <i class="fas fa-id-card text-gray-500 dark:text-gray-400"></i>
-                                </div>
-                                <input class="bg-white border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" id="cliente-identificacion" disabled>
                             </div>
                         </div>
 
@@ -134,22 +133,28 @@
                             <!-- Total y Cambio -->
                             <div class="px-4 py-3 text-xs font-semibold tracking-wide uppercase border-t dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-                                    <div class="flex items-center justify-between w-full md:w-auto">
-                                        <span class="text-gray-600 dark:text-gray-400">FECHA DE COBRO:</span>
-                                        <span id="fecha-cobro" class="text-gray-800 dark:text-gray-200"></span>
+                                    <div class="flex flex-col space-y-2 w-full md:w-auto">
+                                        <div class="flex items-center justify-between w-full">
+                                            <span class="text-gray-600 dark:text-gray-400">FECHA DE COBRO:</span>
+                                            <span id="fecha-cobro" class="text-gray-800 dark:text-gray-200 ml-2"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between w-full">
+                                            <span class="text-gray-600 dark:text-gray-400">USUARIO:</span>
+                                            <span id="usuario-nombre" class="text-gray-800 dark:text-gray-200 ml-2"></span>
+                                        </div>
                                     </div>
                                     <div class="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-8 w-full md:w-auto">
                                         <div class="flex items-center justify-between w-full md:w-auto">
                                             <span class="text-gray-600 dark:text-gray-400">PAGO:</span>
-                                            <span id="monto-pago" class="text-gray-800 dark:text-gray-200"></span>
+                                            <span id="monto-pago" class="text-gray-800 dark:text-gray-200 ml-2"></span>
                                         </div>
                                         <div class="flex items-center justify-between w-full md:w-auto">
                                             <span class="text-gray-600 dark:text-gray-400">CAMBIO:</span>
-                                            <span id="monto-cambio" class="text-gray-800 dark:text-gray-200"></span>
+                                            <span id="monto-cambio" class="text-gray-800 dark:text-gray-200 ml-2"></span>
                                         </div>
                                         <div class="flex items-center justify-between w-full md:w-auto">
                                             <span class="text-gray-600 dark:text-gray-400">TOTAL:</span>
-                                            <span id="monto-total" class="text-gray-800 dark:text-gray-200"></span>
+                                            <span id="monto-total" class="text-gray-800 dark:text-gray-200 ml-2"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -189,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('cliente-identificacion').value = cliente.identificacion;
             document.getElementById('cliente-telefono').value = cliente.telefono;
             document.getElementById('tipo-pago').value = cobranza.tipo_pago.charAt(0).toUpperCase() + cobranza.tipo_pago.slice(1);
+            document.getElementById('usuario-nombre').textContent = cobranza.usuario.name;
             document.getElementById('glosa').value = cobranza.glosa || 'Sin notas adicionales';
             document.getElementById('fecha-cobro').textContent = cobranza.fecha_cobro;
             document.getElementById('monto-total').textContent = `S/ ${cobranza.monto_total}`;
