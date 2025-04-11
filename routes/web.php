@@ -135,8 +135,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/planes/{id}/edit', 'editPlan')->middleware('check.permissions:manage,actualizar');
         Route::put('/planes/{id}/update', 'updatePlan')->middleware('check.permissions:manage,actualizar');
         Route::delete('/planes/{plan}', 'destroyPlan')->middleware('check.permissions:manage,eliminar')->name('planes.destroy');
-        Route::get('/servicios/{id}/edit', [ServiceController::class, 'edit'])->name('servicios.edit');
-        Route::post('/servicios/{id}/update', [ServiceController::class, 'updateServicio'])->name('servicios.update');
+        Route::get('/servicios/{id}/edit', 'edit')->middleware('check.permissions:manage,actualizar')->name('servicios.edit');
+        Route::post('/servicios/{id}/update', 'update')->middleware('check.permissions:manage,actualizar')->name('servicios.update');
     });
 
     // Contracts

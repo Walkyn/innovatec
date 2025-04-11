@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use App\Models\Session;
 use App\Models\HistorySession;
+use App\Models\Cobranza;
 
 class User extends Authenticatable
 {
@@ -126,5 +127,10 @@ class User extends Authenticatable
     public function historySessions()
     {
         return $this->hasMany(HistorySession::class);
+    }
+
+    public function cobranzas()
+    {
+        return $this->hasMany(Cobranza::class, 'usuario_id');
     }
 }

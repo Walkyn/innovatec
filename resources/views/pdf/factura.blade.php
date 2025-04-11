@@ -231,8 +231,8 @@
         </div>
 
         <div class="payment-info">
-            <div class="section-title">OBSERVACIONES</div>
-            <p>{{ $cobranza->glosa ?? 'Sin observaciones' }}</p>
+            <div class="section-title">GLOSA</div>
+            <p>{{ $cobranza->glosa ?? 'Sin notas adicionales' }}</p>
         </div>
     </div>
 

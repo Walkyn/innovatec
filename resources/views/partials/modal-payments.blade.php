@@ -601,6 +601,15 @@
             });
         }
 
+        // Event listener para actualizar el precio cuando se cambia el mes
+        elements.mesSelect.addEventListener('change', function() {
+            const mesId = this.value;
+            const precio = preciosMeses[mesId];
+            if (precio) {
+                elements.precioPlanInput.value = `S/ ${precio}`;
+            }
+        });
+
         const toggleDropdown = () => {
             elements.dropdown.classList.toggle('hidden');
             elements.searchInput.value = '';
@@ -750,6 +759,7 @@
                 const mesesPendientes = data.meses_pendientes || [];
                 const precioPlan = parseFloat(data.precio_plan) || 0;
                 const montoProporcional = parseFloat(data.monto_proporcional) || 0;
+                const mesInicioServicio = mesesPendientes.length > 0 ? mesesPendientes[0].id : null;
 
                 // Filtrar los meses que no están en la tabla
                 const mesesDisponibles = mesesPendientes.filter(mes => {
@@ -758,8 +768,9 @@
                 });
 
                 if (mesesDisponibles.length > 0) {
-                    mesesDisponibles.forEach((mes, index) => {
-                        const precioMes = (index === 0 && montoProporcional > 0) ?
+                    mesesDisponibles.forEach((mes) => {
+                        // Solo aplicar el precio proporcional al mes de inicio del servicio
+                        const precioMes = (mes.id === mesInicioServicio && montoProporcional > 0) ? 
                             montoProporcional : precioPlan;
                         const precioRedondeado = Math.round(precioMes);
                         const precioFormateado = precioRedondeado.toFixed(2);
@@ -845,17 +856,6 @@
                 }, 5500);
             }
         }
-
-        // Evento change para actualizar el precio cuando se selecciona un mes
-        elements.mesSelect.addEventListener('change', () => {
-            const mesId = elements.mesSelect.value;
-            const precio = preciosMeses[mesId];
-
-            const precioPlanInput = document.getElementById('precio-plan');
-            if (precioPlanInput) {
-                precioPlanInput.value = `S/ ${precio}`;
-            }
-        });
 
         const limpiarTablaDetalles = () => {
             const tbody = document.querySelector('#tabla-modal tbody');

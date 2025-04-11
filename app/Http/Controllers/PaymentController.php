@@ -7,18 +7,44 @@ use App\Models\Cliente;
 use App\Models\Cobranza;
 use App\Models\CobranzaContratoServicio;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class PaymentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $clientes = Cliente::where('estado_cliente', '!=', 'inactivo')->get();
-        
-        $cobranzas = Cobranza::with(['cliente', 'usuario'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-    
-        return view('payments.index', compact('clientes', 'cobranzas'));
+        $query = Cobranza::with(['cliente', 'usuario']);
+
+        // Aplicar filtro de búsqueda si existe
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero_boleta', 'like', "%{$search}%")
+                  ->orWhereHas('cliente', function($q) use ($search) {
+                      $q->where('nombres', 'like', "%{$search}%")
+                        ->orWhere('apellidos', 'like', "%{$search}%")
+                        ->orWhere('identificacion', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Aplicar filtros de fecha solo si no se pidió ver todos
+        if (!$request->has('todos')) {
+            if ($request->has('fecha_inicio') && $request->has('fecha_fin')) {
+                $query->whereBetween('fecha_cobro', [
+                    $request->fecha_inicio,
+                    $request->fecha_fin
+                ]);
+            } elseif ($request->has('fecha_inicio')) {
+                $query->whereDate('fecha_cobro', $request->fecha_inicio);
+            }
+        }
+
+        $cobranzas = $query->orderBy('created_at', 'desc')->get();
+        $usuarios = User::whereHas('cobranzas')->get();
+
+        return view('payments.index', compact('cobranzas', 'clientes', 'usuarios'));
     }    
 
     public function store(Request $request)
