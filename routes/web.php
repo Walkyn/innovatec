@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ContratoPDFController;
+use App\Http\Controllers\PaymentPDFController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -106,6 +107,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
     Route::resource('payments', PaymentController::class);
     Route::put('/payments/{id}/anular', [PaymentController::class, 'anular'])->name('payments.anular');
+    Route::get('payments/{id}/pdf', [PaymentPDFController::class, 'generatePDF'])
+        ->middleware('check.permissions:manage,all')
+        ->name('payments.pdf');
 
     // Services
     Route::controller(ServiceController::class)->group(function () {
@@ -213,14 +217,14 @@ Route::middleware('auth')->group(function () {
             ]);
         }
 
-        // Obtener todos los meses que no estén pagados
+        // Obtener todos los meses que no estén pagados ni marcados como no_aplica
         $mesesPendientes = DB::table('meses')
             ->where('id', '>=', $mesInicioServicio)
             ->whereNotIn('id', function ($query) use ($contratoServicioId) {
                 $query->select('mes_id')
                     ->from('cobranza_contratoservicio')
                     ->where('contrato_servicio_id', $contratoServicioId)
-                    ->where('estado_pago', 'pagado');
+                    ->whereIn('estado_pago', ['pagado', 'no_aplica']);
             })
             ->orderBy('anio')
             ->orderBy('numero')
@@ -364,14 +368,14 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
         ]);
     }
 
-    // Obtener todos los meses que no estén pagados
+    // Obtener todos los meses que no estén pagados ni marcados como no_aplica
     $mesesPendientes = DB::table('meses')
         ->where('id', '>=', $mesInicioServicio)
         ->whereNotIn('id', function ($query) use ($contratoServicioId) {
             $query->select('mes_id')
                 ->from('cobranza_contratoservicio')
                 ->where('contrato_servicio_id', $contratoServicioId)
-                ->where('estado_pago', 'pagado');
+                ->whereIn('estado_pago', ['pagado', 'no_aplica']);
         })
         ->orderBy('anio')
         ->orderBy('numero')

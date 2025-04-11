@@ -515,10 +515,17 @@
             let total = 0;
 
             filas.forEach(fila => {
-                const precio = parseFloat(fila.querySelector('td:nth-child(6)').textContent.replace(
-                    'S/ ', ''));
-                if (!isNaN(precio)) {
-                    total += precio;
+                const estadoSelect = fila.querySelector('td:nth-child(5) select');
+                const precioCell = fila.querySelector('td:nth-child(6)');
+                const precioOriginal = parseFloat(precioCell.textContent.replace('S/ ', ''));
+                
+                if (estadoSelect.value === 'no_aplica') {
+                    precioCell.textContent = 'S/ 0.00';
+                } else {
+                    precioCell.textContent = `S/ ${precioOriginal.toFixed(2)}`;
+                    if (!isNaN(precioOriginal)) {
+                        total += precioOriginal;
+                    }
                 }
             });
 
@@ -578,9 +585,21 @@
         // Vincular el campo de pago
         const pagoInput = document.getElementById('pago');
         if (pagoInput) {
-            pagoInput.addEventListener('input', calcularCambio);
+            pagoInput.addEventListener('input', (e) => {
+                const total = parseFloat(document.getElementById('total').textContent.replace('S/ ', ''));
+                const pago = parseFloat(e.target.value);
+                
+                if (!isNaN(pago) && pago < total) {
+                    e.target.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-200');
+                    e.target.classList.remove('border-gray-500', 'focus:border-blue-500', 'focus:ring-blue-200');
+                } else {
+                    e.target.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-200');
+                    e.target.classList.add('border-gray-500', 'focus:border-blue-500', 'focus:ring-blue-200');
+                }
+                
+                calcularCambio();
+            });
         }
-
 
         const toggleDropdown = () => {
             elements.dropdown.classList.toggle('hidden');
@@ -968,11 +987,16 @@
         const guardarCobro = async () => {
             try {
                 const clienteId = document.getElementById('selected-client-id').value;
-                const montoTotal = parseFloat(document.getElementById('total').textContent.replace(
-                    'S/ ', ''));
+                const montoTotal = parseFloat(document.getElementById('total').textContent.replace('S/ ', ''));
                 const montoPagoEfectivo = parseFloat(document.getElementById('pago').value);
                 const tipoPago = document.getElementById('tipo_pago').value;
                 const glosa = document.getElementById('glosa').value;
+
+                // Validar que el monto de pago no sea menor al total
+                if (montoPagoEfectivo < montoTotal) {
+                    mostrarAlertaCobro('El monto de pago no puede ser menor al total');
+                    return;
+                }
 
                 // Obtener los detalles de la tabla
                 const detalles = [];
@@ -1120,6 +1144,13 @@
             .finally(() => {
                 cerrarModalAnular();
             });
+        });
+
+        // Agregar evento change a los selectores de estado
+        document.addEventListener('change', (event) => {
+            if (event.target.matches('td:nth-child(5) select')) {
+                calcularTotal();
+            }
         });
     });
 </script>

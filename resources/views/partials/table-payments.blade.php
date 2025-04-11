@@ -76,7 +76,13 @@
                                     <p class="font-semibold">{{ $cobranza->cliente->nombres }} {{ $cobranza->cliente->apellidos }}</p>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-sm">S/ {{ number_format($cobranza->monto_total, 2) }}</td>
+                            <td class="px-4 py-3 text-sm">
+                                @if($cobranza->estado_cobro === 'anulado')
+                                    <span class="line-through text-gray-500">S/ {{ number_format($cobranza->monto_total, 2) }}</span>
+                                @else
+                                    S/ {{ number_format($cobranza->monto_total, 2) }}
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm">{{ $cobranza->fecha_cobro->format('d/m/Y') }}</td>
                             <td class="px-4 py-3 text-sm">{{ ucfirst($cobranza->tipo_pago) }}</td>
                             <td class="px-4 py-3 text-xs">
@@ -96,11 +102,11 @@
                                     </button>
 
                                     <!-- Botón Exportar a PDF -->
-                                    <button
+                                    <a href="{{ route('payments.pdf', $cobranza->id) }}" target="_blank"
                                         class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-purple-600 bg-purple-50 border border-purple-200 rounded-md hover:bg-purple-100 focus:outline-none focus:ring-1 focus:ring-purple-300 focus:ring-offset-1 dark:text-purple-200 dark:bg-purple-900 dark:border-purple-700 dark:hover:bg-purple-800 dark:focus:ring-purple-600"
                                         aria-label="Exportar a PDF">
                                         <i class="fas fa-file-pdf"></i>
-                                    </button>
+                                    </a>
 
                                     <!-- Botón Ver -->
                                     <button data-modal-target="ver-cobro-modal" data-modal-toggle="ver-cobro-modal"
