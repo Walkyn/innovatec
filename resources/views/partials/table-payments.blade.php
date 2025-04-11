@@ -67,17 +67,23 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                        @forelse($cobranzas as $cobranza)
                         <tr class="text-gray-700 dark:text-gray-400">
-                            <td class="px-4 py-3 text-sm">2025-0000001</td>
-                            <td class="px-4 py-3 text-sm hidden">63371697</td>
-                            <td class="px-4 py-3 text-sm">Brayan Capa Medina</td>
-                            <td class="px-4 py-3 text-sm">50.00</td>
-                            <td class="px-4 py-3 text-sm">2025-01-15</td>
-                            <td class="px-4 py-3 text-sm">Efectivo</td>
+                            <td class="px-4 py-3 text-sm">B{{ $cobranza->numero_boleta }}</td>
+                            <td class="px-4 py-3 text-sm hidden">{{ $cobranza->cliente->identificacion }}</td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center text-sm">
+                                    <p class="font-semibold">{{ $cobranza->cliente->nombres }} {{ $cobranza->cliente->apellidos }}</p>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-sm">S/ {{ number_format($cobranza->monto_total, 2) }}</td>
+                            <td class="px-4 py-3 text-sm">{{ $cobranza->fecha_cobro->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3 text-sm">{{ ucfirst($cobranza->tipo_pago) }}</td>
                             <td class="px-4 py-3 text-xs">
-                                <span
-                                    class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                                    Aceptado
+                                <span class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center 
+                                    {{ $cobranza->estado_cobro === 'emitido' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100' }}">
+                                    <i class="fas {{ $cobranza->estado_cobro === 'emitido' ? 'fa-check-circle mr-2' : 'fa-times-circle mr-2' }}"></i>
+                                    {{ ucfirst($cobranza->estado_cobro) }}
                                 </span>
                             </td>
                             <td class="px-4 py-3">
@@ -98,81 +104,137 @@
 
                                     <!-- Botón Ver -->
                                     <button data-modal-target="ver-cobro-modal" data-modal-toggle="ver-cobro-modal"
-                                        type="button"
+                                        type="button" data-cobranza-id="{{ $cobranza->id }}"
                                         class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:ring-offset-1 dark:text-blue-200 dark:bg-blue-900 dark:border-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-600"
                                         aria-label="Ver">
                                         <i class="fas fa-eye"></i>
                                     </button>
 
-                                    <!-- Botón Eliminar -->
-                                    <button
-                                        class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 focus:outline-none focus:ring-1 focus:ring-red-300 focus:ring-offset-1 dark:text-red-200 dark:bg-red-900 dark:border-red-700 dark:hover:bg-red-800 dark:focus:ring-red-600"
-                                        aria-label="Eliminar">
-                                        <i class="fas fa-trash-alt"></i>
+                                    <!-- Botón Anular -->
+                                    @if($cobranza->estado_cobro !== 'anulado')
+                                    <button data-cobranza-id="{{ $cobranza->id }}"
+                                        class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-md hover:bg-yellow-100 focus:outline-none focus:ring-1 focus:ring-yellow-300 focus:ring-offset-1 dark:text-yellow-200 dark:bg-yellow-900 dark:border-yellow-700 dark:hover:bg-yellow-800 dark:focus:ring-yellow-600 btn-anular"
+                                        aria-label="Anular">
+                                        <i class="fas fa-ban"></i>
                                     </button>
+                                    @endif
                                 </div>
                             </td>
-
                         </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="px-4 py-3 text-sm text-center text-gray-500 dark:text-gray-400">
+                                No hay cobranzas registradas
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             <div
                 class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                 <span class="flex items-center col-span-3">
-                    Viendo 1-10 de 50
+                    Viendo {{ $cobranzas->firstItem() ?? 0 }}-{{ $cobranzas->lastItem() ?? 0 }} de {{ $cobranzas->total() ?? 0 }}
                 </span>
                 <span class="col-span-2"></span>
                 <!-- Paginación -->
                 <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
-                    <nav aria-label="Table navigation">
-                        <ul class="inline-flex items-center">
-                            <li>
-                                <button
-                                    class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none focus:shadow-outline-purple"
-                                    aria-label="Previous">
-                                    <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
-                                        <path
-                                            d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                                            clip-rule="evenodd" fill-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                            </li>
-                            <li>
-                                <button class="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">
-                                    1
-                                </button>
-                            </li>
-                            <li>
-                                <button
-                                    class="px-3 py-1 text-white transition-colors duration-150 bg-purple-600 border border-r-0 border-purple-600 rounded-md focus:outline-none focus:shadow-outline-purple">
-                                    2
-                                </button>
-                            </li>
-                            <li>
-                                <button class="px-3 py-1 rounded-md focus:outline-none focus:shadow-outline-purple">
-                                    3
-                                </button>
-                            </li>
-                            <li>
-                                <span class="px-3 py-1">...</span>
-                            </li>
-                            <li>
-                                <button
-                                    class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none focus:shadow-outline-purple"
-                                    aria-label="Next">
-                                    <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
-                                        <path
-                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4-4a1 1 0 01-1.414 0z"
-                                            clip-rule="evenodd" fill-rule="evenodd"></path>
-                                    </svg>
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
+                    {{ $cobranzas->links() }}
                 </span>
             </div>
         </div>
 
     </div>
 </main>
+
+<script>
+    // Agregar al final del script existente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para mostrar el modal de confirmación de anulación
+        const mostrarConfirmacionAnulacion = (cobranzaId) => {
+            const modal = document.createElement('div');
+            modal.className = 'relative z-[100]';
+            modal.setAttribute('aria-labelledby', 'modal-title');
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+
+            modal.innerHTML = `
+                <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity"></div>
+                <div class="fixed inset-0 z-[100] w-screen overflow-y-auto">
+                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-700 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                            <div class="bg-white dark:bg-gray-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900 sm:mx-0 sm:h-10 sm:w-10">
+                                        <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-200"></i>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" id="modal-title">
+                                            Confirmar anulación
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-500 dark:text-gray-300">
+                                                ¿Está seguro que desea anular este cobro? Esta acción no se puede deshacer.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-600 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                <button type="button" id="confirmar-anulacion"
+                                    class="inline-flex w-full justify-center rounded-md bg-yellow-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 sm:ml-3 sm:w-auto">
+                                    Confirmar
+                                </button>
+                                <button type="button" id="cancelar-anulacion"
+                                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Manejar la confirmación
+            document.getElementById('confirmar-anulacion').addEventListener('click', async () => {
+                try {
+                    const response = await fetch(`/payments/${cobranzaId}/anular`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al anular el cobro: ' + error.message);
+                } finally {
+                    document.body.removeChild(modal);
+                }
+            });
+
+            // Manejar la cancelación
+            document.getElementById('cancelar-anulacion').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        };
+
+        // Agregar evento a los botones de anular
+        document.querySelectorAll('.btn-anular').forEach(button => {
+            button.addEventListener('click', () => {
+                const cobranzaId = button.dataset.cobranzaId;
+                mostrarConfirmacionAnulacion(cobranzaId);
+            });
+        });
+    });
+</script>

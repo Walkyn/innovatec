@@ -206,7 +206,7 @@
                                 </label>
                                 <div class="relative">
                                     <select
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden"
                                         id="servicio">
                                     </select>
                                 </div>
@@ -221,7 +221,7 @@
                                 </label>
                                 <div class="relative">
                                     <select
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden"
                                         id="mes">
                                     </select>
                                 </div>
@@ -240,6 +240,21 @@
                             </div>
                         </div>
                         <!-- ====== Servicio - Boton Section End -->
+
+                        <div class="w-full mb-6 md:mb-0">
+                            <label
+                                class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">
+                                GLOSA
+                            </label>
+                            <div class="relative flex items-center">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
+                                </div>
+                                <input type="text" id="glosa" name="glosa" placeholder="Notas adicionales"
+                                    class="bg-gray-50 border border-gray-100 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    required />
+                            </div>
+                        </div>
 
                         <!-- Alerta -->
                         <div id="modal" x-data="{ showAlert: false }">
@@ -283,7 +298,6 @@
                                                     <th class="px-4 py-3">Acción</th>
                                                     <th class="px-4 py-3">Item</th>
                                                     <th class="px-4 py-3">Servicio</th>
-                                                    <th class="px-4 py-3">Fecha</th>
                                                     <th class="px-4 py-3">Mes</th>
                                                     <th class="px-4 py-3">Estado</th>
                                                     <th class="px-4 py-3 text-right">Subtotal</th>
@@ -334,11 +348,11 @@
                     <!-- Modal footer -->
                     <div
                         class="flex justify-between items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                        <button data-modal-hide="cobro-modal" type="button"
+                        <button type="button" id="btn-guardar-cobro"
                             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                             Realizar Cobro
                         </button>
-                        <button data-modal-hide="cobro-modal" type="button"
+                        <button type="button" data-modal-hide="cobro-modal"
                             class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                             Cancelar
                         </button>
@@ -347,6 +361,36 @@
         </div>
 </div>
 @endif
+</div>
+
+<div class="relative z-10" id="modal-anular-pago" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg dark:bg-gray-800">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" id="modal-title">Confirmar anulación</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">¿Está seguro que desea anular este pago? Esta acción no se puede deshacer.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 dark:bg-gray-700">
+                    <button type="button" id="btn-confirmar-anulacion" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Anular pago</button>
+                    <button type="button" onclick="cerrarModalAnular()" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:bg-gray-600 dark:text-white dark:ring-gray-600 dark:hover:bg-gray-500">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -376,53 +420,17 @@
             const mesSelect = elements.mesSelect;
             const precioPlanInput = elements.precioPlanInput;
             const selectedClientInput = elements.selectedClientInput;
+            const contratoSelect = elements.contratoSelect;
 
             // Validar si el cliente no ha sido seleccionado
             if (!selectedClientInput.value) {
-                const modal = document.getElementById('modal');
-                if (modal) {
-                    const alpineData = Alpine.$data(modal);
-                    alpineData.showAlert = true;
-
-                    const alertMessage = document.getElementById('alert-message');
-                    if (alertMessage) {
-                        alertMessage.textContent = 'Por favor, seleccione un cliente.';
-                    }
-
-                    setTimeout(() => {
-                        alpineData.showAlert = false;
-                    }, 5500);
-                }
-
+                showAlert('Por favor, seleccione un cliente.');
                 return;
             }
 
             // Validar campos
             if (!servicioSelect.value || !mesSelect.value || !precioPlanInput.value) {
-                const modal = document.getElementById('modal');
-                if (modal) {
-                    const alpineData = Alpine.$data(modal);
-                    alpineData.showAlert = true;
-
-                    const alertMessage = document.getElementById('alert-message');
-                    if (alertMessage) {
-                        if (!servicioSelect.value) {
-                            alertMessage.textContent = 'Por favor, seleccione un servicio.';
-                        } else if (!mesSelect.value) {
-                            alertMessage.textContent = 'Por favor, seleccione un mes.';
-                        } else if (!precioPlanInput.value) {
-                            alertMessage.textContent = 'Por favor, ingrese el precio.';
-                        } else {
-                            alertMessage.textContent =
-                                'Por favor, complete todos los campos requeridos: servicio, mes y precio.';
-                        }
-                    }
-
-                    setTimeout(() => {
-                        alpineData.showAlert = false;
-                    }, 5500);
-                }
-
+                showAlert('Por favor, complete todos los campos requeridos.');
                 return;
             }
 
@@ -430,11 +438,13 @@
             const mesText = mesSelect.options[mesSelect.selectedIndex].text;
             const precio = precioPlanInput.value;
             const servicio = servicioSelect.options[servicioSelect.selectedIndex].text;
+            const contratoServicioId = servicioSelect.value;
+            const mesId = mesSelect.value;
 
             const existeMesYServicioEnTabla = (mesText, servicio) => {
                 const filas = document.querySelectorAll('#tabla-modal tbody tr');
                 for (const fila of filas) {
-                    const mesEnFila = fila.querySelector('td:nth-child(5)').textContent.trim();
+                    const mesEnFila = fila.querySelector('td:nth-child(4)').textContent.trim();
                     const servicioEnFila = fila.querySelector('td:nth-child(3)').textContent.trim();
                     if (mesEnFila === mesText && servicioEnFila === servicio) {
                         return true;
@@ -444,31 +454,16 @@
             };
 
             if (existeMesYServicioEnTabla(mesText, servicio)) {
-                const modal = document.getElementById('modal');
-                if (modal) {
-                    const alpineData = Alpine.$data(modal);
-                    alpineData.showAlert = true;
-
-                    const alertMessage = document.getElementById('alert-message');
-                    if (alertMessage) {
-                        alertMessage.textContent =
-                            'El mes seleccionado ya ha sido registrado para este servicio en este ticket.';
-                    }
-
-                    setTimeout(() => {
-                        alpineData.showAlert = false;
-                    }, 5500);
-                }
-
+                showAlert('El mes seleccionado ya ha sido registrado para este servicio en este ticket.');
                 return;
             }
 
             // Si no hay duplicados, agregar la nueva fila
-            const fechaActual = new Date().toLocaleDateString();
-
             const tbody = document.querySelector('#tabla-modal tbody');
             const nuevaFila = document.createElement('tr');
             nuevaFila.classList.add('text-gray-700', 'dark:text-gray-400');
+            nuevaFila.dataset.contratoServicioId = contratoServicioId;
+            nuevaFila.dataset.mesId = mesId;
 
             nuevaFila.innerHTML = `
                 <td class="px-4 py-3">
@@ -478,18 +473,17 @@
                         </button>
                     </div>
                 </td>
-                <td class="px-4 py-3">${tbody.children.length + 1}</td>
-                <td class="px-4 py-3">${servicio}</td>
-                <td class="px-4 py-3 text-sm">${fechaActual}</td>
-                <td class="px-4 py-3 text-sm">${mesText}</td> <!-- Mes y año -->
+                <td class="px-4 py-3 text-sm">${tbody.children.length + 1}</td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap">${servicio}</td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap">${mesText}</td>
                 <td class="px-4 py-3">
                     <div class="flex items-center space-x-2">
-                        <select class="block w-full px-2 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600">
+                        <select class="block w-auto px-2 py-1 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap">
+                            <option value="pagado" selected class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 mr-1"></i> Pagado
+                            </option>
                             <option value="pendiente" class="flex items-center">
                                 <i class="fas fa-clock text-yellow-500 mr-1"></i> Pendiente
-                            </option>
-                            <option value="pagado" class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 mr-1"></i> Pagado
                             </option>
                             <option value="anulado" class="flex items-center">
                                 <i class="fas fa-times-circle text-red-500 mr-1"></i> Anulado
@@ -500,16 +494,20 @@
                         </select>
                     </div>
                 </td>
-                <td class="px-4 py-3 text-sm text-right">${precio}</td> <!-- Precio -->
+                <td class="px-4 py-3 text-sm text-right">${precio}</td>
             `;
 
             tbody.appendChild(nuevaFila);
             calcularTotal();
 
-            // Limpiar campos
-            elements.servicioSelect.value = '';
-            elements.mesSelect.value = '';
+            // Limpiar selects y campos
+            elements.mesSelect.innerHTML = '<option disabled selected>Seleccionar mes</option>';
             elements.precioPlanInput.value = 'S/ 0.00';
+
+            // Recargar los servicios del contrato actual
+            if (contratoSelect.value) {
+                loadServicios(contratoSelect.value, elements.selectedClientIdInput.value);
+            }
         };
         // Función para calcular el total
         const calcularTotal = () => {
@@ -517,7 +515,7 @@
             let total = 0;
 
             filas.forEach(fila => {
-                const precio = parseFloat(fila.querySelector('td:nth-child(7)').textContent.replace(
+                const precio = parseFloat(fila.querySelector('td:nth-child(6)').textContent.replace(
                     'S/ ', ''));
                 if (!isNaN(precio)) {
                     total += precio;
@@ -706,9 +704,7 @@
                 elements.mesSelect.disabled = false;
 
                 if (!data.success) {
-                    // Mostrar mensaje de error
-                    const errorOption = new Option(data.message || 'Error al cargar meses', '', true,
-                        true);
+                    const errorOption = new Option(data.message || 'Error al cargar meses', '', true, true);
                     elements.mesSelect.add(errorOption);
 
                     const precioPlanInput = document.getElementById('precio-plan');
@@ -716,17 +712,34 @@
                         precioPlanInput.value = 'S/ 0.00';
                     }
 
-                    // Mostrar notificación al usuario
                     showAlert(data.message || 'Error al obtener meses pendientes', 'error');
                     return;
                 }
+
+                // Obtener los meses que ya están en la tabla
+                const mesesEnTabla = new Set();
+                const filas = document.querySelectorAll('#tabla-modal tbody tr');
+                filas.forEach(fila => {
+                    const mesText = fila.querySelector('td:nth-child(4)').textContent.trim();
+                    const servicioText = fila.querySelector('td:nth-child(3)').textContent.trim();
+                    const servicioActual = elements.servicioSelect.options[elements.servicioSelect.selectedIndex]?.text;
+                    if (servicioText === servicioActual) {
+                        mesesEnTabla.add(mesText);
+                    }
+                });
 
                 const mesesPendientes = data.meses_pendientes || [];
                 const precioPlan = parseFloat(data.precio_plan) || 0;
                 const montoProporcional = parseFloat(data.monto_proporcional) || 0;
 
-                if (mesesPendientes.length > 0) {
-                    mesesPendientes.forEach((mes, index) => {
+                // Filtrar los meses que no están en la tabla
+                const mesesDisponibles = mesesPendientes.filter(mes => {
+                    const mesText = `${mes.nombre} ${mes.anio}`;
+                    return !mesesEnTabla.has(mesText);
+                });
+
+                if (mesesDisponibles.length > 0) {
+                    mesesDisponibles.forEach((mes, index) => {
                         const precioMes = (index === 0 && montoProporcional > 0) ?
                             montoProporcional : precioPlan;
                         const precioRedondeado = Math.round(precioMes);
@@ -741,9 +754,11 @@
                         elements.mesSelect.add(option);
                     });
 
-                    elements.mesSelect.value = mesesPendientes[0].id;
-                    const precioAMostrar = preciosMeses[mesesPendientes[0].id];
+                    // Seleccionar automáticamente el primer mes disponible
+                    elements.mesSelect.value = mesesDisponibles[0].id;
+                    const precioAMostrar = preciosMeses[mesesDisponibles[0].id];
 
+                    // Actualizar el precio del plan con el primer mes
                     const precioPlanInput = document.getElementById('precio-plan');
                     if (precioPlanInput) {
                         precioPlanInput.value = `S/ ${precioAMostrar}`;
@@ -751,7 +766,7 @@
                 } else {
                     // Mostrar mensaje cuando no hay meses
                     const noDataOption = new Option(
-                        data.message || 'No hay meses pendientes',
+                        'No hay meses pendientes para este servicio',
                         '',
                         true,
                         true
@@ -763,9 +778,7 @@
                         precioPlanInput.value = 'S/ 0.00';
                     }
 
-                    // Mostrar notificación al usuario
-                    showAlert(data.message || 'No hay meses pendientes de pago para este servicio',
-                        'info');
+                    showAlert('No hay meses pendientes de pago para este servicio', 'info');
                 }
             } catch (error) {
                 console.error('Error al obtener meses pendientes:', error);
@@ -779,7 +792,6 @@
                     precioPlanInput.value = 'S/ 0.00';
                 }
 
-                // Mostrar notificación al usuario
                 showAlert('Ocurrió un error al cargar los meses pendientes', 'error');
             }
         };
@@ -877,8 +889,9 @@
         });
         elements.contratoSelect.addEventListener('change', async () => {
             if (elements.contratoSelect.value && elements.selectedClientIdInput.value) {
-                await loadServicios(elements.contratoSelect.value, elements.selectedClientIdInput
-                    .value);
+                // Limpiar la tabla de detalles al cambiar de contrato
+                limpiarTablaDetalles();
+                await loadServicios(elements.contratoSelect.value, elements.selectedClientIdInput.value);
             }
         });
         elements.servicioSelect.addEventListener('change', () => {
@@ -887,5 +900,226 @@
             }
         });
         elements.clearClientButton.addEventListener('click', clearSelection);
+
+        // Función para mostrar alerta de cobro
+        const mostrarAlertaCobro = (mensaje, tipo = 'error', callback = null) => {
+            const modal = document.createElement('div');
+            modal.className = 'relative z-[100]';
+            modal.setAttribute('aria-labelledby', 'modal-title');
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+
+            const icono = tipo === 'error' ?
+                `<svg class="size-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>` :
+                `<svg class="size-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>`;
+
+            const colorFondo = tipo === 'error' ? 'bg-yellow-100 dark:bg-yellow-900/30' :
+                'bg-green-100 dark:bg-green-900/30';
+            const colorBoton = tipo === 'error' ?
+                'bg-yellow-600 hover:bg-yellow-500 dark:hover:bg-yellow-700' :
+                'bg-green-600 hover:bg-green-500 dark:hover:bg-green-700';
+
+            modal.innerHTML = `
+                <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity" aria-hidden="true"></div>
+                <div class="fixed inset-0 z-[100] w-screen overflow-y-auto">
+                    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                        <div class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-700 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                            <div class="bg-white dark:bg-gray-700 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full ${colorFondo} sm:mx-0 sm:size-10">
+                                        ${icono}
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                        <h3 class="text-base font-semibold text-gray-900 dark:text-white" id="modal-title">
+                                            ${tipo === 'error' ? 'Atención' : 'Éxito'}
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-500 dark:text-gray-300">${mensaje}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-600 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                <button type="button" id="cerrar-alerta" class="inline-flex w-full justify-center rounded-md ${colorBoton} px-3 py-2 text-sm font-semibold text-white shadow-xs sm:ml-3 sm:w-auto">
+                                    Aceptar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Agregar evento al botón de cerrar
+            document.getElementById('cerrar-alerta').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                if (callback) {
+                    callback();
+                }
+            });
+        };
+
+        // Función para guardar el cobro
+        const guardarCobro = async () => {
+            try {
+                const clienteId = document.getElementById('selected-client-id').value;
+                const montoTotal = parseFloat(document.getElementById('total').textContent.replace(
+                    'S/ ', ''));
+                const montoPagoEfectivo = parseFloat(document.getElementById('pago').value);
+                const tipoPago = document.getElementById('tipo_pago').value;
+                const glosa = document.getElementById('glosa').value;
+
+                // Obtener los detalles de la tabla
+                const detalles = [];
+                const filas = document.querySelectorAll('#tabla-modal tbody tr');
+
+                if (filas.length === 0) {
+                    mostrarAlertaCobro('Debe agregar al menos un servicio para realizar el cobro');
+                    return;
+                }
+
+                filas.forEach(fila => {
+                    const contratoServicioId = fila.dataset.contratoServicioId;
+                    const mesId = fila.dataset.mesId;
+                    const monto = parseFloat(fila.querySelector('td:nth-child(6)').textContent
+                        .replace('S/ ', ''));
+                    const estado = fila.querySelector('td:nth-child(5) select').value;
+
+                    if (!contratoServicioId || !mesId) {
+                        mostrarAlertaCobro(
+                            'Error en los datos del servicio. Por favor, vuelva a seleccionar los servicios.'
+                        );
+                        return;
+                    }
+
+                    detalles.push({
+                        contrato_servicio_id: contratoServicioId,
+                        mes_id: mesId,
+                        monto_pagado: monto,
+                        estado_pago: estado
+                    });
+                });
+
+                const response = await fetch('/payments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
+                    body: JSON.stringify({
+                        cliente_id: clienteId,
+                        monto_total: montoTotal,
+                        monto_pago_efectivo: montoPagoEfectivo,
+                        tipo_pago: tipoPago,
+                        glosa: glosa,
+                        detalles: detalles
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Cerrar el modal de cobro
+                    document.getElementById('cobro-modal').classList.add('hidden');
+
+                    // Mostrar mensaje de éxito y recargar la página solo después de aceptar
+                    mostrarAlertaCobro(data.message, 'success', () => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlertaCobro('Error al registrar el cobro: ' + error.message);
+            }
+        };
+
+        // Agregar evento al botón de guardar
+        const botonGuardar = document.getElementById('btn-guardar-cobro');
+        if (botonGuardar) {
+            botonGuardar.addEventListener('click', guardarCobro);
+        }
+
+        let cobranzaIdAnular = null;
+
+        // Modal de confirmación de anulación
+        const mostrarModalAnular = (cobranzaId) => {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-[100] overflow-y-auto';
+            modal.setAttribute('aria-labelledby', 'modal-title');
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.innerHTML = `
+                <div class="flex min-h-screen items-end justify-center px-4 pb-20 pt-4 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+                    <div class="inline-block transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Confirmar anulación</h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">¿Está seguro que desea anular este pago? Esta acción no se puede deshacer.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <button type="button" id="btn-confirmar-anulacion" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Anular</button>
+                            <button type="button" onclick="cerrarModalAnular()" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            cobranzaIdAnular = cobranzaId;
+        };
+
+        function cerrarModalAnular() {
+            const modal = document.querySelector('.fixed.inset-0.z-[100]');
+            if (modal) {
+                modal.remove();
+            }
+            cobranzaIdAnular = null;
+        }
+
+        document.getElementById('btn-confirmar-anulacion').addEventListener('click', function() {
+            if (!cobranzaIdAnular) return;
+
+            fetch(`/payments/${cobranzaIdAnular}/anular`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarAlertaCobro(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    mostrarAlertaCobro(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                mostrarAlertaCobro('Error al anular el pago', 'error');
+            })
+            .finally(() => {
+                cerrarModalAnular();
+            });
+        });
     });
 </script>

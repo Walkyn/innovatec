@@ -103,6 +103,9 @@ Route::middleware('auth')->group(function () {
 
     // Payments
     Route::get('payments', [PaymentController::class, 'index'])->middleware('check.permissions:payments,all')->name('payments.index');
+    Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+    Route::resource('payments', PaymentController::class);
+    Route::put('/payments/{id}/anular', [PaymentController::class, 'anular'])->name('payments.anular');
 
     // Services
     Route::controller(ServiceController::class)->group(function () {
@@ -181,10 +184,6 @@ Route::middleware('auth')->group(function () {
         $planId = $contratoServicio->plan_id;
         $precioPlan = DB::table('planes')->where('id', $planId)->value('precio') ?? 0;
 
-        $ultimaFechaPagada = DB::table('cobranza_contratoservicio')
-            ->where('contrato_servicio_id', $contratoServicioId)
-            ->max('mes_id');
-
         // Verificar si existe la tabla meses
         $tablaMesesExiste = Schema::hasTable('meses');
 
@@ -198,14 +197,13 @@ Route::middleware('auth')->group(function () {
             ]);
         }
 
-        $mesInicioDeuda = $ultimaFechaPagada
-            ? $ultimaFechaPagada + 1
-            : DB::table('meses')
+        // Obtener el mes de inicio del servicio
+        $mesInicioServicio = DB::table('meses')
             ->where('fecha_inicio', '<=', $fechaInicioServicio)
             ->where('fecha_fin', '>=', $fechaInicioServicio)
             ->value('id');
 
-        if (!$mesInicioDeuda) {
+        if (!$mesInicioServicio) {
             return response()->json([
                 'success' => false,
                 'message' => 'No hay meses generados para el cálculo',
@@ -215,38 +213,39 @@ Route::middleware('auth')->group(function () {
             ]);
         }
 
-        $mes = DB::table('meses')->find($mesInicioDeuda);
-        $montoProporcional = 0;
-
-        // Calcular días del mes
-        $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
-        $diaInstalacion = date('j', strtotime($fechaInicioServicio));
-        $ultimosDiasMes = date('j', strtotime($mes->fecha_fin)) - 5;
-
-        // Lógica de cálculo proporcional
-        if ($diaInstalacion <= 5) {
-            // Si se instala en los primeros 5 días, se cobra el mes completo
-            $montoProporcional = $precioPlan;
-        } elseif ($diaInstalacion > $ultimosDiasMes) {
-            // Si se instala en los últimos 5 días, se omite el mes y se pasa al siguiente
-            $mesInicioDeuda = $mesInicioDeuda + 1;
-            $montoProporcional = $precioPlan;
-        } else {
-            // Si se instala entre el día 6 y los últimos 5 días, se calcula proporcionalmente
-            $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
-            $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
-        }
-
+        // Obtener todos los meses que no estén pagados
         $mesesPendientes = DB::table('meses')
-            ->where('id', '>=', $mesInicioDeuda)
+            ->where('id', '>=', $mesInicioServicio)
             ->whereNotIn('id', function ($query) use ($contratoServicioId) {
                 $query->select('mes_id')
                     ->from('cobranza_contratoservicio')
-                    ->where('contrato_servicio_id', $contratoServicioId);
+                    ->where('contrato_servicio_id', $contratoServicioId)
+                    ->where('estado_pago', 'pagado');
             })
             ->orderBy('anio')
             ->orderBy('numero')
             ->get();
+
+        // Calcular monto proporcional solo para el primer mes si es necesario
+        $montoProporcional = 0;
+        if ($mesesPendientes->isNotEmpty()) {
+            $primerMes = $mesesPendientes->first();
+            if ($primerMes->id == $mesInicioServicio) {
+                $mes = DB::table('meses')->find($mesInicioServicio);
+                $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
+                $diaInstalacion = date('j', strtotime($fechaInicioServicio));
+                $ultimosDiasMes = date('j', strtotime($mes->fecha_fin)) - 5;
+
+                if ($diaInstalacion <= 5) {
+                    $montoProporcional = $precioPlan;
+                } elseif ($diaInstalacion > $ultimosDiasMes) {
+                    $montoProporcional = $precioPlan;
+                } else {
+                    $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
+                    $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -336,10 +335,6 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
     $planId = $contratoServicio->plan_id;
     $precioPlan = DB::table('planes')->where('id', $planId)->value('precio') ?? 0;
 
-    $ultimaFechaPagada = DB::table('cobranza_contratoservicio')
-        ->where('contrato_servicio_id', $contratoServicioId)
-        ->max('mes_id');
-
     // Verificar si existe la tabla meses
     $tablaMesesExiste = Schema::hasTable('meses');
 
@@ -353,14 +348,13 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
         ]);
     }
 
-    $mesInicioDeuda = $ultimaFechaPagada
-        ? $ultimaFechaPagada + 1
-        : DB::table('meses')
+    // Obtener el mes de inicio del servicio
+    $mesInicioServicio = DB::table('meses')
         ->where('fecha_inicio', '<=', $fechaInicioServicio)
         ->where('fecha_fin', '>=', $fechaInicioServicio)
         ->value('id');
 
-    if (!$mesInicioDeuda) {
+    if (!$mesInicioServicio) {
         return response()->json([
             'success' => false,
             'message' => 'No hay meses generados para el cálculo',
@@ -370,38 +364,39 @@ Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicio
         ]);
     }
 
-    $mes = DB::table('meses')->find($mesInicioDeuda);
-    $montoProporcional = 0;
-
-    // Calcular días del mes
-    $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
-    $diaInstalacion = date('j', strtotime($fechaInicioServicio));
-    $ultimosDiasMes = date('j', strtotime($mes->fecha_fin)) - 5;
-
-    // Lógica de cálculo proporcional
-    if ($diaInstalacion <= 5) {
-        // Si se instala en los primeros 5 días, se cobra el mes completo
-        $montoProporcional = $precioPlan;
-    } elseif ($diaInstalacion > $ultimosDiasMes) {
-        // Si se instala en los últimos 5 días, se omite el mes y se pasa al siguiente
-        $mesInicioDeuda = $mesInicioDeuda + 1;
-        $montoProporcional = $precioPlan;
-    } else {
-        // Si se instala entre el día 6 y los últimos 5 días, se calcula proporcionalmente
-        $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
-        $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
-    }
-
+    // Obtener todos los meses que no estén pagados
     $mesesPendientes = DB::table('meses')
-        ->where('id', '>=', $mesInicioDeuda)
+        ->where('id', '>=', $mesInicioServicio)
         ->whereNotIn('id', function ($query) use ($contratoServicioId) {
             $query->select('mes_id')
                 ->from('cobranza_contratoservicio')
-                ->where('contrato_servicio_id', $contratoServicioId);
+                ->where('contrato_servicio_id', $contratoServicioId)
+                ->where('estado_pago', 'pagado');
         })
         ->orderBy('anio')
         ->orderBy('numero')
         ->get();
+
+    // Calcular monto proporcional solo para el primer mes si es necesario
+    $montoProporcional = 0;
+    if ($mesesPendientes->isNotEmpty()) {
+        $primerMes = $mesesPendientes->first();
+        if ($primerMes->id == $mesInicioServicio) {
+            $mes = DB::table('meses')->find($mesInicioServicio);
+            $diasTotalesMes = (strtotime($mes->fecha_fin) - strtotime($mes->fecha_inicio)) / (60 * 60 * 24) + 1;
+            $diaInstalacion = date('j', strtotime($fechaInicioServicio));
+            $ultimosDiasMes = date('j', strtotime($mes->fecha_fin)) - 5;
+
+            if ($diaInstalacion <= 5) {
+                $montoProporcional = $precioPlan;
+            } elseif ($diaInstalacion > $ultimosDiasMes) {
+                $montoProporcional = $precioPlan;
+            } else {
+                $diasRestantes = (strtotime($mes->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
+                $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
+            }
+        }
+    }
 
     return response()->json([
         'success' => true,
