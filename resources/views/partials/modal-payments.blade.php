@@ -363,36 +363,6 @@
 @endif
 </div>
 
-<div class="relative z-10" id="modal-anular-pago" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg dark:bg-gray-800">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" id="modal-title">Confirmar anulación</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">¿Está seguro que desea anular este pago? Esta acción no se puede deshacer.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 dark:bg-gray-700">
-                    <button type="button" id="btn-confirmar-anulacion" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">Anular pago</button>
-                    <button type="button" onclick="cerrarModalAnular()" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:bg-gray-600 dark:text-white dark:ring-gray-600 dark:hover:bg-gray-500">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         console.log('Script cargado correctamente');
@@ -518,7 +488,7 @@
                 const estadoSelect = fila.querySelector('td:nth-child(5) select');
                 const precioCell = fila.querySelector('td:nth-child(6)');
                 const precioOriginal = parseFloat(precioCell.textContent.replace('S/ ', ''));
-                
+
                 if (estadoSelect.value === 'no_aplica') {
                     precioCell.textContent = 'S/ 0.00';
                 } else {
@@ -586,17 +556,22 @@
         const pagoInput = document.getElementById('pago');
         if (pagoInput) {
             pagoInput.addEventListener('input', (e) => {
-                const total = parseFloat(document.getElementById('total').textContent.replace('S/ ', ''));
+                const total = parseFloat(document.getElementById('total').textContent.replace('S/ ',
+                    ''));
                 const pago = parseFloat(e.target.value);
-                
+
                 if (!isNaN(pago) && pago < total) {
-                    e.target.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-200');
-                    e.target.classList.remove('border-gray-500', 'focus:border-blue-500', 'focus:ring-blue-200');
+                    e.target.classList.add('border-red-500', 'focus:border-red-500',
+                        'focus:ring-red-200');
+                    e.target.classList.remove('border-gray-500', 'focus:border-blue-500',
+                        'focus:ring-blue-200');
                 } else {
-                    e.target.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-200');
-                    e.target.classList.add('border-gray-500', 'focus:border-blue-500', 'focus:ring-blue-200');
+                    e.target.classList.remove('border-red-500', 'focus:border-red-500',
+                        'focus:ring-red-200');
+                    e.target.classList.add('border-gray-500', 'focus:border-blue-500',
+                        'focus:ring-blue-200');
                 }
-                
+
                 calcularCambio();
             });
         }
@@ -732,7 +707,8 @@
                 elements.mesSelect.disabled = false;
 
                 if (!data.success) {
-                    const errorOption = new Option(data.message || 'Error al cargar meses', '', true, true);
+                    const errorOption = new Option(data.message || 'Error al cargar meses', '', true,
+                        true);
                     elements.mesSelect.add(errorOption);
 
                     const precioPlanInput = document.getElementById('precio-plan');
@@ -749,8 +725,10 @@
                 const filas = document.querySelectorAll('#tabla-modal tbody tr');
                 filas.forEach(fila => {
                     const mesText = fila.querySelector('td:nth-child(4)').textContent.trim();
-                    const servicioText = fila.querySelector('td:nth-child(3)').textContent.trim();
-                    const servicioActual = elements.servicioSelect.options[elements.servicioSelect.selectedIndex]?.text;
+                    const servicioText = fila.querySelector('td:nth-child(3)').textContent
+                        .trim();
+                    const servicioActual = elements.servicioSelect.options[elements
+                        .servicioSelect.selectedIndex]?.text;
                     if (servicioText === servicioActual) {
                         mesesEnTabla.add(mesText);
                     }
@@ -777,7 +755,7 @@
                             // Si no es mes de inicio, usar precio proporcional si está disponible (para mes de suspensión)
                             precioMes = mes.precio_proporcional || mes.monto || precioPlan;
                         }
-                        
+
                         const precioRedondeado = Math.round(precioMes);
                         const precioFormateado = precioRedondeado.toFixed(2);
 
@@ -916,7 +894,8 @@
             if (elements.contratoSelect.value && elements.selectedClientIdInput.value) {
                 // Limpiar la tabla de detalles al cambiar de contrato
                 limpiarTablaDetalles();
-                await loadServicios(elements.contratoSelect.value, elements.selectedClientIdInput.value);
+                await loadServicios(elements.contratoSelect.value, elements.selectedClientIdInput
+                    .value);
             }
         });
         elements.servicioSelect.addEventListener('change', () => {
@@ -993,7 +972,8 @@
         const guardarCobro = async () => {
             try {
                 const clienteId = document.getElementById('selected-client-id').value;
-                const montoTotal = parseFloat(document.getElementById('total').textContent.replace('S/ ', ''));
+                const montoTotal = parseFloat(document.getElementById('total').textContent.replace(
+                    'S/ ', ''));
                 const montoPagoEfectivo = parseFloat(document.getElementById('pago').value);
                 const tipoPago = document.getElementById('tipo_pago').value;
                 const glosa = document.getElementById('glosa').value;
@@ -1123,34 +1103,39 @@
             cobranzaIdAnular = null;
         }
 
-        document.getElementById('btn-confirmar-anulacion').addEventListener('click', function() {
-            if (!cobranzaIdAnular) return;
+        // Verificar si el botón existe antes de agregar el event listener
+        const btnConfirmarAnulacion = document.getElementById('btn-confirmar-anulacion');
+        if (btnConfirmarAnulacion) {
+            btnConfirmarAnulacion.addEventListener('click', function() {
+                if (!cobranzaIdAnular) return;
 
-            fetch(`/payments/${cobranzaIdAnular}/anular`, {
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    mostrarAlertaCobro(data.message, 'success');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    mostrarAlertaCobro(data.message, 'error');
-                }
-            })
-            .catch(error => {
-                mostrarAlertaCobro('Error al anular el pago', 'error');
-            })
-            .finally(() => {
-                cerrarModalAnular();
+                fetch(`/payments/${cobranzaIdAnular}/anular`, {
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .content,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            mostrarAlertaCobro(data.message, 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            mostrarAlertaCobro(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        mostrarAlertaCobro('Error al anular el pago', 'error');
+                    })
+                    .finally(() => {
+                        cerrarModalAnular();
+                    });
             });
-        });
+        }
 
         // Agregar evento change a los selectores de estado
         document.addEventListener('change', (event) => {

@@ -21,8 +21,7 @@
                 </button>
                 <div id="optionsDropdown"
                     class="z-10 hidden w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
-                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="optionsDropdownButton">
+                    <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="optionsDropdownButton">
                         <li>
                             <button type="button" id="btn-hoy"
                                 class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
@@ -42,8 +41,8 @@
                 <button id="filterDropdownButton" data-dropdown-toggle="filterDropdown"
                     class="w-full md:w-auto flex items-center justify-center py-2 px-8 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded shadow-sm border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                     type="button">
-                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="h-4 w-4 mr-1.5 -ml-1 text-gray-400"
-                        viewbox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                        class="h-4 w-4 mr-1.5 -ml-1 text-gray-400" viewbox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
                             d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
                             clip-rule="evenodd" />
@@ -212,23 +211,25 @@
                 <label for="search" class="sr-only">Search</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3">
-                        @if(request('search'))
-                            <a href="{{ route('payments.index') }}" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                        @if (request('search'))
+                            <a href="{{ route('payments.index') }}"
+                                class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
                                 <i class="fas fa-times"></i>
                             </a>
                         @else
                             <div class="pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                    </div>
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
+                            </div>
                         @endif
                     </div>
                     <input type="search" id="search" name="search"
                         class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Buscar por boleta, nombre o apellido..." value="{{ request('search') }}" required />
+                        placeholder="Buscar por boleta, nombre o apellido..." value="{{ request('search') }}"
+                        required />
                     <button type="submit"
                         class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
                 </div>
@@ -238,78 +239,96 @@
         <div class="w-full overflow-hidden rounded-lg shadow-xs">
             <div class="w-full overflow-x-auto">
                 <div class="max-h-[500px] overflow-y-auto">
-                <table class="w-full whitespace-no-wrap">
+                    <table class="w-full whitespace-no-wrap">
                         <thead class="sticky top-0 bg-gray-50 dark:bg-gray-800">
-                            <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 dark:text-gray-400">
-                            <th class="px-4 py-3">Boleta</th>
-                            <th class="px-4 py-3">Cliente</th>
-                            <th class="px-4 py-3">Total</th>
-                            <th class="px-4 py-3">Fecha</th>
-                            <th class="px-4 py-3">Pago</th>
-                            <th class="px-4 py-3">Estado</th>
-                            <th class="px-4 py-3">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                            @forelse($cobranzas as $cobranza)
-                            <tr class="text-gray-700 dark:text-gray-400" data-usuario-id="{{ $cobranza->usuario_id }}">
-                                <td class="px-4 py-3 text-sm">B{{ $cobranza->numero_boleta }}</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center text-sm">
-                                        <p class="font-semibold">{{ $cobranza->cliente->nombres }} {{ $cobranza->cliente->apellidos }}</p>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    @if ($cobranza->estado_cobro === 'anulado')
-                                        <span class="line-through text-gray-500">S/ {{ number_format($cobranza->monto_total, 2) }}</span>
-                                    @else
-                                        <span class="whitespace-nowrap">S/ {{ number_format($cobranza->monto_total, 2) }}</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3 text-sm">{{ $cobranza->fecha_cobro->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3 text-sm">{{ ucfirst($cobranza->tipo_pago) }}</td>
-                            <td class="px-4 py-3 text-xs">
-                                    <span class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center {{ $cobranza->estado_cobro === 'emitido' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100' }}">
-                                        <i class="fas {{ $cobranza->estado_cobro === 'emitido' ? 'fa-check-circle mr-2' : 'fa-times-circle mr-2' }}"></i>
-                                        {{ ucfirst($cobranza->estado_cobro) }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex items-center space-x-2 text-sm">
-                                    <!-- Botón Imprimir -->
-                                        <button class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 focus:outline-none focus:ring-1 focus:ring-green-300 focus:ring-offset-1 dark:text-green-200 dark:bg-green-900 dark:border-green-700 dark:hover:bg-green-800 dark:focus:ring-green-600" aria-label="Imprimir">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-
-                                    <!-- Botón Exportar a PDF -->
-                                        <a href="{{ route('payments.pdf', $cobranza->id) }}" target="_blank" class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-purple-600 bg-purple-50 border border-purple-200 rounded-md hover:bg-purple-100 focus:outline-none focus:ring-1 focus:ring-purple-300 focus:ring-offset-1 dark:text-purple-200 dark:bg-purple-900 dark:border-purple-700 dark:hover:bg-purple-800 dark:focus:ring-purple-600" aria-label="Exportar a PDF">
-                                        <i class="fas fa-file-pdf"></i>
-                                        </a>
-
-                                    <!-- Botón Ver -->
-                                        <button data-modal-target="ver-cobro-modal" data-modal-toggle="ver-cobro-modal" type="button" data-cobranza-id="{{ $cobranza->id }}" class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:ring-offset-1 dark:text-blue-200 dark:bg-blue-900 dark:border-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-600" aria-label="Ver">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                        <!-- Botón Anular -->
-                                        @if ($cobranza->estado_cobro !== 'anulado')
-                                            <button data-cobranza-id="{{ $cobranza->id }}" class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-md hover:bg-yellow-100 focus:outline-none focus:ring-1 focus:ring-yellow-300 focus:ring-offset-1 dark:text-yellow-200 dark:bg-yellow-900 dark:border-yellow-700 dark:hover:bg-yellow-800 dark:focus:ring-yellow-600 btn-anular" aria-label="Anular">
-                                                <i class="fas fa-ban"></i>
-                                    </button>
-                                        @endif
-                                </div>
-                            </td>
+                            <tr
+                                class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 dark:text-gray-400">
+                                <th class="px-4 py-3">Boleta</th>
+                                <th class="px-4 py-3">Cliente</th>
+                                <th class="px-4 py-3">Total</th>
+                                <th class="px-4 py-3">Fecha</th>
+                                <th class="px-4 py-3">Pago</th>
+                                <th class="px-4 py-3">Estado</th>
+                                <th class="px-4 py-3">Acciones</th>
                             </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                            @forelse($cobranzas as $cobranza)
+                                <tr class="text-gray-700 dark:text-gray-400"
+                                    data-usuario-id="{{ $cobranza->usuario_id }}">
+                                    <td class="px-4 py-3 text-sm">B{{ $cobranza->numero_boleta }}</td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center text-sm">
+                                            <p class="font-semibold">{{ $cobranza->cliente->nombres }}
+                                                {{ $cobranza->cliente->apellidos }}</p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm">
+                                        @if ($cobranza->estado_cobro === 'anulado')
+                                            <span class="line-through text-gray-500">S/
+                                                {{ number_format($cobranza->monto_total, 2) }}</span>
+                                        @else
+                                            <span class="whitespace-nowrap">S/
+                                                {{ number_format($cobranza->monto_total, 2) }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-sm">{{ $cobranza->fecha_cobro->format('d/m/Y') }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ ucfirst($cobranza->tipo_pago) }}</td>
+                                    <td class="px-4 py-3 text-xs">
+                                        <span
+                                            class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center {{ $cobranza->estado_cobro === 'emitido' ? 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100' : 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100' }}">
+                                            <i
+                                                class="fas {{ $cobranza->estado_cobro === 'emitido' ? 'fa-check-circle mr-2' : 'fa-times-circle mr-2' }}"></i>
+                                            {{ ucfirst($cobranza->estado_cobro) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center space-x-2 text-sm">
+                                            <!-- Botón Imprimir -->
+                                            <button
+                                                class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 focus:outline-none focus:ring-1 focus:ring-green-300 focus:ring-offset-1 dark:text-green-200 dark:bg-green-900 dark:border-green-700 dark:hover:bg-green-800 dark:focus:ring-green-600"
+                                                aria-label="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+
+                                            <!-- Botón Exportar a PDF -->
+                                            <a href="{{ route('payments.pdf', $cobranza->id) }}" target="_blank"
+                                                class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-purple-600 bg-purple-50 border border-purple-200 rounded-md hover:bg-purple-100 focus:outline-none focus:ring-1 focus:ring-purple-300 focus:ring-offset-1 dark:text-purple-200 dark:bg-purple-900 dark:border-purple-700 dark:hover:bg-purple-800 dark:focus:ring-purple-600"
+                                                aria-label="Exportar a PDF">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+
+                                            <!-- Botón Ver -->
+                                            <button data-modal-target="ver-cobro-modal"
+                                                data-modal-toggle="ver-cobro-modal" type="button"
+                                                data-cobranza-id="{{ $cobranza->id }}"
+                                                class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-300 focus:ring-offset-1 dark:text-blue-200 dark:bg-blue-900 dark:border-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-600"
+                                                aria-label="Ver">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+
+                                            <!-- Botón Anular -->
+                                            @if ($cobranza->estado_cobro !== 'anulado')
+                                                <button data-cobranza-id="{{ $cobranza->id }}"
+                                                    class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-md hover:bg-yellow-100 focus:outline-none focus:ring-1 focus:ring-yellow-300 focus:ring-offset-1 dark:text-yellow-200 dark:bg-yellow-900 dark:border-yellow-700 dark:hover:bg-yellow-800 dark:focus:ring-yellow-600 btn-anular"
+                                                    aria-label="Anular">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="7" class="px-4 py-3 text-sm text-center text-gray-500 dark:text-gray-400">
-                                    No hay cobranzas registradas
-                                </td>
-                        </tr>
+                                <tr>
+                                    <td colspan="7"
+                                        class="px-4 py-3 text-sm text-center text-gray-500 dark:text-gray-400">
+                                        No hay cobranzas registradas
+                                    </td>
+                                </tr>
                             @endforelse
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -322,7 +341,7 @@
         document.getElementById('btn-hoy').addEventListener('click', function() {
             const url = new URL(window.location.href);
             url.searchParams.delete('todos');
-            url.searchParams.set('fecha_inicio', '{{ now()->format("Y-m-d") }}');
+            url.searchParams.set('fecha_inicio', '{{ now()->format('Y-m-d') }}');
             window.location.href = url.toString();
         });
 
@@ -337,9 +356,10 @@
 
         // Si no hay ningún parámetro en la URL, mostrar los cobros de hoy por defecto
         const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has('fecha_inicio') && !urlParams.has('fecha_fin') && !urlParams.has('search') && !urlParams.has('todos')) {
+        if (!urlParams.has('fecha_inicio') && !urlParams.has('fecha_fin') && !urlParams.has('search') && !
+            urlParams.has('todos')) {
             const url = new URL(window.location.href);
-            url.searchParams.set('fecha_inicio', '{{ now()->format("Y-m-d") }}');
+            url.searchParams.set('fecha_inicio', '{{ now()->format('Y-m-d') }}');
             window.location.href = url.toString();
         }
 
@@ -393,12 +413,43 @@
             // Manejar la confirmación
             document.getElementById('confirmar-anulacion').addEventListener('click', async () => {
                 try {
+                    // Verificar permisos antes de hacer la petición
+                    const tienePermisos = <?php echo json_encode(auth()->user()->checkModuloAcceso('payments', 'actualizar')); ?>;
+                    
+                    if (!tienePermisos) {
+                        // Mostrar toast de error centrado con overlay
+                        const toastError = document.createElement('div');
+                        toastError.className = 'fixed inset-0 flex items-center justify-center z-50';
+                        toastError.innerHTML = `
+                            <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity"></div>
+                            <div class="relative z-[60] flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800" role="alert">
+                                <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                                    </svg>
+                                    <span class="sr-only">Error icon</span>
+                                </div>
+                                <div class="ms-3 text-sm font-normal">Sin permisos para anular cobros.</div>
+                                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.parentElement.remove()" aria-label="Close">
+                                    <span class="sr-only">Close</span>
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        document.body.appendChild(toastError);
+                        setTimeout(() => {
+                            toastError.remove();
+                        }, 3000);
+                        return;
+                    }
+
                     const response = await fetch(`/payments/${cobranzaId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector(
-                                'meta[name="csrf-token"]').content
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
 
@@ -436,8 +487,7 @@
                         document.body.appendChild(successModal);
 
                         // Manejar el botón de aceptar
-                        document.getElementById('aceptar-anulacion').addEventListener('click',
-                        () => {
+                        document.getElementById('aceptar-anulacion').addEventListener('click', () => {
                             document.body.removeChild(successModal);
                             window.location.reload();
                         });
@@ -459,6 +509,37 @@
         // Agregar evento a los botones de anular
         document.querySelectorAll('.btn-anular').forEach(button => {
             button.addEventListener('click', () => {
+                const tienePermisos = <?php echo json_encode(auth()->user()->checkModuloAcceso('payments', 'eliminar')); ?>;
+                
+                if (!tienePermisos) {
+                    // Mostrar toast de error centrado con overlay
+                    const toastError = document.createElement('div');
+                    toastError.className = 'fixed inset-0 flex items-center justify-center z-50';
+                    toastError.innerHTML = `
+                        <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity"></div>
+                        <div class="relative z-[60] flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800" role="alert">
+                            <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                                </svg>
+                                <span class="sr-only">Error icon</span>
+                            </div>
+                            <div class="ms-3 text-sm font-normal">Sin permisos para anular cobros.</div>
+                            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.parentElement.remove()" aria-label="Close">
+                                <span class="sr-only">Close</span>
+                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    document.body.appendChild(toastError);
+                    setTimeout(() => {
+                        toastError.remove();
+                    }, 3000);
+                    return;
+                }
+
                 const cobranzaId = button.dataset.cobranzaId;
                 mostrarConfirmacionAnulacion(cobranzaId);
             });
@@ -466,9 +547,12 @@
 
         // Función para filtrar la tabla
         function filtrarTabla() {
-            const tiposPagoSeleccionados = Array.from(document.querySelectorAll('input[name="tipo_pago"]:checked')).map(cb => cb.value);
-            const estadosPagoSeleccionados = Array.from(document.querySelectorAll('input[name="estado_pago"]:checked')).map(cb => cb.value);
-            const usuariosSeleccionados = Array.from(document.querySelectorAll('input[name="usuario"]:checked')).map(cb => cb.value);
+            const tiposPagoSeleccionados = Array.from(document.querySelectorAll(
+                'input[name="tipo_pago"]:checked')).map(cb => cb.value);
+            const estadosPagoSeleccionados = Array.from(document.querySelectorAll(
+                'input[name="estado_pago"]:checked')).map(cb => cb.value);
+            const usuariosSeleccionados = Array.from(document.querySelectorAll('input[name="usuario"]:checked'))
+                .map(cb => cb.value);
             const fechaInicio = document.getElementById('fecha_inicio').value;
             const fechaFin = document.getElementById('fecha_fin').value;
 
@@ -476,14 +560,19 @@
 
             filas.forEach(fila => {
                 if (fila.querySelector('td')) {
-                    const tipoPagoCelda = fila.querySelector('td:nth-child(5)')?.textContent.trim().toLowerCase();
-                    const estadoPagoCelda = fila.querySelector('td:nth-child(6) span')?.textContent.trim().toLowerCase();
+                    const tipoPagoCelda = fila.querySelector('td:nth-child(5)')?.textContent.trim()
+                        .toLowerCase();
+                    const estadoPagoCelda = fila.querySelector('td:nth-child(6) span')?.textContent
+                        .trim().toLowerCase();
                     const usuarioId = fila.dataset.usuarioId;
                     const fechaCelda = fila.querySelector('td:nth-child(4)')?.textContent.trim();
 
-                    let mostrarPorTipoPago = tiposPagoSeleccionados.length === 0 || tiposPagoSeleccionados.includes(tipoPagoCelda);
-                    let mostrarPorEstado = estadosPagoSeleccionados.length === 0 || estadosPagoSeleccionados.includes(estadoPagoCelda);
-                    let mostrarPorUsuario = usuariosSeleccionados.length === 0 || usuariosSeleccionados.includes(usuarioId);
+                    let mostrarPorTipoPago = tiposPagoSeleccionados.length === 0 ||
+                        tiposPagoSeleccionados.includes(tipoPagoCelda);
+                    let mostrarPorEstado = estadosPagoSeleccionados.length === 0 ||
+                        estadosPagoSeleccionados.includes(estadoPagoCelda);
+                    let mostrarPorUsuario = usuariosSeleccionados.length === 0 || usuariosSeleccionados
+                        .includes(usuarioId);
 
                     // Convertir fechas para comparación
                     const fechaCeldaObj = new Date(fechaCelda.split('/').reverse().join('-'));
@@ -492,11 +581,13 @@
 
                     let mostrarPorFecha = true;
                     if (fechaInicioObj && fechaFinObj) {
-                        mostrarPorFecha = fechaCeldaObj >= fechaInicioObj && fechaCeldaObj <= fechaFinObj;
+                        mostrarPorFecha = fechaCeldaObj >= fechaInicioObj && fechaCeldaObj <=
+                            fechaFinObj;
                     }
 
                     // Mostrar la fila solo si cumple con todos los filtros
-                    fila.style.display = (mostrarPorTipoPago && mostrarPorEstado && mostrarPorUsuario && mostrarPorFecha) ? '' : 'none';
+                    fila.style.display = (mostrarPorTipoPago && mostrarPorEstado && mostrarPorUsuario &&
+                        mostrarPorFecha) ? '' : 'none';
                 }
             });
         }
@@ -574,7 +665,8 @@
 
             // Cerrar el dropdown al hacer clic fuera
             document.addEventListener('click', function(event) {
-                if (!optionsDropdownButton.contains(event.target) && !optionsDropdown.contains(event.target)) {
+                if (!optionsDropdownButton.contains(event.target) && !optionsDropdown.contains(event
+                        .target)) {
                     optionsDropdown.classList.add('hidden');
                 }
             });
