@@ -769,9 +769,15 @@
 
                 if (mesesDisponibles.length > 0) {
                     mesesDisponibles.forEach((mes) => {
-                        // Solo aplicar el precio proporcional al mes de inicio del servicio
-                        const precioMes = (mes.id === mesInicioServicio && montoProporcional > 0) ? 
-                            montoProporcional : precioPlan;
+                        // Primero verificar si es el mes de inicio del servicio
+                        let precioMes;
+                        if (mes.id === mesInicioServicio && montoProporcional > 0) {
+                            precioMes = montoProporcional;
+                        } else {
+                            // Si no es mes de inicio, usar precio proporcional si está disponible (para mes de suspensión)
+                            precioMes = mes.precio_proporcional || mes.monto || precioPlan;
+                        }
+                        
                         const precioRedondeado = Math.round(precioMes);
                         const precioFormateado = precioRedondeado.toFixed(2);
 
