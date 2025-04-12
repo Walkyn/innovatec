@@ -16,6 +16,11 @@ class PaymentController extends Controller
         $clientes = Cliente::where('estado_cliente', '!=', 'inactivo')->get();
         $query = Cobranza::with(['cliente', 'usuario']);
 
+        // Filtrar por usuario si no es administrador
+        if (!auth()->user()->hasRole('administrador')) {
+            $query->where('usuario_id', auth()->id());
+        }
+
         // Aplicar filtro de búsqueda si existe
         if ($request->has('search')) {
             $search = $request->search;
@@ -38,6 +43,9 @@ class PaymentController extends Controller
                 ]);
             } elseif ($request->has('fecha_inicio')) {
                 $query->whereDate('fecha_cobro', $request->fecha_inicio);
+            } else {
+                // Si no hay filtros de fecha y no se pidió ver todos, mostrar solo los del día actual
+                $query->whereDate('fecha_cobro', now()->format('Y-m-d'));
             }
         }
 

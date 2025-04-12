@@ -215,7 +215,7 @@
                                     <thead>
                                         <tr
                                             class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                            <th class="px-4 py-3 w-16">Acción</th>
+                                            <th class="px-4 py-3 w-16 text-base"><i class="fas fa-trash-alt"></i></th>
                                             <th class="px-4 py-3">Servicio</th>
                                             <th class="px-4 py-3">Plan</th>
                                             <th class="px-4 py-3 w-32">IP</th>

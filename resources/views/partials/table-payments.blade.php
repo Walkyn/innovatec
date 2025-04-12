@@ -329,9 +329,19 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Total de cobros -->
+                <div class="flex items-center justify-between py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 sm:px-4">
+                    <div class="flex items-center">
+                        <p class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase dark:border-gray-700 dark:text-gray-400">
+                            TOTAL DE COBROS EMITIDOS: 
+                            <span id="total-cobros" class="font-medium text-purple-600 dark:text-purple-400">
+                                S/ {{ number_format($cobranzas->where('estado_cobro', '!=', 'anulado')->sum('monto_total'), 2) }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 </main>
 
@@ -387,7 +397,7 @@
                                         </h3>
                                         <div class="mt-2">
                                             <p class="text-sm text-gray-500 dark:text-gray-300">
-                                                ¿Está seguro que desea anular este cobro? Esta acción no se puede deshacer.
+                                                ¿Está seguro que desea anular este cobro? <p class="text-sm text-gray-500 dark:text-gray-300"> Esta acción no se puede deshacer.</p>
                                             </p>
                                         </div>
                                     </div>
@@ -415,11 +425,12 @@
                 try {
                     // Verificar permisos antes de hacer la petición
                     const tienePermisos = <?php echo json_encode(auth()->user()->checkModuloAcceso('payments', 'actualizar')); ?>;
-                    
+
                     if (!tienePermisos) {
                         // Mostrar toast de error centrado con overlay
                         const toastError = document.createElement('div');
-                        toastError.className = 'fixed inset-0 flex items-center justify-center z-50';
+                        toastError.className =
+                            'fixed inset-0 flex items-center justify-center z-50';
                         toastError.innerHTML = `
                             <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity"></div>
                             <div class="relative z-[60] flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800" role="alert">
@@ -429,7 +440,7 @@
                                     </svg>
                                     <span class="sr-only">Error icon</span>
                                 </div>
-                                <div class="ms-3 text-sm font-normal">Sin permisos para anular cobros.</div>
+                                <div class="ms-3 text-sm font-normal">Sin permisos para realizar esta acción.</div>
                                 <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" onclick="this.parentElement.parentElement.remove()" aria-label="Close">
                                     <span class="sr-only">Close</span>
                                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -449,7 +460,8 @@
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]').content
                         }
                     });
 
@@ -487,7 +499,8 @@
                         document.body.appendChild(successModal);
 
                         // Manejar el botón de aceptar
-                        document.getElementById('aceptar-anulacion').addEventListener('click', () => {
+                        document.getElementById('aceptar-anulacion').addEventListener('click',
+                        () => {
                             document.body.removeChild(successModal);
                             window.location.reload();
                         });
@@ -510,11 +523,12 @@
         document.querySelectorAll('.btn-anular').forEach(button => {
             button.addEventListener('click', () => {
                 const tienePermisos = <?php echo json_encode(auth()->user()->checkModuloAcceso('payments', 'eliminar')); ?>;
-                
+
                 if (!tienePermisos) {
                     // Mostrar toast de error centrado con overlay
                     const toastError = document.createElement('div');
-                    toastError.className = 'fixed inset-0 flex items-center justify-center z-50';
+                    toastError.className =
+                    'fixed inset-0 flex items-center justify-center z-50';
                     toastError.innerHTML = `
                         <div class="fixed inset-0 bg-gray-900/75 dark:bg-gray-900/90 transition-opacity"></div>
                         <div class="relative z-[60] flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800" role="alert">
@@ -671,5 +685,54 @@
                 }
             });
         }
+
+        // Función para actualizar el total de cobros
+        function actualizarTotalCobros() {
+            const filas = document.querySelectorAll('tbody tr');
+            let total = 0;
+
+            filas.forEach(fila => {
+                if (fila.style.display !== 'none') {
+                    // Buscar el monto en la tercera columna (índice 2)
+                    const montoCelda = fila.querySelector('td:nth-child(3)');
+                    const estadoCelda = fila.querySelector('td:nth-child(6) span');
+                    
+                    if (montoCelda && estadoCelda) {
+                        // Obtener el texto del monto y limpiarlo
+                        const montoTexto = montoCelda.textContent.trim();
+                        const monto = parseFloat(montoTexto.replace('S/', '').trim());
+                        
+                        // Solo sumar si el estado no es anulado y el monto es un número válido
+                        if (!estadoCelda.textContent.toLowerCase().includes('anulado') && !isNaN(monto)) {
+                            total += monto;
+                        }
+                    }
+                }
+            });
+
+            // Actualizar el total con formato
+            document.getElementById('total-cobros').textContent = `S/ ${total.toFixed(2)}`;
+        }
+
+        // Agregar evento para actualizar el total cuando se apliquen los filtros
+        document.querySelectorAll('input[name="tipo_pago"], input[name="estado_pago"], input[name="usuario"]').forEach(input => {
+            input.addEventListener('change', () => {
+                filtrarTabla();
+                actualizarTotalCobros();
+            });
+        });
+
+        document.getElementById('fecha_inicio').addEventListener('change', () => {
+            filtrarTabla();
+            actualizarTotalCobros();
+        });
+
+        document.getElementById('fecha_fin').addEventListener('change', () => {
+            filtrarTabla();
+            actualizarTotalCobros();
+        });
+
+        // Actualizar el total inicialmente
+        actualizarTotalCobros();
     });
 </script>

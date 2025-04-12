@@ -160,7 +160,7 @@
                                 @else
                                     @if ($servicio->planes->count() == 1)
                                         {{ $servicio->planes->first()->nombre }} -
-                                        ${{ number_format($servicio->planes->first()->precio, 2, '.', ',') }}
+                                        S/ {{ number_format($servicio->planes->first()->precio, 2, '.', ',') }}
                                     @else
                                         <div class="relative inline-block">
                                             <!-- Botón para mostrar/ocultar el desplegable -->
@@ -188,7 +188,7 @@
                                                             <a href="#"
                                                                 class="block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 dark:hover:text-white">
                                                                 {{ $plan->nombre }} -
-                                                                ${{ number_format($plan->precio, 2, '.', ',') }}
+                                                                S/ {{ number_format($plan->precio, 2, '.', ',') }}
                                                             </a>
                                                         </li>
                                                     @endforeach

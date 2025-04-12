@@ -81,10 +81,24 @@ class User extends Authenticatable
 
     public function isOnline()
     {
-        return DB::table('sessions')
-            ->where('user_id', $this->id)
-            ->where('last_activity', '>=', now()->subMinutes(5)->timestamp)
-            ->exists();
+        return $this->last_activity && $this->last_activity->diffInMinutes(now()) < 5;
+    }
+
+    /**
+     * Verifica si el usuario tiene un rol específico.
+     *
+     * @param string $role Nombre del rol a verificar
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        if (!$this->rol) return false;
+        
+        // Convertir ambos a minúsculas para comparación sin importar mayúsculas/minúsculas
+        $userRole = strtolower($this->rol->nombre_rol);
+        $checkRole = strtolower($role);
+        
+        return $userRole === $checkRole;
     }
 
     public function checkModuloAcceso(string $modulo, string $accion)

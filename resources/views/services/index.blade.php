@@ -61,43 +61,53 @@
             @include('partials.alerts')
             <!-- ====== Alerts End -->
 
-            <!-- ====== Table Section Start -->
-            <div class="flex flex-col gap-10">
+            <!-- Table Section Start -->
+            <div>
+                @if(auth()->user()->checkModuloAcceso('manage', 'all'))
+                    @include('partials.table-services')
+                @else
+                    <div class="flex flex-col gap-4 p-4">
+                        <div class="flex items-center justify-center p-6 text-gray-500 dark:text-gray-400">
+                            <div class="text-center">
+                                <i class="fas fa-lock text-4xl mb-4"></i>
+                                <p class="text-lg">No tienes permisos para acceder a esta sección.</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <!-- Table Section End -->
 
+            <!-- Modales -->
+            @if(auth()->user()->checkModuloAcceso('manage', 'all'))
                 <!-- ====== Modal Category Start -->
                 @include('partials.modal-category')
                 <!-- ====== Modal Category End -->
 
-                <!-- ====== Modal Category Edit Start -->
-                @include('partials.modal-category-edit')
-                <!-- ====== Modal Category Edit End -->
-
-                <!-- ====== Modal Services Edit Start -->
-                @include('partials.modal-services-edit')
-                <!-- ====== Modal Services Edit End -->
-
-                <!-- ====== Modal Plans Edit Start -->
-                @include('partials.modal-plans-edit')
-                <!-- ====== Modal Plans Edit End -->
-
-                <!-- ====== Modal Edit All Service Start -->
-                @include('partials.modal-edit-all-service')
-                <!-- ====== Modal Edit All Service End -->
-
-                <!-- ====== Table Services Start -->
-                @include('partials.table-services')
-                <!-- ====== Table Services End -->
-
-                <!-- ====== Modal Services End -->
+                <!-- ====== Modal Service Start -->
                 @include('partials.modal-services')
-                <!-- ====== Modal Services End -->
+                <!-- ====== Modal Service End -->
 
-                <!-- ====== Edit Modal Planes End -->
+                <!-- ====== Modal Plan Start -->
                 @include('partials.modal-planes')
-                <!-- ====== Edit Modal Planes End -->
+                <!-- ====== Modal Plan End -->
 
-            </div>
-            <!-- ====== Table Section End -->
+                <!-- ====== Edit Modal Category Start -->
+                @include('partials.modal-category-edit')
+                <!-- ====== Edit Modal Category End -->
+
+                <!-- ====== Edit Modal Service Start -->
+                @include('partials.modal-services-edit')
+                <!-- ====== Edit Modal Service End -->
+
+                <!-- ====== Edit Modal All Service Start -->
+                @include('partials.modal-edit-all-service')
+                <!-- ====== Edit Modal All Service End -->
+
+                <!-- ====== Edit Modal Planes Start -->
+                @include('partials.modal-plans-edit')
+                <!-- ====== Edit Modal Planes End -->
+            @endif
         </div>
     </main>
 @endsection

@@ -41,7 +41,7 @@ class ContractController extends Controller
             $query->where('estado_contrato', $estado);
         }
 
-        $contratos = $query->paginate(7);
+        $contratos = $query->orderBy('created_at', 'desc')->paginate(7);
     
         foreach ($contratos as $contrato) {
             $contrato->detalles_servicios = $contrato->contratoServicios->map(function ($contratoServicio) {
