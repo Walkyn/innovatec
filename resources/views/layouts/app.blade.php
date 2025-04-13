@@ -34,18 +34,6 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
             <!-- ===== Header End ===== -->
             <section>
                 @yield('content')
-
-                <!-- ===== Restore Start ===== -->
-                @include('partials.modal-restore')
-                <!-- ===== Restore End ===== -->
-
-                <!-- ===== Backup Start ===== -->
-                @include('partials.modal-backup')
-                <!-- ===== Backup End ===== -->
-
-                <!-- ===== Backup Excel Start ===== -->
-                @include('partials.modal-restore-excel')
-                <!-- ===== Backup Excel End ===== -->
                 @yield('scripts')
             </section>
         </div>

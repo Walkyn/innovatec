@@ -112,7 +112,7 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-sm">
-                                    {{ $cliente->created_at->format('d/m/Y') }}
+                                    {{ \Carbon\Carbon::parse($cliente->created_at)->format('d/m/Y') }}
                                 </td>
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">
                                     <a href="tel:{{ $cliente->telefono }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">

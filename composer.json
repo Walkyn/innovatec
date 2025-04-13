@@ -11,6 +11,7 @@
         "hisorange/browser-detect": "^5.0",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
         "whichbrowser/parser": "^2.1"
     },
     "require-dev": {

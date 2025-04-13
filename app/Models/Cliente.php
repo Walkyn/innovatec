@@ -10,18 +10,22 @@ class Cliente extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'nombres',
         'apellidos',
         'identificacion',
-        'telefono',
         'direccion',
+        'telefono',
         'gps',
         'region_id',
         'provincia_id',
         'distrito_id',
         'pueblo_id',
         'estado_cliente',
+        'created_at',
+        'updated_at'
     ];
 
     public function contratos()

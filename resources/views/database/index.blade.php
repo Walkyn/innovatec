@@ -41,4 +41,20 @@
         </div>
     </main>
     <!-- ===== Main Content End ===== -->
+
+    <!-- ===== Restore Start ===== -->
+    @include('partials.modal-restore')
+    <!-- ===== Restore End ===== -->
+
+    <!-- ===== Backup Start ===== -->
+    @include('partials.modal-backup')
+    <!-- ===== Backup End ===== -->
+
+    <!-- ===== Backup Excel Start ===== -->
+    @include('partials.modal-restore-excel')
+    <!-- ===== Backup Excel End ===== -->
+@endsection
+
+@section('scripts')
+// ... existing code ...
 @endsection

@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ContratoPDFController;
 use App\Http\Controllers\PaymentPDFController;
+use App\Http\Controllers\ImportController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -78,6 +79,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('clients/{id}', 'destroy')->middleware('check.permissions:clients,eliminar')->name('clients.destroy');
         Route::get('clients/{id}/details', 'getDetails')->name('clients.details');
     });
+
+    // Import Routes
+    Route::post('import/clientes', [ImportController::class, 'importClientes'])->name('import.clientes');
 
     // Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->middleware('check.permissions:calendar,all')->name('calendar.index');
