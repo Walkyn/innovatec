@@ -78,7 +78,7 @@
                             <th class="px-4 py-3">Telefono</th>
                             <th class="px-4 py-3">Dirección</th>
                             <th class="px-4 py-3">Estado</th>
-                            <th class="px-4 py-3">Detalles</th>
+                            <th class="px-4 py-3 text-center">Info</th>
                             <th class="px-4 py-3">Acción</th>
                         </tr>
                     </thead>
@@ -140,7 +140,7 @@
                                     </span>
                                 </td>
 
-                                <td class="px-4 py-3 text-sm">
+                                <td class="px-4 py-3 text-sm text-center">
                                     <button type="button" 
                                         data-modal-target="meses-modal"
                                         onclick="verDetallesCliente({{ $cliente->id }})"

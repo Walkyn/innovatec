@@ -82,6 +82,12 @@ Route::middleware('auth')->group(function () {
 
     // Import Routes
     Route::post('import/clientes', [ImportController::class, 'importClientes'])->name('import.clientes');
+    Route::get('descargar-plantilla-excel', [ImportController::class, 'descargarPlantilla'])->name('descargar.plantilla.excel');
+    
+    // Ruta temporal para generar la imagen de la plantilla
+    Route::get('generar-imagen-plantilla', function() {
+        return view('templates.excel-template-preview');
+    });
 
     // Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->middleware('check.permissions:calendar,all')->name('calendar.index');

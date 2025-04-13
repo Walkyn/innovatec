@@ -101,6 +101,7 @@
 
             <!-- Modal body -->
             <div class="p-4 md:p-4">
+                
                 <form action="{{ route('import.clientes') }}" method="POST" enctype="multipart/form-data" class="bg-white" id="import-form">
                     @csrf
                     <div class="">
@@ -246,6 +247,16 @@
                     importForm.reset();
                     dropzoneContent.innerHTML = `<span class="font-semibold">Subir archivo</span>`;
                     fileSizeDisplay.innerHTML = 'Peso máximo: 50MB';
+
+                    // Disparar evento para actualizar la fecha en el modal principal
+                    if (data.ultima_importacion) {
+                        const event = new CustomEvent('importacionCompletada', {
+                            detail: {
+                                fecha: data.ultima_importacion.fecha
+                            }
+                        });
+                        document.dispatchEvent(event);
+                    }
                 } else {
                     errorMessage.classList.remove('hidden');
                     document.getElementById('error-text').innerText = data.message;
