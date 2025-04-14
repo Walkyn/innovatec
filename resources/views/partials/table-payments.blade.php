@@ -651,6 +651,9 @@
                 fila.style.display = '';
             });
 
+            // Actualizar el total de cobros
+            actualizarTotalCobros();
+
             // Cerrar el dropdown
             const filterDropdown = document.getElementById('filterDropdown');
             if (filterDropdown) {

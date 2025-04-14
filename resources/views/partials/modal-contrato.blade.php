@@ -391,8 +391,11 @@
                                     <label
                                         class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Precio</label>
                                     <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <span class="text-gray-500 dark:text-gray-400">S/</span>
+                                        </div>
                                         <input x-model="precioPlan"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-2 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 pl-8 pr-2 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                             placeholder="0.00" disabled>
                                     </div>
                                 </div>
@@ -550,7 +553,7 @@
                                                                     <span>Activo</span>
                                                                 </button>
                                                             </td>
-                                                            <td class="px-4 py-3 text-right" x-text="detalle.precio"></td>
+                                                            <td class="px-4 py-3 text-right">S/ <span x-text="Number(detalle.precio).toFixed(2)"></span></td>
                                                         </tr>
                                                     </template>
                                                 </tbody>
@@ -560,7 +563,7 @@
                                             class="grid px-4 py-3 text-xs font-semibold tracking-wide rounded-b text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                                             <span
                                                 class="col-span-5 sm:col-span-4 sm:col-start-6 flex justify-end text-right text-sm font-semibold text-gray-600 dark:text-gray-400">
-                                                Total: $ <span x-text="total"></span>
+                                                Total: S/  <span x-text="Number(total).toFixed(2)"></span>
                                             </span>
                                         </div>
                                     </div>
