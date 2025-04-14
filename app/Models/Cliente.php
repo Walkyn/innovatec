@@ -28,6 +28,11 @@ class Cliente extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
+    ];
+
     public function contratos()
     {
         return $this->hasMany(Contrato::class);

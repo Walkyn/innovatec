@@ -451,3 +451,5 @@ Route::get('/provincias/{provinciaId}/distritos', function ($provinciaId) {
 Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
     return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
 });
+
+Route::get('/exportar-clientes', [DatabaseController::class, 'exportarClientes'])->name('exportar.clientes');
