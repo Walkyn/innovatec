@@ -487,15 +487,26 @@
             filas.forEach(fila => {
                 const estadoSelect = fila.querySelector('td:nth-child(5) select');
                 const precioCell = fila.querySelector('td:nth-child(6)');
-                const precioOriginal = parseFloat(precioCell.textContent.replace('S/ ', ''));
+                
+                // Guardamos el precio original si aún no está guardado
+                if (!precioCell.dataset.precioOriginal) {
+                    precioCell.dataset.precioOriginal = precioCell.textContent.replace('S/ ', '');
+                }
+                
+                const precioOriginal = parseFloat(precioCell.dataset.precioOriginal);
 
-                if (estadoSelect.value === 'no_aplica') {
-                    precioCell.textContent = 'S/ 0.00';
-                } else {
+                if (estadoSelect.value === 'pagado') {
+                    // Si está pagado, mostramos y sumamos el precio original
                     precioCell.textContent = `S/ ${precioOriginal.toFixed(2)}`;
                     if (!isNaN(precioOriginal)) {
                         total += precioOriginal;
                     }
+                } else if (estadoSelect.value === 'no_aplica') {
+                    // Si es no_aplica, mostramos 0
+                    precioCell.textContent = 'S/ 0.00';
+                } else {
+                    // Si es pendiente o anulado, mostramos el precio pero no sumamos al total
+                    precioCell.textContent = `S/ ${precioOriginal.toFixed(2)}`;
                 }
             });
 
