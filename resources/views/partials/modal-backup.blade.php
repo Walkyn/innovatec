@@ -76,7 +76,7 @@
                               </span>
                           </time>
                           <button type="button"
-                              onclick="window.location.href='{{ route('exportar.clientes') }}'"
+                              onclick="exportarExcel()"
                               class="py-2 px-3 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                               <i class="fa fa-file-excel w-3 h-3 me-1.5" aria-hidden="true"></i>
                               Exportar
@@ -150,6 +150,70 @@
             } else {
                 throw new Error(data.message);
             }
+        })
+        .catch(error => {
+            // Mostrar error en el botón
+            button.innerHTML = '<i class="fas fa-times me-1.5"></i> Error al exportar';
+            button.classList.add('text-red-700', 'bg-red-50', 'hover:bg-red-100', 'hover:text-red-700', 'border-red-200');
+            
+            // Restaurar el botón después de 3 segundos
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.className = originalClasses + ' transition-all duration-300';
+                button.disabled = false;
+            }, 3000);
+        });
+    }
+
+    function exportarExcel() {
+        // Obtener el botón y guardar su estado original
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        const originalClasses = button.className;
+        
+        // Agregar clase de transición si no la tiene
+        if (!button.classList.contains('transition-all')) {
+            button.classList.add('transition-all', 'duration-300');
+        }
+        
+        // Mostrar indicador de carga
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1.5"></i> Exportando...';
+        button.disabled = true;
+
+        // Realizar la petición
+        fetch('{{ route("exportar.clientes") }}', {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la exportación');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Mostrar mensaje de éxito
+            button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
+            button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
+            
+            // Descargar el archivo
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'clientes.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            // Restaurar el botón después de 3 segundos
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.className = originalClasses + ' transition-all duration-300';
+                button.disabled = false;
+            }, 3000);
         })
         .catch(error => {
             // Mostrar error en el botón
