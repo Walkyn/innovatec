@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Models\DatabaseBackup;
 
 class BackupController extends Controller
 {
@@ -27,41 +28,41 @@ class BackupController extends Controller
                 Storage::makeDirectory('backups');
             }
 
-            // Especificar solo las tablas relacionadas al chat
-            $tablasChat = [
-                'chats',
-                'mensajes',
-                'chat_usuarios',
-                // Agrega aquí otras tablas relacionadas al chat si existen
-            ];
-
-            // Construir el comando solo para las tablas específicas
-            $tablas = implode(' ', $tablasChat);
-            
-            // Comando para crear el backup con --quick y --no-create-info para optimizar
+            // Comando para crear el backup
             $command = sprintf(
-                'mysqldump -h %s -u %s -p%s --quick --no-create-info %s %s > %s 2>&1 & echo $!',
+                'mysqldump -h %s -u %s -p%s %s > %s',
                 escapeshellarg($host),
                 escapeshellarg($username),
                 escapeshellarg($password),
                 escapeshellarg($database),
-                escapeshellarg($tablas),
                 escapeshellarg($path)
             );
 
-            // Ejecutar el comando en segundo plano
-            $pid = exec($command);
+            // Ejecutar el comando
+            exec($command);
 
-            // Verificar si el archivo se está creando
+            // Verificar si el archivo se creó
             if (file_exists($path)) {
+                // Obtener el tamaño real del archivo
+                clearstatcache(true, $path);
+                $tamanioBytes = filesize($path);
+                $tamanioMB = $tamanioBytes > 0 ? round($tamanioBytes / 1048576, 2) : 0;
+
+                // Registrar en la base de datos
+                DatabaseBackup::create([
+                    'nombre' => $filename,
+                    'tamanio' => $tamanioMB . ' MB',
+                    'estado' => 'Completado',
+                    'archivo_path' => 'backups/' . $filename
+                ]);
+
                 return response()->json([
                     'success' => true,
-                    'message' => 'Backup iniciado exitosamente',
-                    'filename' => $filename
+                    'message' => 'Backup creado exitosamente'
                 ]);
-            } else {
-                throw new \Exception('Error al iniciar el backup');
             }
+
+            throw new \Exception('No se pudo crear el archivo de backup');
 
         } catch (\Exception $e) {
             return response()->json([

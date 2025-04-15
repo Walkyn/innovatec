@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('database_backups', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('tamaño');
-            $table->string('ruta');
-            $table->string('estado')->default('completado');
+            $table->string('tamanio');
+            $table->string('archivo_path');
+            $table->enum('estado', ['Completado', 'Parcial', 'Error'])->default('Completado');
             $table->timestamps();
         });
     }
