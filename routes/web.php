@@ -26,6 +26,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ContratoPDFController;
 use App\Http\Controllers\PaymentPDFController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\BackupController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -453,3 +454,5 @@ Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
 });
 
 Route::get('/exportar-clientes', [DatabaseController::class, 'exportarClientes'])->name('exportar.clientes');
+
+Route::post('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');

@@ -41,6 +41,7 @@
                               Nov 10, 2023</time>
                           <button
                               type="button"
+                              onclick="realizarBackup()"
                               class="py-2 px-3 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                               <i class="fas fa-database me-1.5"></i>
                               Exportar
@@ -103,4 +104,64 @@
         const fechaFormateada = `${dia} de ${mes} del ${anio} a las ${hora}:${minutos}`;
         document.getElementById('ultima-exportacion-fecha').textContent = fechaFormateada;
     });
+
+    function realizarBackup() {
+        // Obtener el botón y guardar su estado original
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        const originalClasses = button.className;
+        
+        // Agregar clase de transición si no la tiene
+        if (!button.classList.contains('transition-all')) {
+            button.classList.add('transition-all', 'duration-300');
+        }
+        
+        // Mostrar indicador de carga
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1.5"></i> Exportando...';
+        button.disabled = true;
+
+        // Realizar la petición AJAX
+        fetch('{{ route("backup.database") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje de éxito manteniendo el estilo del botón pero en verde claro
+                button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
+                button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
+                
+                // Actualizar la fecha del último backup
+                const fecha = new Date();
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.querySelector('time').textContent = 'Ultima copia ' + fecha.toLocaleDateString('es-ES', options);
+                
+                // Restaurar el botón después de 3 segundos
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.className = originalClasses + ' transition-all duration-300';
+                    button.disabled = false;
+                }, 3000);
+            } else {
+                throw new Error(data.message);
+            }
+        })
+        .catch(error => {
+            // Mostrar error en el botón
+            button.innerHTML = '<i class="fas fa-times me-1.5"></i> Error al exportar';
+            button.classList.add('text-red-700', 'bg-red-50', 'hover:bg-red-100', 'hover:text-red-700', 'border-red-200');
+            
+            // Restaurar el botón después de 3 segundos
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.className = originalClasses + ' transition-all duration-300';
+                button.disabled = false;
+            }, 3000);
+        });
+    }
 </script>

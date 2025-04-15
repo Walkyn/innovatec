@@ -347,8 +347,6 @@
                                     <th scope="col" class="p-4">Tamaño</th>
                                     <th scope="col" class="p-4">Fecha de Creación</th>
                                     <th scope="col" class="p-4">Estado</th>
-                                    <th scope="col" class="p-4">Tipo</th>
-                                    <th scope="col" class="p-4">Ubicación</th>
                                     <th scope="col" class="p-4">Acciones</th>
                                 </tr>
                             </thead>
@@ -373,8 +371,6 @@
                                             Completado
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3">Completo</td>
-                                    <td class="px-4 py-3">/backups/20231001</td>
                                     <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <div class="flex items-center space-x-4">
                                             <!-- Botón de Descargar -->
@@ -417,8 +413,6 @@
                                             Parcial
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3">Incremental</td>
-                                    <td class="px-4 py-3">/backups/20230925</td>
                                     <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <div class="flex items-center space-x-4">
                                             <!-- Botón de Descargar -->
