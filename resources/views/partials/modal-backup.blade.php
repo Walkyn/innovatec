@@ -36,9 +36,25 @@
                               Base de Datos
                           </h3>
                           <time
-                              class="block mb-3 text-sm font-normal leading-none text-gray-500 dark:text-gray-400">Ultima
-                              copia
-                              Nov 10, 2023</time>
+                              class="block mb-3 text-sm font-normal leading-none text-gray-500 dark:text-gray-400">
+                              Ultima copia
+                              <span id="ultima-copia-fecha">
+                                  @php
+                                      $ultimaExportacion = App\Models\ExportLogDB::ultimaExportacion('database');
+                                      $fecha = 'Sin copias de seguridad';
+                                      
+                                      if ($ultimaExportacion) {
+                                          setlocale(LC_TIME, 'es_ES.UTF-8', 'Spanish_Spain.1252');
+                                          $fecha = strtolower(
+                                              \Carbon\Carbon::parse($ultimaExportacion->created_at)
+                                                  ->locale('es')
+                                                  ->isoFormat('D [de] MMMM [del] YYYY [a las] H:mm')
+                                          );
+                                      }
+                                  @endphp
+                                  {{ $fecha }}
+                              </span>
+                          </time>
                           <button
                               type="button"
                               onclick="realizarBackup()"
@@ -62,14 +78,18 @@
                           </h3>
                           <time
                               class="block mb-3 text-sm font-normal leading-none text-gray-500 dark:text-gray-400">
-                              Última exportación: <span id="ultima-exportacion-fecha">
+                              Última exportación <span id="ultima-exportacion-fecha">
                                   @php
                                       $ultimaExportacion = App\Models\ExportLogExcel::ultimaExportacion('excel');
                                       $fecha = 'Sin exportaciones';
                                       
                                       if ($ultimaExportacion) {
                                           setlocale(LC_TIME, 'es_ES.UTF-8', 'Spanish_Spain.1252');
-                                          $fecha = ucfirst(\Carbon\Carbon::parse($ultimaExportacion->created_at)->locale('es')->isoFormat('D [de] MMMM [del] YYYY [a las] H:mm'));
+                                          $fecha = strtolower(
+                                              \Carbon\Carbon::parse($ultimaExportacion->created_at)
+                                                  ->locale('es')
+                                                  ->isoFormat('D [de] MMMM [del] YYYY [a las] H:mm')
+                                          );
                                       }
                                   @endphp
                                   {{ $fecha }}
@@ -132,14 +152,20 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Mostrar mensaje de éxito manteniendo el estilo del botón pero en verde claro
                 button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
                 button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
                 
-                // Actualizar la fecha del último backup
+                // Actualizar la fecha del último backup con el nuevo formato
                 const fecha = new Date();
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                document.querySelector('time').textContent = 'Ultima copia ' + fecha.toLocaleDateString('es-ES', options);
+                const dia = fecha.getDate();
+                const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                const mes = meses[fecha.getMonth()];
+                const anio = fecha.getFullYear();
+                const hora = fecha.getHours().toString().padStart(2, '0');
+                const minutos = fecha.getMinutes().toString().padStart(2, '0');
+                
+                const fechaFormateada = `${dia} de ${mes} del ${anio} a las ${hora}:${minutos}`;
+                document.getElementById('ultima-copia-fecha').textContent = fechaFormateada;
                 
                 // Recargar la página después de 2 segundos
                 setTimeout(() => {
@@ -178,26 +204,35 @@
         button.innerHTML = '<i class="fas fa-spinner fa-spin me-1.5"></i> Exportando...';
         button.disabled = true;
 
-        // Simular tiempo de procesamiento (1 segundo) antes de iniciar la descarga
-        setTimeout(() => {
-            // Mostrar mensaje de éxito
-            button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
-            button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
-            
-            // Crear e iniciar la descarga después de mostrar el éxito
-            const downloadLink = document.createElement('a');
-            downloadLink.href = '{{ route("exportar.clientes") }}';
-            downloadLink.style.display = 'none';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+        // Crear e iniciar la descarga
+        const downloadLink = document.createElement('a');
+        downloadLink.href = '{{ route("exportar.clientes") }}';
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
 
-            // Restaurar el botón después de 2 segundos
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.className = originalClasses + ' transition-all duration-300';
-                button.disabled = false;
-            }, 2000);
-        }, 1000); // Espera 1 segundo mostrando el spinner antes de mostrar el éxito
+        // Mostrar mensaje de éxito y actualizar fecha
+        button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
+        button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
+        
+        // Actualizar la fecha de última exportación con el mismo formato
+        const fecha = new Date();
+        const dia = fecha.getDate();
+        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const mes = meses[fecha.getMonth()];
+        const anio = fecha.getFullYear();
+        const hora = fecha.getHours().toString().padStart(2, '0');
+        const minutos = fecha.getMinutes().toString().padStart(2, '0');
+        
+        const fechaFormateada = `${dia} de ${mes} del ${anio} a las ${hora}:${minutos}`;
+        document.getElementById('ultima-exportacion-fecha').textContent = fechaFormateada;
+        
+        // Restaurar el botón después de 2 segundos
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.className = originalClasses + ' transition-all duration-300';
+            button.disabled = false;
+        }, 2000);
     }
 </script>

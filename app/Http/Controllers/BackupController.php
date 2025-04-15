@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Models\DatabaseBackup;
 use Illuminate\Support\Facades\Log;
+use App\Models\ExportLogDB;
 
 class BackupController extends Controller
 {
@@ -96,6 +97,11 @@ class BackupController extends Controller
                 'tamanio' => $tamanioMB . ' MB',
                 'estado' => 'Completado',
                 'archivo_path' => 'backups/' . $filename
+            ]);
+
+            // Después de crear el backup exitosamente
+            ExportLogDB::create([
+                'type' => 'database'
             ]);
 
             return response()->json([
