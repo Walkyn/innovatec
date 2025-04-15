@@ -84,9 +84,9 @@ Route::middleware('auth')->group(function () {
     // Import Routes
     Route::post('import/clientes', [ImportController::class, 'importClientes'])->name('import.clientes');
     Route::get('descargar-plantilla-excel', [ImportController::class, 'descargarPlantilla'])->name('descargar.plantilla.excel');
-    
+
     // Ruta temporal para generar la imagen de la plantilla
-    Route::get('generar-imagen-plantilla', function() {
+    Route::get('generar-imagen-plantilla', function () {
         return view('templates.excel-template-preview');
     });
 
@@ -174,7 +174,12 @@ Route::middleware('auth')->group(function () {
     });
 
     // Database
-    Route::get('/database', [DatabaseController::class, 'index'])->middleware('check.permissions:database,all')->name('database.index');
+    Route::controller(DatabaseController::class)->group(function () {
+        Route::get('/database', 'index')->middleware('check.permissions:database,all')->name('database.index');
+        Route::get('/exportar-clientes', 'exportarClientes')->name('exportar.clientes');
+        Route::get('/backup/descargar/{id}', 'descargar')->middleware('check.permissions:database,guardar')->name('backup.descargar');
+        Route::delete('/backup/eliminar/{id}', 'destroy')->middleware('check.permissions:database,eliminar')->name('backup.eliminar');
+    });
 
     // Rutas de datos protegidas
     Route::get('/contratos/{clientId}', function ($clientId) {
@@ -270,7 +275,7 @@ Route::middleware('auth')->group(function () {
         if ($mesesPendientes->isNotEmpty()) {
             $primerMes = $mesesPendientes->first();
             $ultimoMes = $mesesPendientes->last();
-            
+
             // Cálculo para el primer mes (mes de inicio)
             if ($primerMes->id == $mesInicioServicio->id) {
                 $diasTotalesMes = (strtotime($mesInicioServicio->fecha_fin) - strtotime($mesInicioServicio->fecha_inicio)) / (60 * 60 * 24) + 1;
@@ -281,7 +286,7 @@ Route::middleware('auth')->group(function () {
                 // Si la instalación fue en los últimos 5 días del mes, no se cobra este mes
                 if ($diasRestantesMes < 5) {
                     // Eliminar el primer mes de la colección si la instalación fue en los últimos 5 días
-                    $mesesPendientes = $mesesPendientes->filter(function($mes) use ($mesInicioServicio) {
+                    $mesesPendientes = $mesesPendientes->filter(function ($mes) use ($mesInicioServicio) {
                         return $mes->id !== $mesInicioServicio->id;
                     })->values(); // Agregar values() para reindexar la colección
                     $montoProporcional = 0;
@@ -299,7 +304,7 @@ Route::middleware('auth')->group(function () {
             if ($mesSuspension && $ultimoMes->id == $mesSuspension->id) {
                 $diasTotalesMes = (strtotime($mesSuspension->fecha_fin) - strtotime($mesSuspension->fecha_inicio)) / (60 * 60 * 24) + 1;
                 $diasHastaSuspension = (strtotime($fechaSuspension) - strtotime($mesSuspension->fecha_inicio)) / (60 * 60 * 24) + 1;
-                
+
                 // Si es el mismo mes que el de inicio, mantener el cálculo anterior
                 if ($mesSuspension->id == $mesInicioServicio->id) {
                     $diasHastaSuspension = (strtotime($fechaSuspension) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
@@ -307,9 +312,9 @@ Route::middleware('auth')->group(function () {
                 } else {
                     // Calcular el precio proporcional para el mes de suspensión
                     $precioMesSuspension = ($precioPlan / $diasTotalesMes) * $diasHastaSuspension;
-                    
+
                     // Actualizar el precio del último mes en la colección
-                    $mesesPendientes = $mesesPendientes->map(function($mes) use ($mesSuspension, $precioMesSuspension, $precioPlan) {
+                    $mesesPendientes = $mesesPendientes->map(function ($mes) use ($mesSuspension, $precioMesSuspension, $precioPlan) {
                         if ($mes->id == $mesSuspension->id) {
                             $precioRedondeado = round($precioMesSuspension, 2);
                             $mes->precio_proporcional = $precioRedondeado;
@@ -323,7 +328,7 @@ Route::middleware('auth')->group(function () {
                 }
             } else {
                 // Si no hay mes de suspensión, asignar el precio completo a todos los meses
-                $mesesPendientes = $mesesPendientes->map(function($mes) use ($precioPlan) {
+                $mesesPendientes = $mesesPendientes->map(function ($mes) use ($precioPlan) {
                     $mes->precio_proporcional = $precioPlan;
                     $mes->monto = $precioPlan;
                     return $mes;
@@ -453,6 +458,5 @@ Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
     return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
 });
 
-Route::get('/exportar-clientes', [DatabaseController::class, 'exportarClientes'])->name('exportar.clientes');
 
 Route::post('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');

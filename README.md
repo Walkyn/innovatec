@@ -61,6 +61,14 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## Requisitos del Sistema
+
+- PHP 8.2 o superior
+- Laragon (recomendado) o entorno equivalente (XAMPP, WAMP)
+- Composer 2.5 o superior
+- MySQL 8.0 o superior
+- Node.js 22+ (para compilación de assets)
+
 ## License
 
 This software is the property of **Business Manager** and is protected by copyright. 

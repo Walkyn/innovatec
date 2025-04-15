@@ -76,7 +76,7 @@
                               </span>
                           </time>
                           <button type="button"
-                              onclick="window.location.href='{{ route('exportar.clientes') }}'"
+                              onclick="exportarExcel()"
                               class="py-2 px-3 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                               <i class="fa fa-file-excel w-3 h-3 me-1.5" aria-hidden="true"></i>
                               Exportar
@@ -141,12 +141,10 @@
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
                 document.querySelector('time').textContent = 'Ultima copia ' + fecha.toLocaleDateString('es-ES', options);
                 
-                // Restaurar el botón después de 3 segundos
+                // Recargar la página después de 2 segundos
                 setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.className = originalClasses + ' transition-all duration-300';
-                    button.disabled = false;
-                }, 3000);
+                    location.reload();
+                }, 2000);
             } else {
                 throw new Error(data.message);
             }
@@ -163,5 +161,43 @@
                 button.disabled = false;
             }, 3000);
         });
+    }
+
+    function exportarExcel() {
+        // Obtener el botón y guardar su estado original
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        const originalClasses = button.className;
+        
+        // Agregar clase de transición
+        if (!button.classList.contains('transition-all')) {
+            button.classList.add('transition-all', 'duration-300');
+        }
+        
+        // Mostrar indicador de carga
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1.5"></i> Exportando...';
+        button.disabled = true;
+
+        // Simular tiempo de procesamiento (1 segundo) antes de iniciar la descarga
+        setTimeout(() => {
+            // Mostrar mensaje de éxito
+            button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
+            button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
+            
+            // Crear e iniciar la descarga después de mostrar el éxito
+            const downloadLink = document.createElement('a');
+            downloadLink.href = '{{ route("exportar.clientes") }}';
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+            // Restaurar el botón después de 2 segundos
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.className = originalClasses + ' transition-all duration-300';
+                button.disabled = false;
+            }, 2000);
+        }, 1000); // Espera 1 segundo mostrando el spinner antes de mostrar el éxito
     }
 </script>

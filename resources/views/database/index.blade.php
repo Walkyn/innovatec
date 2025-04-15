@@ -56,5 +56,5 @@
 @endsection
 
 @section('scripts')
-// ... existing code ...
+
 @endsection

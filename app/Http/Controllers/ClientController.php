@@ -12,7 +12,9 @@ class ClientController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Cliente::withCount('contratos');
+        $query = Cliente::with(['contratos' => function($query) {
+            $query->latest();
+        }]);
 
         if ($request->has('search')) {
             $searchTerm = $request->search;
@@ -129,7 +131,9 @@ class ClientController extends Controller
                 'provincia_id' => $request->provincia_id,
                 'distrito_id' => $request->distrito_id,
                 'pueblo_id' => $puebloId,
-                'estado_cliente' => $request->estado_cliente
+                'estado_cliente' => $request->estado_cliente,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
             DB::commit();
