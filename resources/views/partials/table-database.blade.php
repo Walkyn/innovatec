@@ -676,27 +676,36 @@
 
     function descargarBackup(url) {
         fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    // Mostrar el modal de error
-                    const errorMessage = document.getElementById('error-message');
-                    errorMessage.textContent = data.message;
-                    
-                    // Mostrar el modal
-                    if (errorModal) {
-                        errorModal.show();
-                    }
-                } else {
-                    // Si la respuesta es exitosa, iniciar la descarga
-                    window.location.href = url;
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor: ' + response.status);
                 }
+                // Obtener el nombre del archivo del header Content-Disposition si existe
+                const contentDisposition = response.headers.get('Content-Disposition');
+                const fileName = contentDisposition 
+                    ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+                    : 'backup.sql';
+
+                // Convertir la respuesta a blob
+                return response.blob().then(blob => {
+                    // Crear URL del blob
+                    const url = window.URL.createObjectURL(blob);
+                    // Crear enlace temporal
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+                    // Agregar al documento y hacer clic
+                    document.body.appendChild(link);
+                    link.click();
+                    // Limpiar
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                });
             })
             .catch(error => {
-                // Mostrar el modal de error con mensaje genérico
+                console.error('Error en la descarga:', error);
                 const errorMessage = document.getElementById('error-message');
-                errorMessage.textContent = 'Ha ocurrido un error al intentar descargar el archivo';
-                
+                errorMessage.textContent = 'Ha ocurrido un error al intentar descargar el archivo. Por favor, verifica los permisos y que el archivo exista.';
                 if (errorModal) {
                     errorModal.show();
                 }
