@@ -179,6 +179,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/exportar-clientes', 'exportarClientes')->name('exportar.clientes');
         Route::get('/backup/descargar/{id}', 'descargar')->middleware('check.permissions:database,guardar')->name('backup.descargar');
         Route::delete('/backup/eliminar/{id}', 'destroy')->middleware('check.permissions:database,eliminar')->name('backup.eliminar');
+        Route::post('/database/restore', 'restore')->name('database.restore');
     });
 
     // Rutas de datos protegidas

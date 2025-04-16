@@ -18,8 +18,8 @@ class ClientesImport implements ToModel, WithStartRow, WithEvents
     private $totalIgnorados = 0;
     private $hojaActual = '';
     private $filaActual = 0;
-    private $dnisEnExcel = []; // Para mapear DNIs encontrados en el Excel
-    private $pueblosPorHoja = []; // Para mantener un registro de los pueblos por hoja
+    private $dnisEnExcel = [];
+    private $pueblosPorHoja = [];
 
     public function registerEvents(): array
     {

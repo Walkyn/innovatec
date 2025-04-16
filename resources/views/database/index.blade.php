@@ -46,6 +46,10 @@
     @include('partials.modal-restore')
     <!-- ===== Restore End ===== -->
 
+    <!-- ===== Restore Start ===== -->
+    @include('partials.modal-restore-database')
+    <!-- ===== Restore End ===== -->
+
     <!-- ===== Backup Start ===== -->
     @include('partials.modal-backup')
     <!-- ===== Backup End ===== -->

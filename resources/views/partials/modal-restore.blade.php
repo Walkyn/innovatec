@@ -35,14 +35,30 @@
                           <h3 class="flex items-start mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                               Base de Datos
                           </h3>
-                          <time
-                              class="block mb-3 text-sm font-normal leading-none text-gray-500 dark:text-gray-400">Ultima
-                              copia
-                              Nov 10, 2023</time>
+                          <time class="block mb-3 text-sm font-normal leading-none text-gray-500 dark:text-gray-400">
+                              Última restauración: 
+                              @php
+                                  $ultimaRestauracion = DB::table('database_restore_logs')
+                                      ->where('success', true)
+                                      ->latest()
+                                      ->first();
+                                  
+                                  $fecha = 'Sin restauraciones';
+                                  
+                                  if ($ultimaRestauracion) {
+                                      setlocale(LC_TIME, 'es_ES.UTF-8', 'Spanish_Spain.1252');
+                                      $fecha = ucfirst(\Carbon\Carbon::parse($ultimaRestauracion->created_at)->locale('es')->isoFormat('D [de] MMMM [del] YYYY [a las] H:mm'));
+                                  }
+                              @endphp
+                              {{ $fecha }}
+                          </time>
                           <button type="button"
+                              data-modal-target="modal-restore-database"
+                              data-modal-toggle="modal-restore-database"
+                              data-modal-hide="modal-restore"
                               class="py-2 px-3 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                               <i class="fas fa-database me-1.5"></i>
-                              Importar
+                              Restaurar
                           </button>
 
                       </li>
