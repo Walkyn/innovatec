@@ -200,39 +200,45 @@
             button.classList.add('transition-all', 'duration-300');
         }
         
-        // Mostrar indicador de carga
+        // Mostrar indicador de carga con animación
         button.innerHTML = '<i class="fas fa-spinner fa-spin me-1.5"></i> Exportando...';
         button.disabled = true;
+        button.classList.add('animate-pulse');
 
-        // Crear e iniciar la descarga
-        const downloadLink = document.createElement('a');
-        downloadLink.href = '{{ route("exportar.clientes") }}';
-        downloadLink.style.display = 'none';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-
-        // Mostrar mensaje de éxito y actualizar fecha
-        button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
-        button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
-        
-        // Actualizar la fecha de última exportación con el mismo formato
-        const fecha = new Date();
-        const dia = fecha.getDate();
-        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-        const mes = meses[fecha.getMonth()];
-        const anio = fecha.getFullYear();
-        const hora = fecha.getHours().toString().padStart(2, '0');
-        const minutos = fecha.getMinutes().toString().padStart(2, '0');
-        
-        const fechaFormateada = `${dia} de ${mes} del ${anio} a las ${hora}:${minutos}`;
-        document.getElementById('ultima-exportacion-fecha').textContent = fechaFormateada;
-        
-        // Restaurar el botón después de 2 segundos
+        // Mostrar mensaje de éxito después de un momento
         setTimeout(() => {
-            button.innerHTML = originalText;
-            button.className = originalClasses + ' transition-all duration-300';
-            button.disabled = false;
-        }, 2000);
+            button.classList.remove('animate-pulse');
+            button.innerHTML = '<i class="fas fa-check me-1.5"></i> Exportación exitosa';
+            button.classList.add('text-green-700', 'bg-green-50', 'hover:bg-green-100', 'hover:text-green-700', 'border-green-200');
+            
+            // Actualizar la fecha
+            const fecha = new Date();
+            const dia = fecha.getDate();
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            const mes = meses[fecha.getMonth()];
+            const anio = fecha.getFullYear();
+            const hora = fecha.getHours().toString().padStart(2, '0');
+            const minutos = fecha.getMinutes().toString().padStart(2, '0');
+            
+            const fechaFormateada = `${dia} de ${mes} del ${anio} a las ${hora}:${minutos}`;
+            document.getElementById('ultima-exportacion-fecha').textContent = fechaFormateada;
+
+            // Iniciar la descarga después del mensaje de éxito (0.1 segundos)
+            setTimeout(() => {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = '{{ route("exportar.clientes") }}';
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }, 100); // Cambiado de 500 a 100 (0.1 segundos)
+
+            // Restaurar el botón después de mostrar el éxito
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.className = originalClasses + ' transition-all duration-300';
+                button.disabled = false;
+            }, 2000);
+        }, 1000);
     }
 </script>

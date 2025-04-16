@@ -345,7 +345,7 @@
                                         </div>
                                     </th>
                                     <th scope="col" class="p-4">Nombre</th>
-                                    <th scope="col" class="p-4">Tamaño</th>
+                                    <th scope="col" class="p-4 whitespace-nowrap">Tamaño</th>
                                     <th scope="col" class="p-4 whitespace-nowrap">Fecha de Creación</th>
                                     <th scope="col" class="p-4">Estado</th>
                                     <th scope="col" class="p-4">Acciones</th>
@@ -367,7 +367,7 @@
                                             class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             {{ $backup->nombre }}
                                         </th>
-                                        <td class="px-4 py-3">{{ $backup->tamanio }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap">{{ $backup->tamanio }}</td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             {{ $backup->created_at->format('Y-m-d H:i') }}</td>
                                         <td class="px-4 py-3 text-xs">
@@ -400,7 +400,7 @@
                                             <div class="flex items-center space-x-4">
                                                 <!-- Botón de Descargar -->
                                                 <button type="button"
-                                                    onclick="window.location.href='{{ route('backup.descargar', $backup->id) }}'"
+                                                    onclick="descargarBackup('{{ route('backup.descargar', $backup->id) }}')"
                                                     class="flex items-center text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-900">
                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                         class="h-4 w-4 mr-2 -ml-0.5" viewBox="0 0 20 20"
@@ -534,6 +534,35 @@
             </div>
         </div>
 
+        <!-- Modal de Error -->
+        <div id="error-modal" tabindex="-1" data-modal-target="error-modal" data-modal-backdrop="static" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative w-full max-w-md max-h-full">
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <button type="button" 
+                        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" 
+                        data-modal-hide="error-modal"
+                        onclick="closeErrorModal()">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Cerrar modal</span>
+                    </button>
+                    <div class="p-6 text-center">
+                        <svg class="mx-auto mb-4 text-red-500 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                        </svg>
+                        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Error al descargar el archivo</h3>
+                        <p id="error-message" class="mb-5 text-sm text-gray-500 dark:text-gray-400"></p>
+                        <button type="button" 
+                            onclick="closeErrorModal()"
+                            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </main>
 
@@ -624,4 +653,53 @@
         const targetEl = document.getElementById('delete-modal');
         const modal = new Modal(targetEl);
     });
+
+    let errorModal;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar todos los modales
+        const targetEl = document.getElementById('delete-modal');
+        const modal = new Modal(targetEl);
+
+        // Inicializar el modal de error
+        errorModal = new Modal(document.getElementById('error-modal'), {
+            backdrop: 'static',
+            closable: true,
+        });
+    });
+
+    function closeErrorModal() {
+        if (errorModal) {
+            errorModal.hide();
+        }
+    }
+
+    function descargarBackup(url) {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    // Mostrar el modal de error
+                    const errorMessage = document.getElementById('error-message');
+                    errorMessage.textContent = data.message;
+                    
+                    // Mostrar el modal
+                    if (errorModal) {
+                        errorModal.show();
+                    }
+                } else {
+                    // Si la respuesta es exitosa, iniciar la descarga
+                    window.location.href = url;
+                }
+            })
+            .catch(error => {
+                // Mostrar el modal de error con mensaje genérico
+                const errorMessage = document.getElementById('error-message');
+                errorMessage.textContent = 'Ha ocurrido un error al intentar descargar el archivo';
+                
+                if (errorModal) {
+                    errorModal.show();
+                }
+            });
+    }
 </script>
