@@ -179,7 +179,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/exportar-clientes', 'exportarClientes')->name('exportar.clientes');
         Route::get('/backup/descargar/{id}', 'descargar')->middleware('check.permissions:database,guardar')->name('backup.descargar');
         Route::delete('/backup/eliminar/{id}', 'destroy')->middleware('check.permissions:database,eliminar')->name('backup.eliminar');
-        Route::post('/database/restore', 'restore')->name('database.restore');
+        Route::post('/database/restore', 'restore')->middleware('check.permissions:database,actualizar')->name('database.restore');
     });
 
     // Rutas de datos protegidas
@@ -458,6 +458,5 @@ Route::get('/provincias/{provinciaId}/distritos', function ($provinciaId) {
 Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
     return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
 });
-
 
 Route::post('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
