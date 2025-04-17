@@ -141,14 +141,13 @@ class DatabaseController extends Controller
         \Log::info('Iniciando proceso de restauración');
         
         try {
-            // Validación básica
             $request->validate([
+                'backup_file' => 'required|file',
                 'host' => 'required|string',
                 'port' => 'required|numeric',
                 'database' => 'required|string',
                 'username' => 'required|string',
-                'password' => 'nullable|string',
-                'backup_file' => 'required|file'
+                'password' => 'nullable|string'
             ]);
 
             if (!$request->hasFile('backup_file')) {
@@ -156,71 +155,85 @@ class DatabaseController extends Controller
             }
 
             $file = $request->file('backup_file');
-            
-            // Validar el contenido del archivo
-            $content = file_get_contents($file->getRealPath());
-            if (!preg_match('/(CREATE|INSERT|UPDATE|DELETE|DROP|ALTER|SELECT)/i', $content)) {
-                throw new \Exception('El archivo no parece ser un archivo SQL válido');
-            }
-
-            // Verificar la conexión a la base de datos antes de continuar
-            try {
-                $testConnection = new \PDO(
-                    "mysql:host={$request->host};port={$request->port}",
-                    $request->username,
-                    $request->password
-                );
-            } catch (\PDOException $e) {
-                switch ($e->getCode()) {
-                    case 1045:
-                        throw new \Exception('Acceso denegado: Usuario o contraseña incorrectos');
-                    case 2002:
-                        throw new \Exception('No se puede conectar al servidor de base de datos');
-                    default:
-                        throw new \Exception('Error de conexión: ' . $e->getMessage());
-                }
-            }
-
-            // Verificar si la base de datos existe
-            $databases = $testConnection->query('SHOW DATABASES')->fetchAll(\PDO::FETCH_COLUMN);
-            if (!in_array($request->database, $databases)) {
-                throw new \Exception('La base de datos especificada no existe');
-            }
-
-            // Continuar con el proceso de restauración
             $backupPath = $file->store('temp');
             $fullPath = Storage::path($backupPath);
+
+            // Leer y limpiar el contenido del archivo
+            $content = file_get_contents($fullPath);
             
-            // Limpiar el contenido del archivo
-            $content = preg_replace('/^mysqldump: \[Warning\].*$/m', '', $content);
-            $content = preg_replace('/^Warning:.*$/m', '', $content);
-            $content = preg_replace('/^\s*\n/m', '', $content);
+            // Agregar comandos para desactivar y reactivar las restricciones de clave foránea
+            $content = "SET FOREIGN_KEY_CHECKS=0;\n" . 
+                      $content . 
+                      "\nSET FOREIGN_KEY_CHECKS=1;";
             
+            // Patrones a eliminar
+            $patternsToRemove = [
+                '/^mysqldump: \[.*?\]\s.*$/m',
+                '/^Warning:.*$/m',
+                '/^\/\*.*?\*\/;$/m',
+                '/^-- .*$/m',
+                '/^\s*\n/m',
+                '/^mysqldump: Deprecated.*$/m',
+                '/^-- MariaDB dump.*$/m',
+                '/^-- Host.*$/m',
+                '/^-- Server version.*$/m'
+            ];
+
+            // Aplicar limpieza
+            foreach ($patternsToRemove as $pattern) {
+                $content = preg_replace($pattern, '', $content);
+            }
+
+            // Eliminar líneas vacías múltiples
+            $content = preg_replace("/[\r\n]+/", "\n", $content);
+            $content = trim($content);
+
+            // Guardar archivo limpio
             $cleanFilePath = Storage::path('temp/clean_' . basename($backupPath));
             file_put_contents($cleanFilePath, $content);
 
-            // Ejecutar el comando de restauración
-            $command = sprintf(
-                'mysql -h %s -P %s -u %s %s %s < %s 2>&1',
-                escapeshellarg($request->host),
-                escapeshellarg($request->port),
-                escapeshellarg($request->username),
-                $request->password ? '-p' . escapeshellarg($request->password) : '',
-                escapeshellarg($request->database),
-                escapeshellarg($cleanFilePath)
-            );
+            // Detectar entorno
+            $isHosting = !in_array(php_uname('s'), ['Windows NT', 'Darwin']);
 
-            exec($command, $output, $returnVar);
-
-            // Limpiar archivos temporales
-            Storage::delete($backupPath);
-            @unlink($cleanFilePath);
-
-            if ($returnVar !== 0) {
-                throw new \Exception('Error al ejecutar el comando MySQL: ' . implode("\n", $output));
+            // Construir comando con opciones adicionales
+            if ($isHosting) {
+                $command = sprintf(
+                    '/usr/bin/mariadb --init-command="SET SESSION FOREIGN_KEY_CHECKS=0;" -h%s -P%s -u%s%s %s < %s 2>&1',
+                    escapeshellarg($request->host),
+                    escapeshellarg($request->port),
+                    escapeshellarg($request->username),
+                    $request->password ? ' -p' . escapeshellarg($request->password) : '',
+                    escapeshellarg($request->database),
+                    escapeshellarg($cleanFilePath)
+                );
+            } else {
+                $command = sprintf(
+                    'mysql --init-command="SET SESSION FOREIGN_KEY_CHECKS=0;" -h%s -P%s -u%s%s %s < %s 2>&1',
+                    escapeshellarg($request->host),
+                    escapeshellarg($request->port),
+                    escapeshellarg($request->username),
+                    $request->password ? ' -p' . escapeshellarg($request->password) : '',
+                    escapeshellarg($request->database),
+                    escapeshellarg($cleanFilePath)
+                );
             }
 
-            // Registrar la restauración exitosa
+            // Ejecutar comando
+            $output = [];
+            $returnVar = 0;
+            exec($command, $output, $returnVar);
+
+            // Verificar si hay errores específicos en la salida
+            $errorOutput = implode("\n", $output);
+            if (strpos($errorOutput, 'ERROR 1451') !== false) {
+                throw new \Exception('Error al restaurar: Hay restricciones de clave foránea que impiden la restauración. Por favor, asegúrese de que la base de datos esté vacía o que los datos sean consistentes.');
+            }
+
+            if ($returnVar !== 0) {
+                throw new \Exception('Error al ejecutar el comando de restauración: ' . $errorOutput);
+            }
+
+            // Registrar éxito
             DB::table('database_restore_logs')->insert([
                 'archivo_nombre' => $file->getClientOriginalName(),
                 'host' => $request->host,
@@ -240,22 +253,63 @@ class DatabaseController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error en la restauración: ' . $e->getMessage());
             
-            // Registrar el error
-            DB::table('database_restore_logs')->insert([
-                'archivo_nombre' => $request->file('backup_file')->getClientOriginalName(),
-                'host' => $request->host,
-                'database' => $request->database,
-                'username' => $request->username,
-                'success' => false,
-                'error_message' => $e->getMessage(),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            // Limpiar archivos temporales
+            if (isset($backupPath)) {
+                Storage::delete($backupPath);
+            }
+            if (isset($cleanFilePath) && file_exists($cleanFilePath)) {
+                @unlink($cleanFilePath);
+            }
+
+            // Registrar error
+            if ($request->hasFile('backup_file')) {
+                DB::table('database_restore_logs')->insert([
+                    'archivo_nombre' => $request->file('backup_file')->getClientOriginalName(),
+                    'host' => $request->host,
+                    'database' => $request->database,
+                    'username' => $request->username,
+                    'success' => false,
+                    'error_message' => $e->getMessage(),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
 
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function truncateDatabase($host, $port, $database, $username, $password, $isHosting)
+    {
+        try {
+            // Obtener todas las tablas
+            $pdo = new \PDO(
+                "mysql:host={$host};port={$port};dbname={$database}",
+                $username,
+                $password
+            );
+            
+            // Desactivar restricciones de clave foránea
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+            
+            // Obtener todas las tablas
+            $tables = $pdo->query("SHOW TABLES")->fetchAll(\PDO::FETCH_COLUMN);
+            
+            // Truncar cada tabla
+            foreach ($tables as $table) {
+                $pdo->exec("TRUNCATE TABLE `{$table}`");
+            }
+            
+            // Reactivar restricciones
+            $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+            
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Error al vaciar la base de datos: ' . $e->getMessage());
+            return false;
         }
     }
 }

@@ -74,9 +74,10 @@
                                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                                             <i class="fas fa-server me-2"></i>Host
                                         </label>
-                                        <input type="text" name="host" id="host" value="localhost"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                                            required>
+                                        <input type="text" name="host" id="host" 
+                                               value="{{ config('database.connections.mysql.host') }}"
+                                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                                               required>
                                     </div>
                                     <div>
                                         <label for="port"
@@ -94,8 +95,9 @@
                                         <i class="fas fa-database me-2"></i>Base de Datos
                                     </label>
                                     <input type="text" name="database" id="database"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                                        required>
+                                           value="{{ config('database.connections.mysql.database') }}"
+                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                                           required>
                                 </div>
                                 <div>
                                     <label for="username"
@@ -103,8 +105,9 @@
                                         <i class="fas fa-user me-2"></i>Usuario
                                     </label>
                                     <input type="text" name="username" id="username"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                                        required>
+                                           value="{{ config('database.connections.mysql.username') }}"
+                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                                           required>
                                 </div>
                                 <div>
                                     <label for="password"
@@ -112,7 +115,8 @@
                                         <i class="fas fa-key me-2"></i>Contraseña
                                     </label>
                                     <input type="password" name="password" id="password"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                           value="{{ config('database.connections.mysql.password') }}"
+                                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white">
                                 </div>
                             </div>
                         </div>
