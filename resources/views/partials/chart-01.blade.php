@@ -12,7 +12,7 @@
           ></span>
         </span>
         <div class="w-full">
-          <p class="font-semibold text-primary">Ingresos Totales</p>
+          <p class="font-semibold text-primary">Clientes Cobrados</p>
           <p class="text-sm font-medium">12.04.2022 - 12.05.2022</p>
         </div>
       </div>
@@ -25,7 +25,7 @@
           ></span>
         </span>
         <div class="w-full">
-          <p class="font-semibold text-secondary">Total Ventas</p>
+          <p class="font-semibold text-secondary">Total Cobros</p>
           <p class="text-sm font-medium">12.04.2022 - 12.05.2022</p>
         </div>
       </div>
@@ -37,17 +37,17 @@
         <button
           class="rounded bg-white px-3 py-1 text-xs font-medium text-black shadow-card hover:bg-white hover:shadow-card dark:bg-boxdark dark:text-white dark:hover:bg-boxdark"
         >
-          Day
+          Dia
         </button>
         <button
           class="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark"
         >
-          Week
+          Semana
         </button>
         <button
           class="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark"
         >
-          Month
+          Mes
         </button>
       </div>
     </div>

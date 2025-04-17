@@ -138,7 +138,6 @@ class DatabaseController extends Controller
 
     public function restore(Request $request)
     {
-        \Log::info('Iniciando proceso de restauración');
         
         try {
             $request->validate([
@@ -251,7 +250,6 @@ class DatabaseController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error en la restauración: ' . $e->getMessage());
             
             // Limpiar archivos temporales
             if (isset($backupPath)) {
@@ -308,7 +306,6 @@ class DatabaseController extends Controller
             
             return true;
         } catch (\Exception $e) {
-            \Log::error('Error al vaciar la base de datos: ' . $e->getMessage());
             return false;
         }
     }
