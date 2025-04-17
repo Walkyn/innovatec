@@ -99,7 +99,7 @@
                                                     </g>
                                                 </svg>
                                             </span>
-                                            <!-- Mensaje de error -->
+                                            <p id="phone-error-edit" class="text-red-500 mt-2 text-xs italic hidden"></p>
                                             @error('phone')
                                                 <p class="text-red-500 mt-2 text-xs italic">{{ $message }}</p>
                                             @enderror
@@ -272,10 +272,15 @@
                                     </div>
                                 </div>
 
-                                <!-- Botón -->
-                                <div class="flex gap-4">
+                                <!-- Botones -->
+                                <div class="flex flex-col sm:flex-row gap-4">
                                     <input type="submit" value="Actualizar Usuario"
                                         class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90" />
+                                    
+                                    <a href="{{ route('users.index') }}" 
+                                        class="w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-4 text-center font-medium text-gray-700 transition hover:bg-gray-100">
+                                        Cancelar
+                                    </a>
                                 </div>
                             </form>
                         </div>
@@ -393,72 +398,162 @@
     <!-- intlTelInput -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const phoneDisplayCreate = document.querySelector("#phone_display");
-            const phoneInputCreate = document.querySelector("#phone");
+            const phoneDisplay = document.querySelector("#phone_display_edit");
+            const phoneInput = document.querySelector("#phone_edit");
+            const phoneError = document.querySelector("#phone-error-edit");
 
-            const phoneDisplayEdit = document.querySelector("#phone_display_edit");
-            const phoneInputEdit = document.querySelector("#phone_edit");
+            if (phoneDisplay && phoneInput) {
+                const iti = window.intlTelInput(phoneDisplay, {
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                    separateDialCode: true,
+                    preferredCountries: ['pe', 'mx', 'es'],
+                    initialCountry: "auto",
+                    geoIpLookup: function(callback) {
+                        fetch("https://ipapi.co/json")
+                            .then(response => response.json())
+                            .then(data => callback(data.country_code))
+                            .catch(() => callback("pe"));
+                    },
+                    formatOnDisplay: true,
+                    nationalMode: false,
+                });
 
-            const initializePhoneField = (phoneDisplay, phoneInput) => {
-                if (phoneDisplay && phoneInput) {
-                    const iti = window.intlTelInput(phoneDisplay, {
-                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                        separateDialCode: true,
-                        preferredCountries: ['pe', 'mx', 'es'],
-                        initialCountry: "auto",
-                        geoIpLookup: function(callback) {
-                            fetch("https://ipapi.co/json")
-                                .then(response => response.json())
-                                .then(data => callback(data.country_code))
-                                .catch(() => callback("pe"));
-                        },
-                        formatOnDisplay: true,
-                        nationalMode: false,
-                    });
+                const formatPhoneNumber = (number) => {
+                    const cleaned = number.replace(/\D/g, "");
+                    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+                    if (match) {
+                        return `${match[1]}${match[2] ? " " + match[2] : ""}${match[3] ? " " + match[3] : ""}`;
+                    }
+                    return number;
+                };
 
-                    const formatPhoneNumber = (number) => {
-                        const cleaned = number.replace(/\D/g, "");
-                        const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
-                        if (match) {
-                            return `${match[1]}${match[2] ? " " + match[2] : ""}${match[3] ? " " + match[3] : ""}`;
-                        }
-                        return number;
+                const limitDigitsByCountry = (countryCode) => {
+                    const digitLimits = {
+                        pe: 9,
+                        mx: 10,
+                        es: 9,
+                    };
+                    return digitLimits[countryCode] || 10;
+                };
+
+                const updateValidationMessage = (countryCode, currentLength, requiredLength) => {
+                    if (currentLength === 0) {
+                        phoneError.classList.add('hidden');
+                        return;
+                    }
+
+                    const countryNames = {
+                        pe: 'Perú',
+                        mx: 'México',
+                        es: 'España'
                     };
 
-                    const limitDigitsByCountry = (countryCode) => {
-                        const digitLimits = {
-                            pe: 9,
-                            mx: 10,
-                            es: 9,
-                        };
-                        return digitLimits[countryCode] || 10;
-                    };
+                    const countryName = countryNames[countryCode] || 'este país';
+                    
+                    // Obtener el número sin el código de país
+                    let phoneNumberOnly = phoneDisplay.value.replace(/\D/g, "");
+                    // Remover el código de país del número
+                    if (iti.getSelectedCountryData().dialCode) {
+                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + iti.getSelectedCountryData().dialCode), '');
+                    }
+                    
+                    const actualLength = phoneNumberOnly.length;
+                    
+                    if (actualLength < requiredLength) {
+                        phoneError.textContent = `Por favor, ingrese ${requiredLength} dígitos para ${countryName}. Te faltan ${requiredLength - actualLength} dígitos.`;
+                        phoneError.classList.remove('hidden');
+                    } else if (actualLength > requiredLength) {
+                        phoneError.textContent = `El número telefónico para ${countryName} debe tener ${requiredLength} dígitos. Tienes ${actualLength - requiredLength} dígitos extra.`;
+                        phoneError.classList.remove('hidden');
+                    } else {
+                        phoneError.classList.add('hidden');
+                    }
+                };
 
-                    phoneDisplay.addEventListener("input", function() {
-                        const countryData = iti.getSelectedCountryData();
-                        const countryCode = countryData.iso2;
-                        const digitLimit = limitDigitsByCountry(countryCode);
+                phoneDisplay.addEventListener("input", function() {
+                    const countryData = iti.getSelectedCountryData();
+                    const countryCode = countryData.iso2;
+                    const digitLimit = limitDigitsByCountry(countryCode);
 
-                        let currentValue = phoneDisplay.value.replace(/\D/g, "");
-                        if (currentValue.length > digitLimit) {
-                            currentValue = currentValue.slice(0, digitLimit);
-                        }
+                    // Obtener el número sin el código de país
+                    let phoneNumberOnly = phoneDisplay.value.replace(/\D/g, "");
+                    if (countryData.dialCode) {
+                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + countryData.dialCode), '');
+                    }
+                    
+                    const actualLength = phoneNumberOnly.length;
 
-                        phoneDisplay.value = formatPhoneNumber(currentValue);
+                    // Limitar la longitud sin contar el código de país
+                    if (actualLength > digitLimit) {
+                        phoneNumberOnly = phoneNumberOnly.slice(0, digitLimit);
+                        // Reconstruir el número con el código de país
+                        phoneDisplay.value = "+" + countryData.dialCode + " " + formatPhoneNumber(phoneNumberOnly);
+                    }
 
+                    updateValidationMessage(countryCode, actualLength, digitLimit);
+
+                    if (iti.isValidNumber()) {
+                        phoneInput.value = iti.getNumber();
+                        phoneDisplay.classList.remove('border-red-500');
+                        phoneDisplay.classList.add('border-green-500');
+                    } else {
+                        phoneDisplay.classList.remove('border-green-500');
+                        phoneDisplay.classList.add('border-red-500');
+                    }
+                });
+
+                // También actualizamos el mensaje cuando cambia el país
+                phoneDisplay.addEventListener("countrychange", function() {
+                    const countryData = iti.getSelectedCountryData();
+                    const countryCode = countryData.iso2;
+                    const digitLimit = limitDigitsByCountry(countryCode);
+                    
+                    // Obtener el número sin el código de país
+                    let phoneNumberOnly = phoneDisplay.value.replace(/\D/g, "");
+                    if (countryData.dialCode) {
+                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + countryData.dialCode), '');
+                    }
+                    
+                    const actualLength = phoneNumberOnly.length;
+                    
+                    updateValidationMessage(countryCode, actualLength, digitLimit);
+                });
+
+                const form = document.querySelector("form");
+
+                if (form) {
+                    form.addEventListener("submit", function(event) {
                         if (iti.isValidNumber()) {
                             phoneInput.value = iti.getNumber();
+                        } else {
+                            event.preventDefault();
+                            alert("Por favor, ingresa un número de teléfono válido.");
                         }
                     });
+                }
 
-                    if (phoneInput.value) {
-                        iti.setNumber(phoneInput.value);
+                // Inicializar el número si existe
+                if (phoneInput.value) {
+                    iti.setNumber(phoneInput.value);
+                    phoneDisplay.value = phoneInput.value;
+                    
+                    // Validar el número inicial
+                    const countryData = iti.getSelectedCountryData();
+                    const countryCode = countryData.iso2;
+                    const currentLength = phoneDisplay.value.replace(/\D/g, "").length;
+                    const digitLimit = limitDigitsByCountry(countryCode);
+                    
+                    updateValidationMessage(countryCode, currentLength, digitLimit);
+                    
+                    if (iti.isValidNumber()) {
+                        phoneDisplay.classList.remove('border-red-500');
+                        phoneDisplay.classList.add('border-green-500');
+                    } else {
+                        phoneDisplay.classList.remove('border-green-500');
+                        phoneDisplay.classList.add('border-red-500');
                     }
                 }
-            };
-
-            initializePhoneField(phoneDisplayCreate, phoneInputCreate);
-            initializePhoneField(phoneDisplayEdit, phoneInputEdit);
+            }
         });
     </script>
 @endsection
