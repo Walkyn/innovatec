@@ -109,18 +109,15 @@
                                         @endif
                                     </div>
                                     <div class="w-full md:w-1/2 px-3">
-                                        <label
-                                            class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                            for="telefono">
-                                            Telefono
+                                        <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="telefono">
+                                            Teléfono
                                         </label>
-                                        <input
-                                            class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('telefono') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
-                                            id="telefono" type="text" placeholder="" name="telefono"
-                                            value="{{ old('telefono') }}">
-                                        @if ($errors->has('telefono'))
-                                            <p class="text-red-500 text-xs italic">{{ $errors->first('telefono') }}</p>
-                                        @endif
+                                        <div class="relative">
+                                            <input type="tel" id="phone_display" placeholder="917 319 939"
+                                                class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded py-3 pl-[6.5rem] px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800" />
+                                            <input type="hidden" id="phone" name="telefono" value="{{ old('telefono') }}" />
+                                            <p id="phone-error" class="text-red-500 mt-2 text-xs italic hidden"></p>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- ====== DNI - Telefono Section End -->
@@ -374,5 +371,134 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const phoneDisplay = document.querySelector("#phone_display");
+            const phoneInput = document.querySelector("#phone");
+            const phoneError = document.querySelector("#phone-error");
+
+            if (phoneDisplay && phoneInput) {
+                const iti = window.intlTelInput(phoneDisplay, {
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                    separateDialCode: true,
+                    preferredCountries: ['pe', 'mx', 'es'],
+                    initialCountry: "pe",
+                    formatOnDisplay: false,
+                    nationalMode: false,
+                    autoPlaceholder: 'off'
+                });
+
+                const formatPhoneNumber = (number) => {
+                    const cleaned = number.replace(/\D/g, "");
+                    const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,3})$/);
+                    if (match) {
+                        return match.slice(1).filter(Boolean).join(" ");
+                    }
+                    return number;
+                };
+
+                const limitDigitsByCountry = (countryCode) => {
+                    const digitLimits = {
+                        pe: 9,
+                        mx: 10,
+                        es: 9,
+                    };
+                    return digitLimits[countryCode] || 10;
+                };
+
+                phoneDisplay.addEventListener("input", function(e) {
+                    let phoneNumberOnly = this.value.replace(/\D/g, "");
+                    const countryData = iti.getSelectedCountryData();
+                    const countryCode = countryData.iso2;
+                    const digitLimit = limitDigitsByCountry(countryCode);
+
+                    // Limitar la longitud
+                    if (phoneNumberOnly.length > digitLimit) {
+                        phoneNumberOnly = phoneNumberOnly.slice(0, digitLimit);
+                    }
+
+                    // Formatear para mostrar en el input
+                    this.value = formatPhoneNumber(phoneNumberOnly);
+
+                    // Guardar el número completo con código de país en el input oculto
+                    const fullNumber = "+" + countryData.dialCode + phoneNumberOnly;
+                    phoneInput.value = fullNumber;
+
+                    // Validación y mensajes de error
+                    const actualLength = phoneNumberOnly.length;
+                    if (actualLength < digitLimit) {
+                        phoneError.textContent = `Por favor, ingrese ${digitLimit} dígitos para ${countryData.name}. Te faltan ${digitLimit - actualLength} dígitos.`;
+                        phoneError.classList.remove('hidden');
+                        phoneDisplay.classList.add('border-red-500');
+                        phoneDisplay.classList.remove('border-green-500');
+                    } else if (actualLength === digitLimit) {
+                        phoneError.classList.add('hidden');
+                        phoneDisplay.classList.remove('border-red-500');
+                        phoneDisplay.classList.add('border-green-500');
+                    }
+                });
+
+                phoneDisplay.addEventListener("countrychange", function() {
+                    const countryData = iti.getSelectedCountryData();
+                    const phoneNumberOnly = this.value.replace(/\D/g, "");
+                    const fullNumber = "+" + countryData.dialCode + phoneNumberOnly;
+                    phoneInput.value = fullNumber;
+                    
+                    // Disparar el evento input para actualizar la validación
+                    this.dispatchEvent(new Event('input'));
+                });
+
+                // Inicializar con valor existente si hay uno
+                if (phoneInput.value) {
+                    iti.setNumber(phoneInput.value);
+                    const countryData = iti.getSelectedCountryData();
+                    const nationalNumber = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                    phoneDisplay.value = nationalNumber.replace(/[^\d]/g, "").replace(/(\d{3})(\d{3})(\d{3})/, "$1 $2 $3").trim();
+                }
+            }
+        });
+    </script>
+
+    <style>
+        /* Mantenemos solo los estilos base de iti que no se pueden replicar con Tailwind */
+        .iti {
+            @apply w-full;
+        }
+        .iti__country-list {
+            @apply w-[360px] max-h-[300px];
+        }
+        .iti__country {
+            @apply flex items-center p-2;
+        }
+        .iti__country-name {
+            @apply ml-2.5 text-sm;
+        }
+        .iti__dial-code {
+            @apply text-gray-500 text-sm;
+        }
+        .iti__flag-container {
+            @apply p-0;
+        }
+        .iti--separate-dial-code .iti__selected-flag {
+            @apply bg-white dark:bg-gray-800 border-0 rounded-l-lg w-[65px];
+        }
+        .dark .iti--separate-dial-code .iti__selected-flag {
+            @apply bg-gray-800 border border-gray-600;
+        }
+        .iti--separate-dial-code input {
+            @apply pl-[75px] border border-gray-200 dark:border-gray-600 rounded-lg h-[45px] text-sm shadow-sm;
+        }
+        .iti--separate-dial-code .iti__selected-dial-code {
+            @apply ml-1 text-gray-700 dark:text-gray-300;
+        }
+        .iti--separate-dial-code input:hover,
+        .iti--separate-dial-code input:focus {
+            @apply border-gray-300 dark:border-gray-500 outline-none;
+        }
+        .iti {
+            @apply flex items-stretch;
+        }
+    </style>
 
 @endsection
