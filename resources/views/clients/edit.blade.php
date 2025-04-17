@@ -43,9 +43,8 @@
                             </a>
 
                             <p class="font-medium 2xl:px-20">
-                                Actualiza los datos de tus clientes para acceder a nuestros planes de internet de alta
-                                velocidad y
-                                soporte personalizado.
+                                Actualiza los datos de tus clientes para personalizar sus planes de internet de alta
+                                velocidad y soporte personalizado.
                             </p>
 
                             <span class="mt-15 inline-block">
@@ -70,7 +69,7 @@
                                             Nombres
                                         </label>
                                         <input
-                                            class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                            class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                             id="nombres" type="text" placeholder="" name="nombres"
                                             value="{{ old('nombres', $cliente->nombres) }}">
                                         @if ($errors->has('nombres'))
@@ -84,7 +83,7 @@
                                             Apellidos
                                         </label>
                                         <input
-                                            class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                            class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                             id="apellidos" type="text" placeholder="" name="apellidos"
                                             value="{{ old('apellidos', $cliente->apellidos) }}">
                                         @if ($errors->has('apellidos'))
@@ -103,7 +102,7 @@
                                             Identificación
                                         </label>
                                         <input
-                                            class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('identificacion') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                            class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('identificacion') ? 'border-red-500' : 'border-gray-100' }} dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                             id="identificacion" type="text" placeholder="" name="identificacion"
                                             value="{{ old('identificacion', $cliente->identificacion) }}">
                                         @if ($errors->has('identificacion'))
@@ -119,7 +118,7 @@
                                         </label>
                                         <div class="relative">
                                             <input type="tel" id="phone_display" placeholder="Introduce tu número"
-                                                class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800" />
+                                                class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800" />
                                             <input type="hidden" id="phone" name="telefono" value="{{ old('telefono', $cliente->telefono) }}" />
                                             <p id="phone-error" class="text-red-500 mt-2 text-xs italic hidden"></p>
                                             @if ($errors->has('telefono'))
@@ -140,7 +139,7 @@
                                         </label>
                                         <div class="relative">
                                             <select id="region_id" name="region_id"
-                                                class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border {{ $errors->has('region_id') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                                class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border {{ $errors->has('region_id') ? 'border-red-500' : 'border-gray-100' }} dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                                 required>
                                                 <option value="" disabled>Seleccionar región</option>
                                                 @foreach ($regiones as $region)
@@ -162,7 +161,7 @@
                                         <div class="relative">
                                             <select id="provincia_id" name="provincia_id"
                                                 data-selected="{{ $cliente->provincia_id }}"
-                                                class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border {{ $errors->has('provincia_id') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                                class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border {{ $errors->has('provincia_id') ? 'border-red-500' : 'border-gray-100' }} dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                                 required>
                                                 <option value="" disabled>Seleccionar provincia</option>
                                                 @if ($cliente->region)
@@ -190,7 +189,7 @@
                                         <div class="relative">
                                             <select id="distrito_id" name="distrito_id"
                                                 data-selected="{{ $cliente->distrito_id }}"
-                                                class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border {{ $errors->has('distrito_id') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                                class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border {{ $errors->has('distrito_id') ? 'border-red-500' : 'border-gray-100' }} dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                                 required>
                                                 <option value="" disabled>Seleccionar distrito</option>
                                                 @if ($cliente->provincia)
@@ -213,7 +212,7 @@
                                         </label>
                                         <div class="relative">
                                             <input list="pueblos_list"
-                                                class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('pueblo') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                                class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('pueblo') ? 'border-red-500' : 'border-gray-100' }} dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                                 id="pueblo" name="pueblo"
                                                 placeholder="Escribe o selecciona una zona" required
                                                 value="{{ old('pueblo', $cliente->pueblo->nombre ?? '') }}"
@@ -240,7 +239,7 @@
                                             Dirección
                                         </label>
                                         <input
-                                            class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('direccion') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                            class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('direccion') ? 'border-red-500' : 'border-gray-100' }} dark:border-gray-600 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                             id="direccion" type="text" placeholder="" name="direccion"
                                             value="{{ old('direccion', $cliente->direccion) }}">
                                         @if ($errors->has('direccion'))
@@ -261,13 +260,12 @@
                                             Coordenadas GPS
                                         </label>
                                         <div class="relative">
-                                            <input type="text" id="gps" name="gps" placeholder="lat, lon"
-                                                class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border {{ $errors->has('gps') ? 'border-red-500' : 'border-gray-200' }} dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
-                                                value="{{ old('gps', $cliente->gps) }}">
-                                            @if ($errors->has('coordenadas'))
-                                                <p class="text-red-500 text-xs italic">{{ $errors->first('coordenadas') }}
-                                                </p>
-                                            @endif
+                                            <input type="text" 
+                                                   id="gps" 
+                                                   name="gps" 
+                                                   placeholder="lat/lon"
+                                                   class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                                   value="{{ old('gps', $cliente->gps) }}">
                                         </div>
                                     </div>
 
@@ -279,7 +277,7 @@
                                         </label>
                                         <div class="relative">
                                             <select name="estado_cliente"
-                                                class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                                class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                                 <option value="activo"
                                                     {{ old('estado_cliente', $cliente->estado_cliente) == 'activo' ? 'selected' : '' }}>
                                                     Activo</option>
@@ -475,56 +473,69 @@
                                     }
                                 });
                             </script>
-                            <style>
-                                /* Mantenemos solo los estilos base de iti que no se pueden replicar con Tailwind */
-                                .iti {
-                                    @apply w-full;
-                                }
-                                .iti__country-list {
-                                    @apply w-[360px] max-h-[300px];
-                                }
-                                .iti__country {
-                                    @apply flex items-center p-2;
-                                }
-                                .iti__country-name {
-                                    @apply ml-2.5 text-sm;
-                                }
-                                .iti__dial-code {
-                                    @apply text-gray-500 text-sm;
-                                }
-                                .iti__flag-container {
-                                    @apply p-0;
-                                }
-                                .iti--separate-dial-code .iti__selected-flag {
-                                    @apply bg-white dark:bg-gray-800 border-0 rounded-l-lg w-[65px];
-                                }
-                                .dark .iti--separate-dial-code .iti__selected-flag {
-                                    @apply bg-gray-800 border border-gray-600;
-                                }
-                                .iti--separate-dial-code input {
-                                    @apply pl-[75px] border border-gray-200 dark:border-gray-600 rounded-lg h-[45px] text-sm shadow-sm;
-                                }
-                                .iti--separate-dial-code .iti__selected-dial-code {
-                                    @apply ml-1 text-gray-700 dark:text-gray-300;
-                                }
-                                .iti--separate-dial-code input:hover,
-                                .iti--separate-dial-code input:focus {
-                                    @apply border-gray-300 dark:border-gray-500 outline-none;
-                                }
-                                .iti {
-                                    @apply flex items-stretch;
-                                }
-                            </style>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const gpsInput = document.getElementById('gps');
+                                    
+                                    function validateGPS(value) {
+                                        // Si está vacío, no mostrar error
+                                        if (!value) return { isValid: true, message: '' };
+
+                                        // Verificar si contiene el separador /
+                                        if (!value.includes('/')) {
+                                            return {
+                                                isValid: false,
+                                                message: 'Use / como separador entre latitud y longitud'
+                                            };
+                                        }
+
+                                        return {
+                                            isValid: true,
+                                            message: ''
+                                        };
+                                    }
+
+                                    // Crear el elemento de error una sola vez
+                                    const errorElement = document.createElement('p');
+                                    errorElement.classList.add('text-red-500', 'mt-2', 'text-xs', 'italic', 'gps-error');
+                                    gpsInput.parentNode.appendChild(errorElement);
+
+                                    gpsInput.addEventListener('input', function(e) {
+                                        // Remover espacios en blanco y reemplazar comas por /
+                                        let value = this.value.replace(/\s/g, '').replace(',', '/');
+                                        
+                                        // Actualizar el valor del input
+                                        this.value = value;
+                                        
+                                        const result = validateGPS(value);
+                                        
+                                        if (!result.isValid) {
+                                            this.classList.add('border-red-500');
+                                            this.classList.remove('border-green-500');
+                                            errorElement.textContent = result.message;
+                                            errorElement.classList.remove('hidden');
+                                        } else {
+                                            this.classList.remove('border-red-500');
+                                            this.classList.add('border-green-500');
+                                            errorElement.classList.add('hidden');
+                                        }
+                                    });
+
+                                    // Manejar el pegado de texto
+                                    gpsInput.addEventListener('paste', function(e) {
+                                        setTimeout(() => {
+                                            let value = this.value.replace(/\s/g, '').replace(',', '/');
+                                            this.value = value;
+                                            // Disparar el evento input para validar
+                                            this.dispatchEvent(new Event('input'));
+                                        }, 0);
+                                    });
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- ====== Forms Section End -->
-
         </div>
     </main>
-    <!-- ===== Main Content End ===== -->
-
-
-
 @endsection

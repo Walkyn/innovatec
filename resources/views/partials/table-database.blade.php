@@ -16,19 +16,27 @@
                     <div
                         class="flex flex-col md:flex-row md:items-center md:justify-end space-y-3 md:space-y-0 md:space-x-4 p-4">
                         <div class="w-full md:w-full">
-                            <form class="flex items-center">
-                                <label for="simple-search" class="sr-only">Search</label>
+                            <form class="flex items-center" id="searchForm">
+                                <label for="simple-search" class="sr-only">Buscar por fecha</label>
                                 <div class="relative w-full">
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400"
-                                            fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-auto">
+                                        <!-- Icono de lupa (visible por defecto) -->
+                                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                         </svg>
+                                        <!-- Icono X (inicialmente oculto) -->
+                                        <button type="button" 
+                                            class="w-5 h-5 text-red-500 hover:text-red-700 hidden clear-search-button"
+                                            onclick="clearSearch()">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
                                     </div>
-                                    <input type="text" id="simple-search" placeholder="Buscar copias de seguridad"
-                                        required=""
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                    <input type="date" 
+                                        id="simple-search" 
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        placeholder="Seleccionar fecha">
                                 </div>
                             </form>
                         </div>
@@ -711,4 +719,120 @@
                 }
             });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('simple-search');
+        const clearButton = document.querySelector('.clear-search-button');
+        const searchIcon = document.querySelector('.search-icon');
+        
+        if (searchInput) {
+            searchInput.addEventListener('change', function(e) {
+                if (e.target.value) {
+                    // Mostrar X y ocultar lupa
+                    clearButton.classList.remove('hidden');
+                    searchIcon.classList.add('hidden');
+                    buscarBackups(e.target.value);
+                } else {
+                    // Mostrar lupa y ocultar X
+                    clearButton.classList.add('hidden');
+                    searchIcon.classList.remove('hidden');
+                }
+            });
+        }
+    });
+
+    function clearSearch() {
+        const searchInput = document.getElementById('simple-search');
+        const clearButton = document.querySelector('.clear-search-button');
+        const searchIcon = document.querySelector('.search-icon');
+        
+        // Limpiar el input
+        searchInput.value = '';
+        
+        // Mostrar lupa y ocultar X
+        clearButton.classList.add('hidden');
+        searchIcon.classList.remove('hidden');
+        
+        // Recargar todos los backups
+        buscarBackups('');
+    }
+
+    function buscarBackups(fecha = '') {
+        // Mostrar indicador de carga
+        const tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="px-4 py-3 text-center">
+                    <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary-600 border-r-transparent align-[-0.125em]" role="status">
+                        <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Cargando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        fetch(`{{ route('database.index') }}?fecha=${fecha}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Actualizar el contenido de tbody
+                tableBody.innerHTML = data.html;
+                
+                // Reinicializar los modales después de actualizar el contenido
+                reinicializarModales();
+            } else {
+                throw new Error(data.message || 'Error al cargar los datos');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="px-4 py-3 text-center text-red-500">
+                        ${error.message || 'Error al cargar los datos. Por favor, intente nuevamente.'}
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Función para reinicializar los modales
+    function reinicializarModales() {
+        // Reinicializar el modal de eliminación
+        const deleteModalElement = document.getElementById('delete-modal');
+        const deleteModal = new Modal(deleteModalElement);
+
+        // Reinicializar los botones de eliminar
+        document.querySelectorAll('[data-modal-toggle="delete-modal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                deleteModal.show();
+            });
+        });
+
+        // Reinicializar los botones de cerrar modal
+        document.querySelectorAll('[data-modal-hide="delete-modal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                deleteModal.hide();
+            });
+        });
+    }
+
+    // Inicialización inicial de modales
+    document.addEventListener('DOMContentLoaded', function() {
+        reinicializarModales();
+    });
+
+    // Prevenir envío del formulario
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+    });
 </script>

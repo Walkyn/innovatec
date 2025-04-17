@@ -17,11 +17,53 @@ class DatabaseController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index()
+    public function index(Request $request)
     {
-        $backups = DatabaseBackup::orderBy('created_at', 'desc')->paginate(10);
+        try {
+            $query = DatabaseBackup::query();
+            
+            if ($request->has('fecha')) {
+                $fecha = $request->fecha;
+                $query->whereDate('created_at', $fecha);
+            }
+            
+            $backups = $query->orderBy('created_at', 'desc')->paginate(10);
+            
+            // Definir las clases de estado
+            $estadoClase = [
+                'Completado' => 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100',
+                'Parcial' => 'text-yellow-700 bg-yellow-100 dark:bg-yellow-700 dark:text-yellow-100',
+                'Error' => 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100',
+            ];
 
-        return view('database.index', compact('backups'));
+            $iconoClase = [
+                'Completado' => 'fa-check-circle',
+                'Parcial' => 'fa-exclamation-circle',
+                'Error' => 'fa-times-circle',
+            ];
+            
+            if ($request->ajax()) {
+                $view = view('partials.table-content', compact('backups', 'estadoClase', 'iconoClase'))->render();
+                return response()->json([
+                    'success' => true,
+                    'html' => $view,
+                    'count' => $backups->total()
+                ]);
+            }
+            
+            return view('database.index', compact('backups', 'estadoClase', 'iconoClase'));
+        } catch (\Exception $e) {
+            Log::error('Error en la búsqueda de backups: ' . $e->getMessage());
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al cargar los datos: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            throw $e;
+        }
     }
 
     public function exportarClientes()
