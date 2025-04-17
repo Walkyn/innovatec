@@ -176,7 +176,7 @@ Route::middleware('auth')->group(function () {
     // Database
     Route::controller(DatabaseController::class)->group(function () {
         Route::get('/database', 'index')->middleware('check.permissions:database,all')->name('database.index');
-        Route::get('/exportar-clientes', 'exportarClientes')->name('exportar.clientes');
+        Route::get('/exportar-clientes', 'exportarClientes')->middleware('check.permissions:database,guardar')->name('exportar.clientes');
         Route::get('/backup/descargar/{id}', 'descargar')->middleware('check.permissions:database,guardar')->name('backup.descargar');
         Route::delete('/backup/eliminar/{id}', 'destroy')->middleware('check.permissions:database,eliminar')->name('backup.eliminar');
         Route::post('/database/restore', 'restore')->middleware('check.permissions:database,actualizar')->name('database.restore');
