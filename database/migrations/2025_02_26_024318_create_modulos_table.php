@@ -26,7 +26,7 @@ return new class extends Migration
             ['id_modulo' => 5, 'nombre_modulo' => 'calendar'], // Calendario
             ['id_modulo' => 6, 'nombre_modulo' => 'profile'], // Perfil
             ['id_modulo' => 7, 'nombre_modulo' => 'settings'], // Configuración
-            ['id_modulo' => 8, 'nombre_modulo' => 'charts'], // Gráficos
+            ['id_modulo' => 8, 'nombre_modulo' => 'reports'], // Reportes
             ['id_modulo' => 9, 'nombre_modulo' => 'database'], // Database
             ['id_modulo' => 10, 'nombre_modulo' => 'users'], // Users
         ]);

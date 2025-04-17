@@ -376,7 +376,7 @@
                                             },
                                             {
                                                 id: 8,
-                                                name: 'Gráficos'
+                                                name: 'Reportes'
                                             },
                                             {
                                                 id: 9,

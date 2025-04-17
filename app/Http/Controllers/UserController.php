@@ -146,7 +146,7 @@ class UserController extends Controller
             'calendar' => 'Calendario',
             'profile' => 'Perfil',
             'settings' => 'Configuración',
-            'charts' => 'Gráficos',
+            'reports' => 'Reportes',
             'database' => 'Base de Datos',
             'users' => 'Usuarios'
         ];

@@ -6,7 +6,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\ChartController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ServiceController;
@@ -111,8 +111,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/company/update-logo', 'updateLogo')->middleware('check.permissions:settings,actualizar')->name('company.update.logo');
     });
 
-    // Charts
-    Route::get('charts', [ChartController::class, 'index'])->middleware('check.permissions:charts,all')->name('charts.index');
+    // Reports
+    Route::get('reports', [ReportController::class, 'index'])->middleware('check.permissions:reports,all')->name('reports.index');
 
     // Payments
     Route::controller(PaymentController::class)->group(function () {

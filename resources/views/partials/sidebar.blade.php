@@ -170,15 +170,15 @@
                 <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">Más</h3>
         
                 <ul class="mb-6 flex flex-col gap-1.5">
-                    <!-- Menú Gráficos -->
-                    @if ($user && ($user->id_rol === 1 || in_array('charts', $modulos)))
+                    <!-- Menú Re -->
+                    @if ($user && ($user->id_rol === 1 || in_array('reports', $modulos)))
                         <li>
                             <a
-                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'charts.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
-                                href="{{ route('charts.index') }}"
+                                class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 {{ str_starts_with($currentRoute, 'reports.') ? 'bg-graydark dark:bg-meta-4' : '' }}"
+                                href="{{ route('reports.index') }}"
                             >
                                 <i class="fas fa-chart-pie"></i>
-                                Gráficos
+                                Reportes
                             </a>
                         </li>
                     @endif
