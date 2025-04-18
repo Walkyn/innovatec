@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\User;
 use App\Models\Cobranza;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -49,6 +50,45 @@ class HomeController extends Controller
             ->where('estado_cobro', 'emitido')
             ->sum('monto_total');
         
+        // Obtener clientes únicos cobrados este mes
+        $clientesCobradosMes = Cobranza::where('estado_cobro', 'emitido')
+            ->whereMonth('fecha_cobro', now()->month)
+            ->whereYear('fecha_cobro', now()->year)
+            ->distinct('cliente_id')
+            ->count('cliente_id');
+        
+        // Calcular el porcentaje de clientes cobrados respecto a los activos
+        $porcentajeClientesCobrados = $cantidadClientesActivos > 0 
+            ? round(($clientesCobradosMes / $cantidadClientesActivos) * 100, 2) 
+            : 0;
+
+        // Calcular el total de servicios activos contratados
+        $ingresoTotalServicios = DB::table('contrato_servicio')
+            ->join('contratos', 'contrato_servicio.contrato_id', '=', 'contratos.id')
+            ->join('planes', 'contrato_servicio.plan_id', '=', 'planes.id')
+            ->where('contrato_servicio.estado_servicio_cliente', 'activo')
+            ->sum('planes.precio');
+
+        // Calcular el total cobrado este mes
+        $totalCobradoMes = Cobranza::where('estado_cobro', 'emitido')
+            ->whereMonth('fecha_cobro', now()->month)
+            ->whereYear('fecha_cobro', now()->year)
+            ->sum('monto_total');
+
+        // Calcular el ingreso del mes anterior para comparación
+        $ingresoMesAnterior = DB::table('contrato_servicio')
+            ->join('contratos', 'contrato_servicio.contrato_id', '=', 'contratos.id')
+            ->join('planes', 'contrato_servicio.plan_id', '=', 'planes.id')
+            ->where('contrato_servicio.estado_servicio_cliente', 'activo')
+            ->where('contrato_servicio.created_at', '<', now()->startOfMonth())
+            ->sum('planes.precio');
+
+        // Calcular el porcentaje de variación
+        $porcentajeVariacion = 0;
+        if ($ingresoMesAnterior > 0) {
+            $porcentajeVariacion = round((($ingresoTotalServicios - $ingresoMesAnterior) / $ingresoMesAnterior) * 100, 2);
+        }
+
         return view('home.index', compact(
             'totalClientes',
             'totalUsuariosActivos',
@@ -57,7 +97,12 @@ class HomeController extends Controller
             'porcentajeUsuariosActivos',
             'clientesCobrados',
             'totalCobrado',
-            'periodo'
+            'periodo',
+            'clientesCobradosMes',
+            'porcentajeClientesCobrados',
+            'totalCobradoMes',
+            'ingresoTotalServicios',
+            'porcentajeVariacion'
         ));
     }
 
