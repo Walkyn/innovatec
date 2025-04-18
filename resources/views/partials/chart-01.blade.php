@@ -13,7 +13,7 @@
         </span>
         <div class="w-full">
           <p class="font-semibold text-primary">Clientes Cobrados</p>
-          <p class="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+          <p class="text-sm font-medium clientes-cobrados">{{ $clientesCobrados }} clientes</p>
         </div>
       </div>
       <div class="flex min-w-47.5">
@@ -26,7 +26,7 @@
         </span>
         <div class="w-full">
           <p class="font-semibold text-secondary">Total Cobros</p>
-          <p class="text-sm font-medium">12.04.2022 - 12.05.2022</p>
+          <p class="text-sm font-medium total-cobrado">S/. {{ number_format($totalCobrado, 2) }}</p>
         </div>
       </div>
     </div>
@@ -35,17 +35,23 @@
         class="inline-flex items-center rounded-md bg-whiter p-1.5 dark:bg-meta-4"
       >
         <button
-          class="rounded bg-white px-3 py-1 text-xs font-medium text-black shadow-card hover:bg-white hover:shadow-card dark:bg-boxdark dark:text-white dark:hover:bg-boxdark"
+          type="button"
+          data-periodo="dia"
+          class="periodo-btn rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark {{ $periodo == 'dia' ? 'bg-white shadow-card dark:bg-boxdark' : '' }}"
         >
-          Dia
+          Día
         </button>
         <button
-          class="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark"
+          type="button"
+          data-periodo="semana"
+          class="periodo-btn rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark {{ $periodo == 'semana' ? 'bg-white shadow-card dark:bg-boxdark' : '' }}"
         >
           Semana
         </button>
         <button
-          class="rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark"
+          type="button"
+          data-periodo="mes"
+          class="periodo-btn rounded px-3 py-1 text-xs font-medium text-black hover:bg-white hover:shadow-card dark:text-white dark:hover:bg-boxdark {{ $periodo == 'mes' ? 'bg-white shadow-card dark:bg-boxdark' : '' }}"
         >
           Mes
         </button>
@@ -56,3 +62,53 @@
     <div id="chartOne" class="-ml-5"></div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const botonesPeriodo = document.querySelectorAll('.periodo-btn');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    botonesPeriodo.forEach(boton => {
+        boton.addEventListener('click', async function() {
+            // Remover clase activa de todos los botones
+            botonesPeriodo.forEach(b => {
+                b.classList.remove('bg-white', 'shadow-card', 'dark:bg-boxdark');
+            });
+            
+            // Agregar clase activa al botón clickeado
+            this.classList.add('bg-white', 'shadow-card', 'dark:bg-boxdark');
+            
+            try {
+                const periodo = this.getAttribute('data-periodo');
+                const response = await fetch(`/obtener-datos-periodo?periodo=${periodo}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+
+                const data = await response.json();
+                
+                // Actualizar los valores en la vista
+                const clientesCobradosElement = document.querySelector('.clientes-cobrados');
+                const totalCobradoElement = document.querySelector('.total-cobrado');
+
+                if (clientesCobradosElement && totalCobradoElement) {
+                    clientesCobradosElement.textContent = `${data.clientesCobrados} clientes`;
+                    totalCobradoElement.textContent = `S/. ${data.totalCobrado}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un error al obtener los datos');
+            }
+        });
+    });
+});
+</script>

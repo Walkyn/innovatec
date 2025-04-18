@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Models\User;
+use App\Models\Cobranza;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $totalClientes = Cliente::count();
         $totalUsuarios = User::count();
@@ -19,12 +21,139 @@ class HomeController extends Controller
         $porcentajeClientesActivos = $totalClientes > 0 ? round(($cantidadClientesActivos / $totalClientes) * 100, 2) : 0;
         $porcentajeUsuariosActivos = $totalUsuarios > 0 ? round(($totalUsuariosActivos / $totalUsuarios) * 100, 2) : 0;
         
+        // Obtener el período seleccionado (por defecto 'dia')
+        $periodo = $request->periodo ?? 'dia';
+        
+        // Configurar las fechas según el período
+        $fechaInicio = now()->startOfDay();
+        $fechaFin = now()->endOfDay();
+        
+        switch($periodo) {
+            case 'semana':
+                $fechaInicio = now()->startOfWeek();
+                $fechaFin = now()->endOfWeek();
+                break;
+            case 'mes':
+                $fechaInicio = now()->startOfMonth();
+                $fechaFin = now()->endOfMonth();
+                break;
+        }
+        
+        // Consultar cobranzas según el período
+        $clientesCobrados = Cobranza::whereBetween('fecha_cobro', [$fechaInicio, $fechaFin])
+            ->where('estado_cobro', 'emitido')
+            ->distinct('cliente_id')
+            ->count('cliente_id');
+            
+        $totalCobrado = Cobranza::whereBetween('fecha_cobro', [$fechaInicio, $fechaFin])
+            ->where('estado_cobro', 'emitido')
+            ->sum('monto_total');
+        
         return view('home.index', compact(
             'totalClientes',
             'totalUsuariosActivos',
             'cantidadClientesActivos',
             'porcentajeClientesActivos',
-            'porcentajeUsuariosActivos'
+            'porcentajeUsuariosActivos',
+            'clientesCobrados',
+            'totalCobrado',
+            'periodo'
         ));
+    }
+
+    // Agregar método para AJAX
+    public function obtenerDatosPeriodo(Request $request)
+    {
+        $periodo = $request->periodo ?? 'dia';
+        
+        // Configurar fechas según período
+        $fechaInicio = now()->startOfDay();
+        $fechaFin = now()->endOfDay();
+        
+        // Configurar locale en español
+        setlocale(LC_TIME, 'es_ES.UTF-8', 'Spanish_Spain.1252');
+        Carbon::setLocale('es');
+        
+        switch($periodo) {
+            case 'semana':
+                $fechaInicio = now()->startOfWeek();
+                $fechaFin = now()->endOfWeek();
+                break;
+            case 'mes':
+                $fechaInicio = now()->startOfMonth();
+                $fechaFin = now()->endOfMonth();
+                break;
+        }
+
+        if ($periodo === 'dia') {
+            // Para día, agrupar por hora y contar clientes únicos
+            $cobranzas = Cobranza::where('estado_cobro', 'emitido')
+                ->whereDate('fecha_cobro', now())
+                ->selectRaw('HOUR(fecha_cobro) as hora, 
+                            COUNT(DISTINCT cliente_id) as total_clientes,
+                            SUM(monto_total) as total_cobros')
+                ->groupBy('hora')
+                ->orderBy('hora')
+                ->get();
+
+            $fechas = [];
+            $clientes = [];
+            $cobros = [];
+
+            for ($hora = 0; $hora < 24; $hora++) {
+                $horaFormato = str_pad($hora, 2, '0', STR_PAD_LEFT) . ':00';
+                $fechas[] = $horaFormato;
+                
+                $cobranzaHora = $cobranzas->where('hora', $hora)->first();
+                $clientes[] = $cobranzaHora ? $cobranzaHora->total_clientes : 0;
+                $cobros[] = $cobranzaHora ? $cobranzaHora->total_cobros : 0;
+            }
+        } else {
+            // Para semana y mes, agrupar por fecha y contar clientes únicos
+            $cobranzas = Cobranza::where('estado_cobro', 'emitido')
+                ->whereBetween('fecha_cobro', [$fechaInicio, $fechaFin])
+                ->selectRaw('DATE(fecha_cobro) as fecha, 
+                            COUNT(DISTINCT cliente_id) as total_clientes,
+                            SUM(monto_total) as total_cobros')
+                ->groupBy('fecha')
+                ->orderBy('fecha')
+                ->get();
+
+            $fechas = [];
+            $clientes = [];
+            $cobros = [];
+
+            foreach ($cobranzas as $cobranza) {
+                $fecha = Carbon::parse($cobranza->fecha);
+                
+                if ($periodo === 'semana') {
+                    $fechas[] = ucfirst($fecha->isoFormat('dddd'));
+                } else {
+                    $fechas[] = $fecha->isoFormat('D [de] MMMM');
+                }
+                
+                $clientes[] = (int)$cobranza->total_clientes;
+                $cobros[] = (float)$cobranza->total_cobros;
+            }
+        }
+
+        // Calcular el total de clientes únicos para todo el período
+        $totalClientesUnicos = Cobranza::where('estado_cobro', 'emitido')
+            ->whereBetween('fecha_cobro', [$fechaInicio, $fechaFin])
+            ->distinct('cliente_id')
+            ->count('cliente_id');
+
+        $totalCobrado = $cobranzas->sum('total_cobros');
+
+        return response()->json([
+            'success' => true,
+            'clientesCobrados' => $totalClientesUnicos,
+            'totalCobrado' => number_format($totalCobrado, 2),
+            'grafico' => [
+                'fechas' => $fechas,
+                'clientes' => $clientes,
+                'cobros' => $cobros
+            ]
+        ]);
     }
 }

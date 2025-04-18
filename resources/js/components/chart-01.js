@@ -2,16 +2,16 @@ import ApexCharts from "apexcharts";
 
 // ===== chartOne
 const chart01 = () => {
+  // Configuración base del gráfico
   const chartOneOptions = {
     series: [
       {
-        name: "Product One",
-        data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30, 45],
+        name: "Clientes Cobrados",
+        data: [],
       },
-
       {
-        name: "Product Two",
-        data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39, 51],
+        name: "Total Cobros",
+        data: [],
       },
     ],
     legend: {
@@ -32,7 +32,6 @@ const chart01 = () => {
         left: 0,
         opacity: 0.1,
       },
-
       toolbar: {
         show: false,
       },
@@ -57,15 +56,21 @@ const chart01 = () => {
     ],
     stroke: {
       width: [2, 2],
-      curve: "straight",
+      curve: "smooth",
     },
-
     markers: {
-      size: 0,
-    },
-    labels: {
-      show: false,
-      position: "top",
+      size: 4,
+      colors: "#fff",
+      strokeColors: ["#3C50E0", "#80CAEE"],
+      strokeWidth: 3,
+      strokeOpacity: 0.9,
+      strokeDashArray: 0,
+      fillOpacity: 1,
+      discrete: [],
+      hover: {
+        size: undefined,
+        sizeOffset: 5,
+      },
     },
     grid: {
       xaxis: {
@@ -82,62 +87,106 @@ const chart01 = () => {
     dataLabels: {
       enabled: false,
     },
-    markers: {
-      size: 4,
-      colors: "#fff",
-      strokeColors: ["#3056D3", "#80CAEE"],
-      strokeWidth: 3,
-      strokeOpacity: 0.9,
-      strokeDashArray: 0,
-      fillOpacity: 1,
-      discrete: [],
-      hover: {
-        size: undefined,
-        sizeOffset: 5,
-      },
-    },
     xaxis: {
       type: "category",
-      categories: [
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-      ],
+      categories: [],
       axisBorder: {
         show: false,
       },
       axisTicks: {
         show: false,
       },
-    },
-    yaxis: {
-      title: {
+      labels: {
+        rotate: -45,
+        rotateAlways: false,
         style: {
-          fontSize: "0px",
-        },
-      },
-      min: 0,
-      max: 100,
+          fontSize: '12px'
+        }
+      }
     },
+    yaxis: [{
+      title: {
+        text: "Clientes",
+      },
+      min: 0
+    }, {
+      opposite: true,
+      title: {
+        text: "Montos (S/.)",
+      },
+      min: 0
+    }],
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: function (y, { seriesIndex }) {
+          if (seriesIndex === 0) {
+            return y + " clientes";
+          }
+          return "S/. " + y.toFixed(2);
+        }
+      }
+    }
   };
 
-  const chartSelector = document.querySelectorAll("#chartOne");
+  let chart = null;
 
-  if (chartSelector.length) {
-    const chartOne = new ApexCharts(
-      document.querySelector("#chartOne"),
-      chartOneOptions
-    );
-    chartOne.render();
+  // Función para cargar y actualizar datos
+  async function actualizarDatos(periodo = 'dia') {
+    try {
+      const response = await fetch(`/obtener-datos-periodo?periodo=${periodo}`);
+      const data = await response.json();
+
+      // Actualizar contadores superiores
+      document.querySelector('.clientes-cobrados').textContent = `${data.clientesCobrados} clientes`;
+      document.querySelector('.total-cobrado').textContent = `S/. ${data.totalCobrado}`;
+
+      // Actualizar datos del gráfico
+      chart.updateOptions({
+        xaxis: {
+          categories: data.grafico.fechas
+        }
+      });
+
+      chart.updateSeries([
+        {
+          name: "Clientes Cobrados",
+          data: data.grafico.clientes
+        },
+        {
+          name: "Total Cobros",
+          data: data.grafico.cobros
+        }
+      ]);
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    }
+  }
+
+  // Inicializar gráfico y eventos
+  const chartSelector = document.querySelector("#chartOne");
+  if (chartSelector) {
+    // Crear instancia del gráfico
+    chart = new ApexCharts(chartSelector, chartOneOptions);
+    chart.render();
+
+    // Configurar eventos de los botones
+    document.querySelectorAll('.periodo-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        // Actualizar clases de los botones
+        document.querySelectorAll('.periodo-btn').forEach(btn => {
+          btn.classList.remove('bg-white', 'shadow-card', 'dark:bg-boxdark');
+        });
+        this.classList.add('bg-white', 'shadow-card', 'dark:bg-boxdark');
+        
+        // Cargar datos del período seleccionado
+        actualizarDatos(this.getAttribute('data-periodo'));
+      });
+    });
+
+    // Cargar datos iniciales
+    actualizarDatos('dia');
   }
 };
 

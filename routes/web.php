@@ -394,6 +394,9 @@ Route::middleware('auth')->group(function () {
     })->middleware('check.permissions:manage,all');
 
     Route::post('/api/update-location', [LocationController::class, 'updateLocation'])->name('api.update-location');
+
+    Route::get('/obtener-datos-periodo', [HomeController::class, 'obtenerDatosPeriodo'])
+        ->name('obtener.datos.periodo');
 });
 
 // Rutas que devuelven datos
