@@ -2,102 +2,130 @@ import ApexCharts from "apexcharts";
 
 // ===== chartTwo
 const chart02 = () => {
-  const chartTwoOptions = {
-    series: [
-      {
-        name: "Clientes Cobrados",
-        data: window.datosGrafico?.total_clientes || [0, 0, 0, 0, 0, 0, 0],
-      },
-      {
-        name: "Monto Total (S/.)",
-        data: window.datosGrafico?.montos || [0, 0, 0, 0, 0, 0, 0],
-      },
-    ],
-    colors: ["#3056D3", "#80CAEE"],
-    chart: {
-      type: "bar",
-      height: 335,
-      stacked: true,
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
-    },
+  if (!document.getElementById('reports-page')) return;
 
-    responsive: [
-      {
-        breakpoint: 1536,
-        options: {
-          plotOptions: {
-            bar: {
-              borderRadius: 0,
-              columnWidth: "25%",
-            },
+  const periodSelect = document.getElementById('periodSelect');
+  const rutaObtenerDatos = document.getElementById('rutaObtenerDatos')?.value;
+
+  if (!periodSelect || !rutaObtenerDatos) return;
+
+  let chart = null;
+
+  const actualizarGrafico = async (periodo) => {
+    try {
+      const response = await fetch(`${rutaObtenerDatos}?periodo=${periodo}`);
+      const data = await response.json();
+
+      const options = {
+        series: [
+          {
+            name: "Total Cobrado",
+            type: 'column',
+            data: data.series[0].data
+          },
+          {
+            name: "Clientes Cobrados",
+            type: 'line',
+            data: data.series[1].data
+          }
+        ],
+        chart: {
+          height: 350,
+          type: 'line',
+          toolbar: {
+            show: false,
+          }
+        },
+        colors: ['#3C50E0', '#80CAEE'],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: "55%",
+            borderRadius: 2,
           },
         },
-      },
-    ],
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        borderRadius: 0,
-        columnWidth: "25%",
-        borderRadiusApplication: "end",
-        borderRadiusWhenStacked: "last",
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val, opts) {
-        const seriesName = opts.w.config.series[opts.seriesIndex].name;
-        if (seriesName === "Clientes Cobrados") {
-          return val + " cli.";
-        }
-        return '';
-      },
-    },
-    tooltip: {
-      shared: true,
-      intersect: false,
-      y: {
-        formatter: function (val, { seriesIndex, dataPointIndex, w }) {
-          if (seriesIndex === 0) {
-            return val + " clientes";
+        dataLabels: {
+          enabled: false,
+        },
+        stroke: {
+          width: [0, 4],
+          curve: 'smooth'
+        },
+        xaxis: {
+          categories: data.labels,
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false,
+          },
+          labels: {
+            style: {
+              fontSize: '12px'
+            }
           }
-          return "S/. " + val;
+        },
+        yaxis: [
+          {
+            title: {
+              text: ""
+            },
+            labels: {
+              formatter: function(val) {
+                return 'S/. ' + val.toFixed(2);
+              }
+            }
+          },
+          {
+            opposite: true,
+            title: {
+              text: ""
+            },
+            labels: {
+              formatter: function(val) {
+                return Math.round(val);
+              }
+            }
+          }
+        ],
+        tooltip: {
+          y: {
+            formatter: function(val, { seriesIndex }) {
+              if (seriesIndex === 0) {
+                return 'S/. ' + val.toFixed(2);
+              }
+              return val + ' clientes';
+            }
+          }
+        },
+        legend: {
+          show: true,
+          position: 'bottom',
+          markers: {
+            width: 8,
+            height: 8,
+            radius: 100
+          }
         }
-      }
-    },
-    xaxis: {
-      categories: window.datosGrafico?.fechas || ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
-    },
-    legend: {
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Satoshi",
-      fontWeight: 500,
-      fontSize: "14px",
+      };
 
-      markers: {
-        radius: 99,
-      },
-    },
-    fill: {
-      opacity: 1,
-    },
+      if (chart) {
+        chart.updateOptions(options);
+      } else {
+        chart = new ApexCharts(document.querySelector("#chartTwo"), options);
+        chart.render();
+      }
+    } catch (error) {
+      console.error('Error al actualizar el gráfico:', error);
+    }
   };
 
-  const chartSelector = document.querySelectorAll("#chartTwo");
-
-  if (chartSelector.length) {
-    const chartTwo = new ApexCharts(
-      document.querySelector("#chartTwo"),
-      chartTwoOptions
-    );
-    chartTwo.render();
-  }
+  periodSelect.addEventListener('change', (e) => {
+    actualizarGrafico(e.target.value);
+  });
+  
+  // Inicializar con el período seleccionado
+  actualizarGrafico(periodSelect.value);
 };
 
 export default chart02;

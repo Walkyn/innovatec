@@ -1,55 +1,125 @@
+@php
+    $now = Carbon\Carbon::now();
+    $now->locale('es');
+    setlocale(LC_TIME, 'es_ES.UTF-8', 'Spanish_Spain.1252');
+    
+    // Función para obtener datos según el período
+    function obtenerDatosPeriodo($periodo) {
+        $now = Carbon\Carbon::now();
+        $now->locale('es');
+        
+        switch($periodo) {
+            case 'semana_actual':
+                $inicio = $now->startOfWeek();
+                $fin = $now->copy()->endOfWeek();
+                $datos = App\Models\Cobranza::selectRaw('DATE(fecha_cobro) as fecha, COUNT(DISTINCT cliente_id) as clientes, SUM(monto_total) as total')
+                    ->whereBetween('fecha_cobro', [$inicio, $fin])
+                    ->where('estado_cobro', 'emitido')
+                    ->groupBy('fecha')
+                    ->get();
+                $labels = collect(range(0, 6))->map(fn($i) => ucfirst($inicio->copy()->addDays($i)->isoFormat('ddd')));
+                break;
+                
+            case 'semana_anterior':
+                $inicio = $now->copy()->subWeek()->startOfWeek();
+                $fin = $inicio->copy()->endOfWeek();
+                $datos = App\Models\Cobranza::selectRaw('DATE(fecha_cobro) as fecha, COUNT(DISTINCT cliente_id) as clientes, SUM(monto_total) as total')
+                    ->whereBetween('fecha_cobro', [$inicio, $fin])
+                    ->where('estado_cobro', 'emitido')
+                    ->groupBy('fecha')
+                    ->get();
+                $labels = collect(range(0, 6))->map(fn($i) => ucfirst($inicio->copy()->addDays($i)->isoFormat('ddd')));
+                break;
+                
+            case 'mes_actual':
+                // Obtenemos todos los meses que tienen datos
+                $datosMeses = App\Models\Cobranza::selectRaw('MONTH(fecha_cobro) as mes, COUNT(DISTINCT cliente_id) as clientes, SUM(monto_total) as total')
+                    ->whereYear('fecha_cobro', $now->year)
+                    ->where('estado_cobro', 'emitido')
+                    ->groupBy('mes')
+                    ->orderBy('mes')
+                    ->get()
+                    ->keyBy('mes');
+
+                // Array con nombres de meses en español
+                $nombresMeses = [
+                    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                ];
+
+                // Creamos array con todos los meses del año
+                $datos = [];
+                $labels = [];
+                
+                for ($mes = 1; $mes <= 12; $mes++) {
+                    $nombreMes = $nombresMeses[$mes];
+                    $labels[] = $nombreMes;
+                    
+                    if (isset($datosMeses[$mes])) {
+                        $datos[] = [
+                            'mes' => $mes,
+                            'nombre' => $nombreMes,
+                            'total' => $datosMeses[$mes]->total,
+                            'clientes' => $datosMeses[$mes]->clientes
+                        ];
+                    } else {
+                        $datos[] = [
+                            'mes' => $mes,
+                            'nombre' => $nombreMes,
+                            'total' => 0,
+                            'clientes' => 0
+                        ];
+                    }
+                }
+                break;
+                
+            case 'todos_años':
+                $datos = App\Models\Cobranza::selectRaw('YEAR(fecha_cobro) as año, COUNT(DISTINCT cliente_id) as clientes, SUM(monto_total) as total')
+                    ->where('estado_cobro', 'emitido')
+                    ->groupBy('año')
+                    ->orderBy('año')
+                    ->get();
+                $labels = $datos->pluck('año');
+                break;
+        }
+        
+        return [
+            'labels' => $labels,
+            'datos' => $datos
+        ];
+    }
+    
+    $periodoInicial = 'semana_actual';
+    $datosIniciales = obtenerDatosPeriodo($periodoInicial);
+@endphp
+
 <div
   class="col-span-12 rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-6"
 >
   <div class="mb-4 justify-between gap-4 sm:flex">
     <div>
       <h4 class="text-xl font-bold text-black dark:text-white">
-        Ganancias {{ $datosGrafico['semanaSeleccionada'] === 'anterior' ? 'Semana Anterior' : 'Semana Actual' }}
+        Análisis de Cobros
       </h4>
     </div>
     <div>
-      <div class="relative z-20 inline-block">
-        <select
-          name="semana"
-          id="selectorSemana"
-          class="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 text-sm font-medium outline-none"
-        >
-          <option value="actual" {{ $datosGrafico['semanaSeleccionada'] === 'actual' ? 'selected' : '' }}>Semana Actual</option>
-          <option value="anterior" {{ $datosGrafico['semanaSeleccionada'] === 'anterior' ? 'selected' : '' }}>Semana Anterior</option>
-        </select>
-        <span class="absolute right-3 top-1/2 z-10 -translate-y-1/2">
-          <svg
-            width="10"
-            height="6"
-            viewBox="0 0 10 6"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0.47072 1.08816C0.47072 1.02932 0.500141 0.955772 0.54427 0.911642C0.647241 0.808672 0.809051 0.808672 0.912022 0.896932L4.85431 4.60386C4.92785 4.67741 5.06025 4.67741 5.14851 4.60386L9.09079 0.896932C9.19376 0.793962 9.35557 0.808672 9.45854 0.911642C9.56151 1.01461 9.5468 1.17642 9.44383 1.27939L5.50155 4.98632C5.22206 5.23639 4.78076 5.23639 4.51598 4.98632L0.558981 1.27939C0.50014 1.22055 0.47072 1.16171 0.47072 1.08816Z"
-              fill="#637381"
-            />
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M1.22659 0.546578L5.00141 4.09604L8.76422 0.557869C9.08459 0.244537 9.54201 0.329403 9.79139 0.578788C10.112 0.899434 10.0277 1.36122 9.77668 1.61224L9.76644 1.62248L5.81552 5.33722C5.36257 5.74249 4.6445 5.7544 4.19352 5.32924C4.19327 5.32901 4.19377 5.32948 4.19352 5.32924L0.225953 1.61241C0.102762 1.48922 -4.20186e-08 1.31674 -3.20269e-08 1.08816C-2.40601e-08 0.905899 0.0780105 0.712197 0.211421 0.578787C0.494701 0.295506 0.935574 0.297138 1.21836 0.539529L1.22659 0.546578ZM4.51598 4.98632C4.78076 5.23639 5.22206 5.23639 5.50155 4.98632L9.44383 1.27939C9.5468 1.17642 9.56151 1.01461 9.45854 0.911642C9.35557 0.808672 9.19376 0.793962 9.09079 0.896932L5.14851 4.60386C5.06025 4.67741 4.92785 4.67741 4.85431 4.60386L0.912022 0.896932C0.809051 0.808672 0.647241 0.808672 0.54427 0.911642C0.500141 0.955772 0.47072 1.02932 0.47072 1.08816C0.47072 1.16171 0.50014 1.22055 0.558981 1.27939L4.51598 4.98632Z"
-              fill="#637381"
-            />
-          </svg>
-        </span>
-      </div>
+      <select id="periodSelect" class="bg-white border rounded-md px-3 py-1 dark:bg-boxdark dark:border-strokedark">
+        <option value="semana_actual" selected>Semana Actual</option>
+        <option value="semana_anterior">Semana Anterior</option>
+        <option value="mes_actual">Por Meses</option>
+        <option value="todos_años">Por Años</option>
+      </select>
     </div>
   </div>
 
   <div>
-    <div id="chartTwo" class="-mb-9 -ml-5"></div>
+    <div id="chartTwo" class="-ml-5"></div>
   </div>
 </div>
 
-<script>
-    window.datosGrafico = @json($datosGrafico);
-
-    document.getElementById('selectorSemana').addEventListener('change', function() {
-        window.location.href = '{{ route("reports.index") }}?semana=' + this.value;
-    });
-</script>
+<input type="hidden" id="datosChart02" value="{{ json_encode([
+    'labels' => $datosIniciales['labels'],
+    'datos' => $datosIniciales['datos']
+]) }}">
+<input type="hidden" id="rutaObtenerDatos" value="{{ route('obtener.datos.chart02') }}">

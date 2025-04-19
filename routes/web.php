@@ -27,6 +27,7 @@ use App\Http\Controllers\ContratoPDFController;
 use App\Http\Controllers\PaymentPDFController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\ChartController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -397,6 +398,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/obtener-datos-periodo', [HomeController::class, 'obtenerDatosPeriodo'])
         ->name('obtener.datos.periodo');
+
+    Route::get('/obtener-datos-chart02', [ChartController::class, 'obtenerDatosChart02'])->name('obtener.datos.chart02');
 });
 
 // Rutas que devuelven datos

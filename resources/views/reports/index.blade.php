@@ -30,6 +30,12 @@
                 </div>
                 <!-- ====== Chart Four End -->
 
+                <!-- ====== Chart Five Start -->
+                <div class="col-span-12">
+                    @include('partials.chart-05')
+                </div>
+                <!-- ====== Chart Five End -->
+
                 <!-- ====== Chart Two Start -->
                 @include('partials.chart-02')
                 <!-- ====== Chart Two End -->

@@ -32,7 +32,7 @@
   <div class="mb-3 justify-between gap-4 sm:flex">
     <div>
       <h4 class="text-xl font-bold text-black dark:text-white">
-        Análisis de Cobros
+        Análisis de Cobros Mensual
       </h4>
     </div>
   </div>
