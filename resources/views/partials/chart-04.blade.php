@@ -3,7 +3,7 @@
 >
   <div>
     <h3 class="text-xl font-bold text-black dark:text-white">
-      Visitors Analytics
+      Análisis
     </h3>
   </div>
   <div>

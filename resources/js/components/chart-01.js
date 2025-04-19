@@ -97,24 +97,32 @@ const chart01 = () => {
         show: false,
       },
       labels: {
-        rotate: -45,
-        rotateAlways: false,
+        rotate: 0,
         style: {
-          fontSize: '12px'
-        }
+          fontSize: '12px',
+          fontFamily: 'Satoshi, sans-serif',
+        },
+        trim: false,
       }
     },
     yaxis: [{
       title: {
         text: "Clientes",
       },
-      min: 0
+      min: 0,
+      forceNiceScale: true
     }, {
       opposite: true,
       title: {
         text: "Montos (S/.)",
       },
-      min: 0
+      min: 0,
+      forceNiceScale: true,
+      labels: {
+        formatter: function(value) {
+          return 'S/. ' + value.toFixed(2);
+        }
+      }
     }],
     tooltip: {
       shared: true,

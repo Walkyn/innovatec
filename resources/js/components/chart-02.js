@@ -5,12 +5,12 @@ const chart02 = () => {
   const chartTwoOptions = {
     series: [
       {
-        name: "Sales",
-        data: [44, 55, 41, 67, 22, 43, 65],
+        name: "Clientes Cobrados",
+        data: window.datosGrafico?.total_clientes || [0, 0, 0, 0, 0, 0, 0],
       },
       {
-        name: "Revenue",
-        data: [13, 23, 20, 8, 13, 27, 15],
+        name: "Monto Total (S/.)",
+        data: window.datosGrafico?.montos || [0, 0, 0, 0, 0, 0, 0],
       },
     ],
     colors: ["#3056D3", "#80CAEE"],
@@ -49,11 +49,29 @@ const chart02 = () => {
       },
     },
     dataLabels: {
-      enabled: false,
+      enabled: true,
+      formatter: function (val, opts) {
+        const seriesName = opts.w.config.series[opts.seriesIndex].name;
+        if (seriesName === "Clientes Cobrados") {
+          return val + " cli.";
+        }
+        return '';
+      },
     },
-
+    tooltip: {
+      shared: true,
+      intersect: false,
+      y: {
+        formatter: function (val, { seriesIndex, dataPointIndex, w }) {
+          if (seriesIndex === 0) {
+            return val + " clientes";
+          }
+          return "S/. " + val;
+        }
+      }
+    },
     xaxis: {
-      categories: ["M", "T", "W", "T", "F", "S", "S"],
+      categories: window.datosGrafico?.fechas || ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
     },
     legend: {
       position: "top",

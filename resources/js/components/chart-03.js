@@ -2,14 +2,22 @@ import ApexCharts from "apexcharts";
 
 // ===== chartThree
 const chart03 = () => {
+  // Solo ejecutar si estamos en la página de reportes
+  if (!document.getElementById('reports-page')) return;
+
   const chartThreeOptions = {
-    series: [65, 34, 45, 12],
+    series: [
+      parseFloat(document.getElementById('pagoEfectivo').value),
+      parseFloat(document.getElementById('pagoDeposito').value),
+      parseFloat(document.getElementById('totalEmitido').value),
+      parseFloat(document.getElementById('totalAnulado').value)
+    ],
     chart: {
       type: "donut",
       width: 380,
     },
-    colors: ["#3C50E0", "#6577F3", "#8FD0EF", "#0FADCF"],
-    labels: ["Desktop", "Tablet", "Mobile", "Unknown"],
+    colors: ["#3C50E0", "#80CAEE", "#00E396", "#FF4560"],
+    labels: ["Pagos Efectivo", "Pagos Depósito", "Total Emitido", "Total Anulado"],
     legend: {
       show: false,
       position: "bottom",
@@ -39,14 +47,10 @@ const chart03 = () => {
     ],
   };
 
-  const chartSelector = document.querySelectorAll("#chartThree");
-
-  if (chartSelector.length) {
-    const chartThree = new ApexCharts(
-      document.querySelector("#chartThree"),
-      chartThreeOptions
-    );
-    chartThree.render();
+  const chartThree = document.querySelector("#chartThree");
+  if (chartThree) {
+    const chartInstance = new ApexCharts(chartThree, chartThreeOptions);
+    chartInstance.render();
   }
 };
 

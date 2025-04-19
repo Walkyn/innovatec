@@ -4,18 +4,18 @@
   <div class="mb-4 justify-between gap-4 sm:flex">
     <div>
       <h4 class="text-xl font-bold text-black dark:text-white">
-        Profit this week
+        Ganancias {{ $datosGrafico['semanaSeleccionada'] === 'anterior' ? 'Semana Anterior' : 'Semana Actual' }}
       </h4>
     </div>
     <div>
       <div class="relative z-20 inline-block">
         <select
-          name="#"
-          id="#"
+          name="semana"
+          id="selectorSemana"
           class="relative z-20 inline-flex appearance-none bg-transparent py-1 pl-3 pr-8 text-sm font-medium outline-none"
         >
-          <option value="">This Week</option>
-          <option value="">Last Week</option>
+          <option value="actual" {{ $datosGrafico['semanaSeleccionada'] === 'actual' ? 'selected' : '' }}>Semana Actual</option>
+          <option value="anterior" {{ $datosGrafico['semanaSeleccionada'] === 'anterior' ? 'selected' : '' }}>Semana Anterior</option>
         </select>
         <span class="absolute right-3 top-1/2 z-10 -translate-y-1/2">
           <svg
@@ -45,3 +45,11 @@
     <div id="chartTwo" class="-mb-9 -ml-5"></div>
   </div>
 </div>
+
+<script>
+    window.datosGrafico = @json($datosGrafico);
+
+    document.getElementById('selectorSemana').addEventListener('change', function() {
+        window.location.href = '{{ route("reports.index") }}?semana=' + this.value;
+    });
+</script>

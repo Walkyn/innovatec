@@ -174,15 +174,6 @@
                 @include ('partials.chart-01')
                 <!-- ====== Chart One End -->
 
-                <!-- ====== Chart Two Start -->
-                @include('partials.chart-02')
-                <!-- ====== Chart Two End -->
-
-                <!-- ====== Map One Start -->
-                @include('partials.map-01')
-
-                <!-- ====== Map One End -->
-
                 <!-- ====== Table One Start -->
                 <div class="col-span-12 xl:col-span-8">
                     @include('partials/table-01')
