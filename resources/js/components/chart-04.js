@@ -2,14 +2,21 @@ import ApexCharts from "apexcharts";
 
 // ===== chartFour
 const chart04 = () => {
+  // Solo ejecutar si estamos en la página de reportes
+  if (!document.getElementById('reports-page')) return;
+
+  // Obtener datos
+  const datosCobrosDiarios = JSON.parse(document.getElementById('datosCobrosDiarios').value);
+  const diasDelMes = parseInt(document.getElementById('diasDelMes').value);
+  
+  // Crear array de días del 1 al 30/31
+  const dias = Array.from({length: diasDelMes}, (_, i) => (i + 1).toString());
+
   const chartFourOptions = {
     series: [
       {
-        data: [
-          168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112, 123, 212,
-          270, 190, 310, 115, 90, 380, 112, 223, 292, 170, 290, 110, 115, 290,
-          380, 312,
-        ],
+        name: 'Total Cobrado',
+        data: datosCobrosDiarios
       },
     ],
     colors: ["#3C50E0"],
@@ -38,57 +45,20 @@ const chart04 = () => {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-      ],
+      categories: dias,
       axisBorder: {
         show: false,
       },
       axisTicks: {
         show: false,
-      },
-    },
-    legend: {
-      show: true,
-      position: "top",
-      horizontalAlign: "left",
-      fontFamily: "Satoshi",
-
-      markers: {
-        radius: 99,
-      },
+      }
     },
     yaxis: {
-      title: false,
+      labels: {
+        formatter: function (value) {
+          return 'S/. ' + value.toFixed(2);
+        }
+      }
     },
     grid: {
       yaxis: {
@@ -100,27 +70,19 @@ const chart04 = () => {
     fill: {
       opacity: 1,
     },
-
     tooltip: {
-      x: {
-        show: false,
-      },
       y: {
         formatter: function (val) {
-          return val;
+          return 'S/. ' + val.toFixed(2);
         },
       },
     },
   };
 
-  const chartSelector = document.querySelectorAll("#chartFour");
-
-  if (chartSelector.length) {
-    const chartFour = new ApexCharts(
-      document.querySelector("#chartFour"),
-      chartFourOptions
-    );
-    chartFour.render();
+  const chartFour = document.querySelector("#chartFour");
+  if (chartFour) {
+    const chart = new ApexCharts(chartFour, chartFourOptions);
+    chart.render();
   }
 };
 
