@@ -111,6 +111,31 @@ class HomeController extends Controller
     {
         $periodo = $request->periodo ?? 'dia';
         
+        // Configurar fechas para el total mostrado en la parte superior
+        $fechaInicioTotal = now()->startOfDay();
+        $fechaFinTotal = now()->endOfDay();
+        
+        switch($periodo) {
+            case 'semana':
+                $fechaInicioTotal = now()->startOfWeek();
+                $fechaFinTotal = now()->endOfWeek();
+                break;
+            case 'mes':
+                $fechaInicioTotal = now()->startOfMonth();
+                $fechaFinTotal = now()->endOfMonth();
+                break;
+        }
+
+        // Calcular el total cobrado solo para el período actual (para mostrar en la parte superior)
+        $totalCobrado = Cobranza::where('estado_cobro', 'emitido')
+            ->whereBetween('fecha_cobro', [$fechaInicioTotal, $fechaFinTotal])
+            ->sum('monto_total');
+
+        $totalClientesUnicos = Cobranza::where('estado_cobro', 'emitido')
+            ->whereBetween('fecha_cobro', [$fechaInicioTotal, $fechaFinTotal])
+            ->distinct('cliente_id')
+            ->count('cliente_id');
+
         // Configurar locale en español
         setlocale(LC_TIME, 'es_ES.UTF-8', 'Spanish_Spain.1252');
         Carbon::setLocale('es');
@@ -221,14 +246,6 @@ class HomeController extends Controller
                 }
             }
         }
-
-        // Calcular el total de clientes únicos para todo el período
-        $totalClientesUnicos = Cobranza::where('estado_cobro', 'emitido')
-            ->whereBetween('fecha_cobro', [$fechaInicio, $fechaFin])
-            ->distinct('cliente_id')
-            ->count('cliente_id');
-
-        $totalCobrado = $cobranzas->sum('total_cobros');
 
         return response()->json([
             'success' => true,

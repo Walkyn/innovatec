@@ -168,11 +168,10 @@
                 <!-- Notification Menu Area -->
 
                 <!-- Chat Notification Area -->
-                <li class="relative" x-data="{ dropdownOpen: false, notifying: true }" @click.outside="dropdownOpen = false">
+                <li class="relative">
                     <a class="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        href="#" @click.prevent="dropdownOpen = ! dropdownOpen; notifying = false">
-                        <span :class="!notifying && 'hidden'"
-                            class="absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-meta-1">
+                        href="{{ route('messages.index') }}">
+                        <span class="absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-meta-1">
                             <span
                                 class="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
                         </span>
@@ -193,98 +192,6 @@
                                 fill="" />
                         </svg>
                     </a>
-
-                    <!-- Dropdown Start -->
-                    <div x-show="dropdownOpen"
-                        class="absolute -right-16 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80">
-                        <div class="px-4.5 py-3">
-                            <h5 class="text-sm font-medium text-bodydark2">Mensajes</h5>
-                        </div>
-
-                        <ul class="flex h-auto flex-col overflow-y-auto">
-                            <li>
-                                <a class="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                                    href="messages.html">
-                                    <div class="h-12.5 w-12.5 rounded-full">
-                                        <img src="{{ asset('images/user/user-02.png') }}" alt="User" />
-                                    </div>
-
-                                    <div>
-                                        <h6 class="text-sm font-medium text-black dark:text-white">
-                                            Mariya Desoja
-                                        </h6>
-                                        <p class="text-sm">I like your confidence 💪</p>
-                                        <p class="text-xs">2min ago</p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                                    href="messages.html">
-                                    <div class="h-12.5 w-12.5 rounded-full">
-                                        <img src="{{ asset('images/user/user-01.png') }}" alt="User" />
-                                    </div>
-
-                                    <div>
-                                        <h6 class="text-sm font-medium text-black dark:text-white">
-                                            Robert Jhon
-                                        </h6>
-                                        <p class="text-sm">Can you share your offer?</p>
-                                        <p class="text-xs">10min ago</p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                                    href="messages.html">
-                                    <div class="h-12.5 w-12.5 rounded-full">
-                                        <img src="{{ asset('images/user/user-03.png') }}" alt="User" />
-                                    </div>
-
-                                    <div>
-                                        <h6 class="text-sm font-medium text-black dark:text-white">
-                                            Henry Dholi
-                                        </h6>
-                                        <p class="text-sm">I cam across your profile and...</p>
-                                        <p class="text-xs">1day ago</p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                                    href="messages.html">
-                                    <div class="h-12.5 w-12.5 rounded-full">
-                                        <img src="{{ asset('images/user/user-04.png') }}" alt="User" />
-                                    </div>
-
-                                    <div>
-                                        <h6 class="text-sm font-medium text-black dark:text-white">
-                                            Cody Fisher
-                                        </h6>
-                                        <p class="text-sm">I’m waiting for you response!</p>
-                                        <p class="text-xs">5days ago</p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="flex gap-4.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                                    href="messages.html">
-                                    <div class="h-12.5 w-12.5 rounded-full">
-                                        <img src="{{ asset('images/user/user-02.png') }}" alt="User" />
-                                    </div>
-
-                                    <div>
-                                        <h6 class="text-sm font-medium text-black dark:text-white">
-                                            Mariya Desoja
-                                        </h6>
-                                        <p class="text-sm">I like your confidence 💪</p>
-                                        <p class="text-xs">2min ago</p>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- Dropdown End -->
                 </li>
                 <!-- Chat Notification Area -->
             </ul>

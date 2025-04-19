@@ -107,14 +107,14 @@ const chart01 = () => {
     },
     yaxis: [{
       title: {
-        text: "Clientes",
+        text: "",
       },
       min: 0,
       forceNiceScale: true
     }, {
       opposite: true,
       title: {
-        text: "Montos (S/.)",
+        text: "",
       },
       min: 0,
       forceNiceScale: true,

@@ -39,9 +39,6 @@
                                             fill="" />
                                     </svg>
                                 </span>
-                                <span class="text-xs {{ ($totalCobradoMes / $ingresoTotalServicios * 100) >= 80 ? 'text-meta-3' : 'text-meta-1' }}">
-                                    de S/. {{ number_format($ingresoTotalServicios, 2) }}
-                                </span>
                             @else
                                 <span class="flex items-center gap-1 text-sm font-medium text-meta-1">
                                     0%

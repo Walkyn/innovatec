@@ -21,13 +21,13 @@ use App\Models\ContratoServicio;
 use App\Http\Controllers\DatabaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ContratoPDFController;
 use App\Http\Controllers\PaymentPDFController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\MessageController;
 
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
@@ -110,6 +110,11 @@ Route::middleware('auth')->group(function () {
         Route::post('settings.info-ticket/store', 'storeInfoTicket')->middleware('check.permissions:settings,guardar')->name('settings.storeInfoTicket');
         Route::put('/company/update-cover', 'updateCover')->middleware('check.permissions:settings,actualizar')->name('company.update.cover');
         Route::put('/company/update-logo', 'updateLogo')->middleware('check.permissions:settings,actualizar')->name('company.update.logo');
+    });
+
+    // Messages
+    Route::controller(MessageController::class)->group(function () {
+        Route::get('messages', 'index')->middleware('check.permissions:messages,all')->name('messages.index');
     });
 
     // Reports
