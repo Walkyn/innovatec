@@ -10,14 +10,38 @@
         
         switch($periodo) {
             case 'semana_actual':
-                $inicio = $now->startOfWeek();
-                $fin = $now->copy()->endOfWeek();
-                $datos = App\Models\Cobranza::selectRaw('DATE(fecha_cobro) as fecha, COUNT(DISTINCT cliente_id) as clientes, SUM(monto_total) as total')
-                    ->whereBetween('fecha_cobro', [$inicio, $fin])
-                    ->where('estado_cobro', 'emitido')
-                    ->groupBy('fecha')
-                    ->get();
-                $labels = collect(range(0, 6))->map(fn($i) => ucfirst($inicio->copy()->addDays($i)->isoFormat('ddd')));
+                $inicio = $now->startOfWeek(Carbon\Carbon::MONDAY);
+                $fin = $now->copy()->endOfWeek(Carbon\Carbon::SUNDAY);
+                
+                // Debug para ver qué fechas se están procesando
+                \Log::info('Fecha inicio:', [$inicio->format('Y-m-d')]);
+                \Log::info('Fecha fin:', [$fin->format('Y-m-d')]);
+                
+                $cobros = App\Models\Cobranza::selectRaw('
+                    DATE(fecha_cobro) as fecha,
+                    COUNT(DISTINCT cliente_id) as clientes,
+                    SUM(monto_total) as total
+                ')
+                ->whereBetween('fecha_cobro', [$inicio, $fin])
+                ->where('estado_cobro', 'emitido')
+                ->groupBy('fecha')
+                ->orderBy('fecha')
+                ->get();
+
+                // Debug para ver los cobros
+                \Log::info('Cobros encontrados:', $cobros->toArray());
+
+                // Solo enviamos los datos crudos, el formateo lo haremos en JavaScript
+                $datos = $cobros->map(function($cobro) {
+                    return [
+                        'fecha' => $cobro->fecha,
+                        'clientes' => (int)$cobro->clientes,
+                        'total' => (float)$cobro->total
+                    ];
+                })->toArray();
+                
+                // No necesitamos labels separados, los generaremos en JavaScript
+                $labels = [];
                 break;
                 
             case 'semana_anterior':

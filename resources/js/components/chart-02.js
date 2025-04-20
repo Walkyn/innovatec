@@ -15,18 +15,64 @@ const chart02 = () => {
     try {
       const response = await fetch(`${rutaObtenerDatos}?periodo=${periodo}`);
       const data = await response.json();
+      
+      console.log('Datos recibidos:', data); // Para debug
+      
+      let categories = [];
+      let seriesData = [];
+      let clientesData = [];
+
+      // Manejar diferentes formatos según el período
+      if (periodo === 'semana_actual' || periodo === 'semana_anterior') {
+        // Para datos semanales
+        const fechasConDatos = data.datos.map(item => {
+          const [year, month, day] = item.fecha.split('-');
+          const fecha = new Date(year, month - 1, day);
+          const dias = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+          return {
+            label: dias[fecha.getDay()],
+            total: parseFloat(item.total),
+            clientes: parseInt(item.clientes)
+          };
+        });
+
+        categories = fechasConDatos.map(item => item.label);
+        seriesData = fechasConDatos.map(item => item.total);
+        clientesData = fechasConDatos.map(item => item.clientes);
+      } 
+      else if (periodo === 'mes_actual') {
+        // Para datos mensuales
+        if (Array.isArray(data.datos)) {
+          categories = data.datos.map(item => item.nombre); // Usamos el nombre del mes
+          seriesData = data.datos.map(item => parseFloat(item.total) || 0);
+          clientesData = data.datos.map(item => parseInt(item.clientes) || 0);
+        } else {
+          console.error('Formato de datos incorrecto para mes_actual:', data);
+          return;
+        }
+      }
+      else if (periodo === 'todos_años') {
+        // Para datos anuales
+        categories = data.labels;
+        seriesData = data.datos.map(item => parseFloat(item.total) || 0);
+        clientesData = data.datos.map(item => parseInt(item.clientes) || 0);
+      }
+
+      console.log('Categories:', categories); // Para debug
+      console.log('Series Data:', seriesData); // Para debug
+      console.log('Clientes Data:', clientesData); // Para debug
 
       const options = {
         series: [
           {
             name: "Total Cobrado",
             type: 'column',
-            data: data.series[0].data
+            data: seriesData
           },
           {
             name: "Clientes Cobrados",
             type: 'line',
-            data: data.series[1].data
+            data: clientesData
           }
         ],
         chart: {
@@ -52,16 +98,12 @@ const chart02 = () => {
           curve: 'smooth'
         },
         xaxis: {
-          categories: data.labels,
-          axisBorder: {
-            show: false,
-          },
-          axisTicks: {
-            show: false,
-          },
+          categories: categories,
+          type: 'category',
           labels: {
             style: {
-              fontSize: '12px'
+              fontSize: '12px',
+              textTransform: 'capitalize'
             }
           }
         },
@@ -110,13 +152,14 @@ const chart02 = () => {
       };
 
       if (chart) {
-        chart.updateOptions(options);
-      } else {
-        chart = new ApexCharts(document.querySelector("#chartTwo"), options);
-        chart.render();
+        chart.destroy();
       }
+      chart = new ApexCharts(document.querySelector("#chartTwo"), options);
+      chart.render();
+      
     } catch (error) {
       console.error('Error al actualizar el gráfico:', error);
+      console.log('Estado de los datos cuando ocurrió el error:', data); // Para debug
     }
   };
 

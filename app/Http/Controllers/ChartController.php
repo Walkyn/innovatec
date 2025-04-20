@@ -38,62 +38,35 @@ class ChartController extends Controller
                 break;
                 
             case 'mes_actual':
-                $datosMeses = Cobranza::selectRaw('MONTH(fecha_cobro) as mes, COUNT(DISTINCT cliente_id) as clientes, SUM(monto_total) as total')
-                    ->whereYear('fecha_cobro', $now->year)
-                    ->where('estado_cobro', 'emitido')
-                    ->groupBy('mes')
-                    ->orderBy('mes')
-                    ->get()
-                    ->keyBy('mes');
+                $datosMeses = Cobranza::selectRaw('
+                    MONTH(fecha_cobro) as mes,
+                    COUNT(DISTINCT cliente_id) as clientes,
+                    SUM(monto_total) as total
+                ')
+                ->whereYear('fecha_cobro', $now->year)
+                ->where('estado_cobro', 'emitido')
+                ->groupBy('mes')
+                ->orderBy('mes')
+                ->get();
 
-                // Array con nombres de meses en español
                 $nombresMeses = [
-                    1 => 'Enero',
-                    2 => 'Febrero',
-                    3 => 'Marzo',
-                    4 => 'Abril',
-                    5 => 'Mayo',
-                    6 => 'Junio',
-                    7 => 'Julio',
-                    8 => 'Agosto',
-                    9 => 'Septiembre',
-                    10 => 'Octubre',
-                    11 => 'Noviembre',
-                    12 => 'Diciembre'
+                    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
                 ];
 
                 $datos = [];
-                $labels = [];
-                
-                foreach ($nombresMeses as $mes => $nombre) {
-                    $labels[] = $nombre;
-                    if (isset($datosMeses[$mes])) {
-                        $datos[] = [
-                            'mes' => $mes,
-                            'total' => round($datosMeses[$mes]->total, 2),
-                            'clientes' => $datosMeses[$mes]->clientes
-                        ];
-                    } else {
-                        $datos[] = [
-                            'mes' => $mes,
-                            'total' => 0,
-                            'clientes' => 0
-                        ];
-                    }
+                for ($mes = 1; $mes <= 12; $mes++) {
+                    $datoMes = $datosMeses->firstWhere('mes', $mes);
+                    $datos[] = [
+                        'nombre' => $nombresMeses[$mes],
+                        'total' => $datoMes ? $datoMes->total : 0,
+                        'clientes' => $datoMes ? $datoMes->clientes : 0
+                    ];
                 }
 
                 return response()->json([
-                    'labels' => $labels,
-                    'series' => [
-                        [
-                            'name' => 'Total Cobrado',
-                            'data' => collect($datos)->pluck('total')
-                        ],
-                        [
-                            'name' => 'Clientes Cobrados',
-                            'data' => collect($datos)->pluck('clientes')
-                        ]
-                    ]
+                    'datos' => $datos
                 ]);
                 break;
                 
