@@ -8,12 +8,14 @@ use App\Models\Session;
 use App\Models\HistorySession;
 use hisorange\BrowserDetect\Parser as Browser;
 use WhichBrowser\Parser;
+use App\Models\ConfiguracionEmpresa;
 
 class AuthController extends Controller
 {
     public function index()
     {
-        return view('auth.login');
+        $configuracion = ConfiguracionEmpresa::first();
+        return view('auth.login', compact('configuracion'));
     }
 
     public function login(Request $request)

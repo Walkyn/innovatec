@@ -8,21 +8,23 @@
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 flex items-center justify-center min-h-screen">
 
             <!-- ====== Forms Section Start -->
-            <div class="w-full md:w-auto rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div
+                class="w-full md:w-auto rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                 <div class="flex flex-wrap items-center">
                     <div class="hidden md:block w-full md:w-1/2">
 
                         <div class="px-26 py-17.5 text-center">
-                            <a class="mb-5.5 justify-center flex items-center gap-2" href="#">
-                                <img class="h-10" src="{{ asset('images/logo/logo.png') }}" alt="Logo">
-                                <span class="text-xl font-bold text-gray-900 dark:text-white">Business Manager</span>
+                            <a class="mb-4 justify-center flex items-center gap-2" href="#">
+                                <img class="h-18"
+                                    src="{{ $configuracion->logo ? asset('storage/logos/' . $configuracion->logo) : asset('images/logo/logo.png') }}"
+                                    alt="Logo">
                             </a>
 
                             <p class="font-medium 2xl:px-20">
                                 Accede a tu cuenta para gestionar pagos, y administrar tus servicios de manera eficiente.
                             </p>
 
-                            <span class="mt-15 inline-block">
+                            <span class="mt-6 inline-block">
                                 <img src="./images/illustration/illustration-03.svg" alt="illustration" />
                             </span>
                         </div>
@@ -35,8 +37,10 @@
                             <!-- ====== Alerts Start -->
                             @include('partials.alerts')
                             <!-- ====== Alerts End -->
+                            <span
+                                class="text-2xl font-bold text-gray-900 dark:text-white">{{ $configuracion->nombre ?? 'Business Manager' }}</span>
 
-                            <h2 class="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
+                            <h2 class="mt-8 mb-4 text-lg font-bold text-black dark:text-white sm:text-title-lg">
                                 Iniciar Sesión
                             </h2>
 
