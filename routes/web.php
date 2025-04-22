@@ -28,7 +28,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\MessageController;
-
+use App\Http\Controllers\PanelController;
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -471,3 +471,6 @@ Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
 });
 
 Route::post('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
+
+Route::get('/mis-pagos', [PanelController::class, 'index'])->name('login-cliente');
+Route::get('/dashboard', [PanelController::class, 'dashboard'])->name('panel.dashboard');

@@ -5,9 +5,9 @@
 >
     <!-- SIDEBAR HEADER -->
     <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <a href="index.html">
+        <a href="{{ route('home.index') }}">
             <img src="{{ asset('images/logo/logo.png') }}" alt="Logo" class="h-10" />
-            <a class="mr-6 text-lg font-semibold text-gray-300" href="#"> B-MANAGER </a>
+            <a class="mr-6 text-lg font-semibold text-gray-300" href="{{ route('home.index') }}"> B-MANAGER </a>
         </a>
 
         <button class="block lg:hidden" @click.stop="sidebarToggle = !sidebarToggle">

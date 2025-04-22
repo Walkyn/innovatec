@@ -17,7 +17,7 @@
                     <nav>
                         <ol class="flex items-center gap-2">
                             <li>
-                                <a class="font-medium" href="index.html">Dashboard /</a>
+                                <a class="font-medium" href="{{ route('home.index') }}">Panel /</a>
                             </li>
                             <li class="text-primary">Calendario</li>
                         </ol>
@@ -29,28 +29,30 @@
                 @include('partials.calendar-event-modal')
 
                 <!-- Encabezado con botones -->
-                <div class="flex items-center justify-between p-4 border-b border-stroke dark:border-strokedark">
+                <div class="flex flex-col gap-4 sm:flex-row items-center justify-between pb-4 border-b border-stroke dark:border-strokedark">
                     <!-- Botón "Add Event +" -->
                     <button onclick="openModal(new Date().toISOString().split('T')[0])"
-                        class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
-                        Add Event +
+                        class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
+                        Agregar Evento +
                     </button>
 
                     <!-- Título del mes y año -->
-                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Marzo 2025</h2>
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white order-first sm:order-none">
+                        Marzo 2025
+                    </h2>
 
                     <!-- Botones de vista (mes, semana, día) -->
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-center">
                         <button
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                             Mes
                         </button>
                         <button
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                             Semana
                         </button>
                         <button
-                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            class="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                             Día
                         </button>
                     </div>

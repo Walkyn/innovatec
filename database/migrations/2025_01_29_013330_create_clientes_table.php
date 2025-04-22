@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombres');
             $table->string('apellidos');
             $table->string('identificacion')->unique();
+            $table->string('clave_acceso')->nullable();
             $table->string('telefono');
             $table->text('direccion');
             $table->string('gps')->nullable();
