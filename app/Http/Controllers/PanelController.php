@@ -17,6 +17,16 @@ class PanelController extends Controller
         return view('panel.dashboard');
     }
 
+    public function realizarPago()
+    {
+        return view('panel.realizar-pago');
+    }
+
+    public function historialPagos()
+    {
+        return view('panel.historial-pago');
+    }
+
     public function misPagos()
     {
         return view('panel.mis-pagos');

@@ -37,13 +37,13 @@
         }
 
         /*
-1. Use a consistent sensible line-height in all browsers.
-2. Prevent adjustments of font size after orientation changes in iOS.
-3. Use a more readable tab size.
-4. Use the user's configured `sans` font-family by default.
-5. Use the user's configured `sans` font-feature-settings by default.
-6. Use the user's configured `sans` font-variation-settings by default.
-*/
+        1. Use a consistent sensible line-height in all browsers.
+        2. Prevent adjustments of font size after orientation changes in iOS.
+        3. Use a more readable tab size.
+        4. Use the user's configured `sans` font-family by default.
+        5. Use the user's configured `sans` font-feature-settings by default.
+        6. Use the user's configured `sans` font-variation-settings by default.
+        */
 
         html {
             line-height: 1.5;
@@ -64,9 +64,9 @@
         }
 
         /*
-1. Remove the margin in all browsers.
-2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
-*/
+        1. Remove the margin in all browsers.
+        2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+        */
 
         body {
             margin: 0;
@@ -76,10 +76,10 @@
         }
 
         /*
-1. Add the correct height in Firefox.
-2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
-3. Ensure horizontal rules are visible by default.
-*/
+        1. Add the correct height in Firefox.
+        2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+        3. Ensure horizontal rules are visible by default.
+        */
 
         hr {
             height: 0;
@@ -91,8 +91,8 @@
         }
 
         /*
-Add the correct text decoration in Chrome, Edge, and Safari.
-*/
+        Add the correct text decoration in Chrome, Edge, and Safari.
+        */
 
         abbr:where([title]) {
             -webkit-text-decoration: underline dotted;
@@ -100,8 +100,8 @@ Add the correct text decoration in Chrome, Edge, and Safari.
         }
 
         /*
-Remove the default font size and weight for headings.
-*/
+        Remove the default font size and weight for headings.
+        */
 
         h1,
         h2,
@@ -114,8 +114,8 @@ Remove the default font size and weight for headings.
         }
 
         /*
-Reset links to optimize for opt-in styling instead of opt-out.
-*/
+        Reset links to optimize for opt-in styling instead of opt-out.
+        */
 
         a {
             color: inherit;
@@ -123,8 +123,8 @@ Reset links to optimize for opt-in styling instead of opt-out.
         }
 
         /*
-Add the correct font weight in Edge and Safari.
-*/
+        Add the correct font weight in Edge and Safari.
+        */
 
         b,
         strong {
@@ -132,9 +132,9 @@ Add the correct font weight in Edge and Safari.
         }
 
         /*
-1. Use the user's configured `mono` font family by default.
-2. Correct the odd `em` font sizing in all browsers.
-*/
+        1. Use the user's configured `mono` font family by default.
+        2. Correct the odd `em` font sizing in all browsers.
+        */
 
         code,
         kbd,
@@ -147,16 +147,16 @@ Add the correct font weight in Edge and Safari.
         }
 
         /*
-Add the correct font size in all browsers.
-*/
+        Add the correct font size in all browsers.
+        */
 
         small {
             font-size: 80%;
         }
 
         /*
-Prevent `sub` and `sup` elements from affecting the line height in all browsers.
-*/
+        Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+        */
 
         sub,
         sup {
@@ -1334,6 +1334,18 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        
+        .dots::after {
+            content: '';
+            animation: dots 3.5s infinite;
+        }
     </style>
 </head>
 
@@ -1351,7 +1363,27 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
 
         <!-- ===== Content Start ===== -->
         <section>
-            @yield('content')
+            <!-- Preloader Elegante -->
+            <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-95">
+                <div class="relative">
+                    <!-- Anillos animados -->
+                    <div class="flex items-center justify-center">
+                        <div class="absolute w-16 h-16 border-4 border-blue-200 rounded-full animate-ping"></div>
+                        <div class="absolute w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
+                        <div class="absolute w-12 h-12 border-4 border-transparent border-t-blue-400 rounded-full animate-spin"></div>
+                        <div class="absolute w-8 h-8 border-4 border-transparent border-t-blue-300 rounded-full animate-spin"></div>
+                    </div>
+                    <!-- Texto con animación de pulso -->
+                    <div class="mt-8 text-sm text-gray-600 text-center animate-pulse">
+                        <span class="dots"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido principal -->
+            <div id="main-content" class="hidden">
+                @yield('content')
+            </div>
         </section>
         <!-- ===== Content End ===== -->
 
@@ -1498,11 +1530,58 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
             })
         })
         // end: Tab
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const preloader = document.getElementById('preloader');
+            const mainContent = document.getElementById('main-content');
+
+            // Función para mostrar el preloader
+            window.showPreloader = function() {
+                preloader.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            }
+
+            // Función para ocultar el preloader
+            window.hidePreloader = function() {
+                preloader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            }
+
+            // Ocultar el preloader cuando la página termine de cargar
+            window.addEventListener('load', function() {
+                hidePreloader();
+            });
+
+            // Mostrar el preloader en cada navegación
+            document.addEventListener('turbolinks:before-visit', showPreloader);
+            document.addEventListener('turbolinks:load', hidePreloader);
+
+            // Para peticiones AJAX con Axios
+            axios.interceptors.request.use(function (config) {
+                showPreloader();
+                return config;
+            }, function (error) {
+                hidePreloader();
+                return Promise.reject(error);
+            });
+
+            axios.interceptors.response.use(function (response) {
+                hidePreloader();
+                return response;
+            }, function (error) {
+                hidePreloader();
+                return Promise.reject(error);
+            });
+
+            // Para formularios tradicionales
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    showPreloader();
+                });
+            });
+        });
     </script>
 
-</body>
-
-</html>
 </body>
 
 </html>
