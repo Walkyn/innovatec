@@ -1,277 +1,190 @@
 @extends('layouts.app-cliente')
-@section('title', 'Nexus - Mis Pagos')
+@section('title', 'Nexus - Panel Principal')
 
 @section('content')
 
-    <!--Start Content -->
-    <div class="relative p-6 w-full max-h-full mx-auto">
+    <!-- Contenido principal -->
+    <div class="container mx-auto p-4">
+        <!-- Portada de la empresa -->
+        <div class="relative z-20 h-35 md:h-65">
 
-        <!-- Modal content -->
-        <div class="relative bg-white rounded-md shadow dark:bg-gray-700">
-            <!-- Modal header -->
-            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                <h3 class="text-xl font-medium text-gray-900 dark:text-white">
-                    Mi Información
-                </h3>
+            <img id="companyCoverPreview"
+                src="{{ isset($company) && $company->portada ? asset('storage/covers/' . $company->portada) : './images/portada.jpg' }}"
+                alt="company cover" class="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center" />
+
+            <!-- Botón de "Mas" -->
+            <div class="absolute top-1 left-1 z-10 xsm:top-4 xsm:left-4">
+                <a href="#"
+                    class="flex transition-all cursor-pointer items-center justify-center gap-2 rounded bg-primary px-2 py-1 text-sm font-medium text-white hover:bg-opacity-80">
+                    <span class="flex-shrink-0">
+                        <svg class="fill-white" width="14" height="14" viewBox="0 0 14 14" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M7.0007 1.16663C4.23737 1.16663 1.16737 4.23663 1.16737 6.99996C1.16737 9.76329 4.23737 12.8333 7.0007 12.8333C9.76403 12.8333 12.834 9.76329 12.834 6.99996C12.834 4.23663 9.76403 1.16663 7.0007 1.16663ZM7.58403 9.91663H6.41737V8.74996H7.58403V9.91663ZM7.58403 7.58329H6.41737V4.08329H7.58403V7.58329Z"
+                                fill="white" />
+                        </svg>
+                    </span>
+                    <span>
+                        Mas Información
+                    </span>
+                </a>
             </div>
-            <!-- Modal body -->
-            <div class="space-y-4">
-                <main class="profile-page">
-                    <div class="relative flex flex-col min-w-0 break-words bg-white dark:bg-gray-800 w-full">
-                        <div class="px-5">
-                            <!-- Información del cliente -->
-                            <div class="flex flex-col items-center py-4">
-                                <!-- Sección de perfil-->
-                                <div class="flex flex-col items-center py-6">
-                                    <div class="relative group mb-4">
-                                        <div
-                                            class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                                            <span class="text-2xl font-bold text-white">JL</span>
-                                        </div>
+        </div>
 
-                                        <!-- Indicador de estado (activo) -->
-                                        <div
-                                            class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center">
-                                            <i class="fas fa-check-circle text-white text-xs"></i>
-                                        </div>
-                                    </div>
+        <!-- Tarjeta de información principal -->
+        <div class="bg-white rounded-b-lg shadow-sm border border-gray-100 p-6 mb-8">
+            <!-- Encabezado -->
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="hidden md:flex w-24 h-24 rounded-lg bg-gray-100 items-center justify-center">
+                    <img src="{{ isset($company) && $company->logo ? asset('storage/logos/' . $company->logo) : './images/user/profile.png' }}"
+                        alt="Logo Empresa" class="w-22 h-22 object-contain">
+                </div>
 
-                                    <!-- Nombre y detalles -->
-                                    <div class="text-center">
-                                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-1">Juan López Martínez
-                                        </h3>
-                                        <p
-                                            class="text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center">
-                                            <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                                            Activo desde 15 de Marzo de 2022
-                                        </p>
-                                    </div>
-                                </div>
+                <div class="flex-1">
+                    <h1 class="text-2xl md:text-3xl font-light text-gray-900">Nexus Telecom Peru</h1>
+                    <p class="text-gray-500 font-light">Soluciones en telecomunicaciones</p>
+                </div>
+            </div>
 
-                                <!-- Información de contacto y ubicación -->
-                                <div
-                                    class="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                    <!-- 1. Identificación -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                            <i class="fas fa-id-card text-blue-500 dark:text-blue-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Identificación</p>
-                                            <p class="text-gray-800 text-sm dark:text-white font-medium">DNI 75849632</p>
-                                        </div>
-                                    </div>
+            <!-- Sobre Nosotros -->
+            <div class="mb-8">
+                <h3 class="text-lg font-light text-gray-800 border-b pb-2 mb-4">Sobre Nosotros</h3>
+                <div class="prose max-w-none text-gray-600">
+                    <p>Nexus Telecom Peru es una empresa líder en el sector de telecomunicaciones, fundada en 2008 con la
+                        misión de conectar a las personas y negocios a través de soluciones tecnológicas innovadoras.</p>
 
-                                    <!-- 2. Teléfono -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                            <i class="fas fa-phone text-blue-500 dark:text-blue-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                                            <a href="tel:987654321"
-                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">
-                                                987 654 321
-                                            </a>
-                                        </div>
-                                    </div>
+                    <p>Hemos sido reconocidos por tres años consecutivos como la empresa de telecomunicaciones con mayor
+                        crecimiento en la región, gracias a nuestra capacidad de adaptación y a nuestra constante inversión
+                        en tecnología de vanguardia.</p>
+                </div>
+            </div>
 
-                                    <!-- 3. Fecha de Instalación -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                            <i class="fas fa-calendar-alt text-blue-500 dark:text-blue-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Instalación</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm">15/03/2022</p>
-                                        </div>
-                                    </div>
+            <!-- Estadísticas clave -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <!-- Años de experiencia -->
+                <div class="p-4 border-l-2 border-blue-500">
+                    <p class="text-sm text-gray-500 mb-1">Experiencia</p>
+                    <p class="text-2xl font-light text-gray-800">15+ años</p>
+                </div>
 
-                                    <!-- 4. Ubicación GPS -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                            <i class="fas fa-map-marker-alt text-blue-500 dark:text-blue-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Ubicación</p>
-                                            <a href="https://www.google.com/maps?q=-12.123456,-77.123456" target="_blank"
-                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">
-                                                -12.123456, -77.123456
-                                            </a>
-                                        </div>
-                                    </div>
+                <!-- Clientes -->
+                <div class="p-4 border-l-2 border-green-500">
+                    <p class="text-sm text-gray-500 mb-1">Clientes</p>
+                    <p class="text-2xl font-light text-gray-800">10k+</p>
+                </div>
 
-                                    <!-- 5. Región -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                            <i class="fas fa-map text-purple-500 dark:text-purple-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Región</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                                Lima
-                                            </p>
-                                        </div>
-                                    </div>
+                <!-- Soporte -->
+                <div class="p-4 border-l-2 border-purple-500">
+                    <p class="text-sm text-gray-500 mb-1">Soporte</p>
+                    <p class="text-2xl font-light text-gray-800">24/7</p>
+                </div>
+            </div>
 
-                                    <!-- 6. Provincia -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                            <i class="fas fa-city text-purple-500 dark:text-purple-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Provincia</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                                Lima
-                                            </p>
-                                        </div>
-                                    </div>
+            <!-- Información de contacto -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-light text-gray-800 border-b pb-2">Información de contacto</h3>
 
-                                    <!-- 7. Distrito -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                            <i class="fas fa-map-marked-alt text-purple-500 dark:text-purple-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Distrito</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                                San Isidro
-                                            </p>
-                                        </div>
-                                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Teléfono -->
+                    <div class="flex items-start space-x-3">
+                        <div class="mt-1 flex-shrink-0 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Teléfono</p>
+                            <a href="tel:+51123456789" class="text-gray-700 hover:text-blue-600">+51 123 456 789</a>
+                        </div>
+                    </div>
 
-                                    <!-- 8. Centro Poblado -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                            <i class="fas fa-map-pin text-purple-500 dark:text-purple-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Zona</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                                Zona Comercial
-                                            </p>
-                                        </div>
-                                    </div>
+                    <!-- Email -->
+                    <div class="flex items-start space-x-3">
+                        <div class="mt-1 flex-shrink-0 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Email</p>
+                            <a href="mailto:contacto@nexus.com"
+                                class="text-gray-700 hover:text-blue-600">contacto@nexus.com</a>
+                        </div>
+                    </div>
 
-                                    <!-- 9. Dirección -->
-                                    <div class="flex items-center space-x-3">
-                                        <div
-                                            class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                            <i class="fas fa-home text-purple-500 dark:text-purple-300"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Dirección Completa</p>
-                                            <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                                Av. Los Incas 123, 2do piso, San Isidro
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Dirección -->
+                    <div class="flex items-start space-x-3">
+                        <div class="mt-1 flex-shrink-0 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Dirección</p>
+                            <p class="text-gray-700">Av. Principal 123, Lima</p>
+                        </div>
+                    </div>
 
-                                <!-- Plan y detalles -->
-                                <div class="w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-3">
-                                            <div
-                                                class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                                <i class="fas fa-wifi text-green-500 dark:text-green-300"></i>
-                                            </div>
-                                            <div>
-                                                <div class="flex items-center space-x-1">
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                                                        Internet Fibra Óptica
-                                                    </p>
-                                                </div>
-                                                <p class="text-lg font-bold text-gray-800 dark:text-white">
-                                                    S/ 120.00
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="h-12 w-px bg-gray-200 dark:bg-gray-600"></div>
-                                        <div class="flex items-center space-x-3">
-                                            <div
-                                                class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                                <i class="fas fa-check-circle text-green-500 dark:text-green-300"></i>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm text-gray-500 dark:text-gray-400">Estado</p>
-                                                <p class="text-sm font-semibold text-green-600 dark:text-green-400">
-                                                    Activo
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+                    <!-- Website -->
+                    <div class="flex items-start space-x-3">
+                        <div class="mt-1 flex-shrink-0 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Sitio web</p>
+                            <a href="https://www.nexus.com" target="_blank"
+                                class="text-gray-700 hover:text-blue-600">www.nexus.com</a>
+                        </div>
+                    </div>
 
-                                <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                                    <div class="flex justify-between mb-6">
-                                        <div>
-                                            <div class="flex items-center mb-1">
-                                                <div class="text-2xl font-semibold">2</div>
-                                            </div>
-                                            <div class="text-sm font-medium text-gray-400">Contratos Activos</div>
-                                        </div>
-                                    </div>
-
-                                    <a href="/gebruikers"
-                                        class="text-[#f84525] font-medium text-sm hover:text-red-800">Ver</a>
-                                </div>
-
-                                <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                                    <div class="flex justify-between mb-6">
-                                        <div>
-                                            <div class="flex items-center mb-1">
-                                                <div class="text-2xl font-semibold">2</div>
-                                            </div>
-                                            <div class="text-sm font-medium text-gray-400">Servicios Activos</div>
-                                        </div>
-                                    </div>
-
-                                    <a href="/gebruikers"
-                                        class="text-[#f84525] font-medium text-sm hover:text-red-800">Ver</a>
-                                </div>
-                                <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                                    <div class="flex justify-between mb-4">
-                                        <div>
-                                            <div class="flex items-center mb-1">
-                                                <div class="text-2xl font-semibold">100</div>
-                                                <div
-                                                    class="p-1 rounded bg-emerald-500/10 text-emerald-500 text-[12px] font-semibold leading-none ml-2">
-                                                    +30%</div>
-                                            </div>
-                                            <div class="text-sm font-medium text-gray-400">Meses pendientes</div>
-                                        </div>
-                                    </div>
-                                    <a href="/dierenartsen"
-                                        class="text-[#f84525] font-medium text-sm hover:text-red-800">Ver</a>
-                                </div>
-                                <div class="bg-white rounded-md border border-gray-100 p-6 shadow-md shadow-black/5">
-                                    <div class="flex justify-between mb-6">
-                                        <div>
-                                            <div class="text-2xl font-semibold mb-1">100</div>
-                                            <div class="text-sm font-medium text-gray-400">Total pendiente</div>
-                                        </div>
-                                    </div>
-                                    <a href=""
-                                        class="text-[#f84525] font-medium text-sm hover:text-red-800">Ver</a>
-                                </div>
+                    <!-- Redes sociales -->
+                    <div class="flex items-start space-x-3">
+                        <div class="mt-1 flex-shrink-0 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Redes</p>
+                            <div class="flex space-x-3">
+                                <a href="#" class="text-gray-500 hover:text-blue-600">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                                    </svg>
+                                </a>
+                                <a href="#" class="text-gray-500 hover:text-blue-600">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
+                                    </svg>
+                                </a>
+                                <a href="#" class="text-gray-500 hover:text-blue-600">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                                    </svg>
+                                </a>
                             </div>
                         </div>
                     </div>
-                </main>
+                </div>
             </div>
         </div>
     </div>
-    <!-- End Content -->
 
 @endsection

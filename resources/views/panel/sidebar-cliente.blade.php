@@ -14,6 +14,13 @@
             </a>
         </li>
         <li class="mb-1 group">
+            <a href="{{ route('panel.mi-perfil') }}"
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                <i class='bx bx-user mr-3 text-lg'></i>
+                <span class="text-sm">Mi Perfil</span>
+            </a>
+        </li>
+        <li class="mb-1 group">
             <a href=""
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
                 <i class='bx bx-user mr-3 text-lg'></i>

@@ -1364,7 +1364,7 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
         <!-- ===== Content Start ===== -->
         <section>
             <!-- Preloader Elegante -->
-            <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-white bg-opacity-95">
+            <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-95">
                 <div class="relative">
                     <!-- Anillos animados -->
                     <div class="flex items-center justify-center">

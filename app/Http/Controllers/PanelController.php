@@ -17,6 +17,11 @@ class PanelController extends Controller
         return view('panel.dashboard');
     }
 
+    public function miPerfil()
+    {
+        return view('panel.mi-perfil');
+    }
+
     public function realizarPago()
     {
         return view('panel.realizar-pago');
