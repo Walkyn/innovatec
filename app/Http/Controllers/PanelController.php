@@ -37,6 +37,16 @@ class PanelController extends Controller
         return view('panel.comprobantes');
     }
 
+    public function mesesPendientes()
+    {
+        return view('panel.meses-pendientes');
+    }
+
+    public function mensajes()
+    {
+        return view('panel.mensajes');
+    }
+
     public function misPagos()
     {
         return view('panel.mis-pagos');

@@ -478,3 +478,5 @@ Route::get('/historial-pagos', [PanelController::class, 'historialPagos'])->name
 Route::get('/realizar-pago', [PanelController::class, 'realizarPago'])->name('panel.realizar-pago');
 Route::get('/mi-perfil', [PanelController::class, 'miPerfil'])->name('panel.mi-perfil');
 Route::get('/comprobantes', [PanelController::class, 'comprobantes'])->name('panel.comprobantes');
+Route::get('/meses-pendientes', [PanelController::class, 'mesesPendientes'])->name('panel.meses-pendientes');
+Route::get('/mensajes', [PanelController::class, 'mensajes'])->name('panel.mensajes');

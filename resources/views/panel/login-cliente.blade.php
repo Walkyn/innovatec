@@ -4,12 +4,12 @@
 @section('content')
 
     <!-- ====== Forms Section Start -->
-    <section class="bg-gray-1 dark:bg-dark py-20 lg:py-[120px]">
+    <section class="bg-gray-1 dark:bg-gray-900 py-20 lg:py-[120px]">
         <div class="container mx-auto">
             <div class="flex flex-wrap -mx-4">
                 <div class="w-full px-4">
                     <div
-                        class="relative mx-auto max-w-[525px] overflow-hidden rounded-lg bg-white py-16 px-10 text-center sm:px-12 md:px-[60px] dark:bg-dark-2">
+                        class="relative mx-auto max-w-[525px] overflow-hidden rounded-lg bg-white py-16 px-10 text-center sm:px-12 md:px-[60px] dark:bg-gray-900">
                         <div class="mb-10 text-center md:mb-16">
                             <a href="javascript:void(0)" class="mx-auto inline-block max-w-[160px]">
                                 <img src="{{ asset('images/logo/logo.png') }}" alt="logo" />
@@ -33,7 +33,7 @@
 
                         </form>
                         <a href="javascript:void(0)"
-                            class="inline-block mb-2 text-base text-dark dark:text-white hover:text-primary hover:underline">
+                            class="inline-block mb-2 text-base text-gray-500 dark:text-gray-200 hover:text-primary hover:underline">
                             Olvidaste tu contraseña?
                         </a>
                         <p class="text-base text-body-color dark:text-dark-6">
