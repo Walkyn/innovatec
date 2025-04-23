@@ -24,9 +24,9 @@
                         <div class="flex items-center mb-0.5">
                             <div class="text-xl font-semibold">10</div>
                             <span
-                                class="p-1 rounded text-[12px] font-semibold bg-blue-500/10 text-blue-500 leading-none ml-1">$80</span>
+                                class="p-1 rounded text-[12px] font-semibold bg-yellow-500/10 text-yellow-500 leading-none ml-1">$80</span>
                         </div>
-                        <span class="text-gray-400 text-sm">Pendiente</span>
+                        <span class="text-gray-400 text-sm">Revisión</span>
                     </div>
                     <div class="rounded-md border border-dashed border-gray-200 p-4">
                         <div class="flex items-center mb-0.5">
@@ -42,20 +42,26 @@
                     <div class="font-medium">Historial de Pagos</div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full min-w-[460px]">
+                    <table class="w-full min-w-[460px] whitespace-no-wrap">
                         <thead>
                             <tr>
                                 <th
-                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md whitespace-nowrap">
                                     Medio de Pago</th>
                                 <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Servicio</th>
+                                    <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    Meses</th>
                                 <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Monto</th>
                                 <th
-                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    Fecha</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md whitespace-nowrap">
                                     Estado</th>
                             </tr>
                         </thead>
@@ -73,11 +79,19 @@
                                     <span class="text-[13px] font-medium text-gray-500">Internet Basico</span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">Enero, Febrero, Marzo</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
                                     <span class="text-[13px] font-medium text-emerald-500">S/. 235</span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">20/04/2025</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap">
                                     <span
-                                        class="inline-block p-1 rounded bg-emerald-500/10 text-emerald-500 font-medium text-[12px] leading-none">Completado</span>
+                                        class="text-xs font-medium text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="fas fa-check-circle"></i>
+                                        Completado</span>
                                 </td>
                             </tr>
                             <tr>
@@ -93,11 +107,47 @@
                                     <span class="text-[13px] font-medium text-gray-500">Internet Basico</span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">Enero, Febrero, Marzo</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
                                     <span class="text-[13px] font-medium text-emerald-500">S/. 235</span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">20/04/2025</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap">
                                     <span
-                                        class="inline-block p-1 rounded bg-rose-500/10 text-rose-500 font-medium text-[12px] leading-none">Rechazado</span>
+                                        class="text-xs font-medium text-rose-600 bg-rose-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="fas fa-times-circle"></i>
+                                        Rechazado</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <div class="flex items-center">
+                                        <img src="{{ asset('images/paymethods/bbva.png') }}" alt="bbva"
+                                            class="w-8 h-8 rounded object-cover block">
+                                        <a href="#"
+                                            class="text-gray-600 text-sm font-medium hover:text-blue-500 ml-2 truncate">BBVA</a>
+                                    </div>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">Internet Basico</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">Enero, Febrero, Marzo</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-emerald-500">S/. 235</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <span class="text-[13px] font-medium text-gray-500">20/04/2025</span>
+                                </td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap">
+                                    <span
+                                        class="text-xs font-medium text-yellow-600 bg-yellow-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                        <i class="fas fa-clock"></i>
+                                        Revisión</span>
                                 </td>
                             </tr>
                         </tbody>

@@ -5,6 +5,76 @@
 
     <!--Start Content -->
     <div class="relative p-4 w-full max-h-full mx-auto">
+        <!-- Toast notification centrado -->
+        <div x-data="{ 
+            show: false,
+            message: '',
+            progress: 0,
+            progressInterval: null,
+            showToast(msg) {
+                this.message = msg;
+                this.show = true;
+                this.progress = 0;
+                
+                if (this.progressInterval) clearInterval(this.progressInterval);
+                
+                const startTime = Date.now();
+                const duration = 3000; // 3 segundos
+                
+                this.progressInterval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    this.progress = (elapsed / duration) * 100;
+                    
+                    if (this.progress >= 100) {
+                        this.show = false;
+                        clearInterval(this.progressInterval);
+                    }
+                }, 10);
+                
+                setTimeout(() => {
+                    this.show = false;
+                    clearInterval(this.progressInterval);
+                }, duration);
+            }
+        }" 
+        @notify.window="showToast($event.detail.message)"
+        class="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+            <div x-show="show" 
+                x-transition:enter="transform ease-out duration-300 transition"
+                x-transition:enter-start="translate-y-2 opacity-0"
+                x-transition:enter-end="translate-y-0 opacity-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="max-w-sm w-full mx-4 bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+                <div class="p-4">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-3 w-0 flex-1">
+                            <p class="text-sm font-medium text-gray-900" x-text="message"></p>
+                        </div>
+                        <div class="ml-4 flex-shrink-0 flex">
+                            <button @click="show = false" class="rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <span class="sr-only">Cerrar</span>
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-1">
+                        <div class="bg-green-500 h-1 rounded-full transition-all duration-10 ease-linear"
+                            :style="'width: ' + progress + '%'">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
             <div class="flex justify-between mb-4 items-start">
                 <div class="font-medium text-lg">Realizar Pagos</div>
@@ -14,12 +84,10 @@
             <div class="grid grid-cols-1 gap-4 mb-6">
                 <!-- Selector de contrato -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Contrato</label>
                         <select
-                            class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                             <option value="">Seleccione un contrato</option>
                             <option value="1">CONTR-2023-001</option>
                             <option value="2">CONTR-2023-002</option>
@@ -30,7 +98,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Servicio</label>
                         <select
-                            class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                             <option value="">Seleccione un servicio</option>
                             <option value="1">Internet Fibra Óptica (S/ 120.00)</option>
                             <option value="2">Televisión HD (S/ 80.00)</option>
@@ -236,16 +304,7 @@
                                 </td>
 
                                 <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded bg-blue-100 flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-gray-600 text-sm font-medium ml-2">Internet Fibra Óptica</span>
-                                    </div>
+                                    <span class="text-gray-600 text-sm font-medium ml-2">Internet Basico</span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
                                     <span class="text-[13px] font-medium text-gray-600">S/ 120.00</span>
@@ -267,16 +326,7 @@
                                 </td>
 
                                 <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded bg-purple-100 flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-gray-600 text-sm font-medium ml-2">Televisión HD</span>
-                                    </div>
+                                    <span class="text-gray-600 text-sm font-medium ml-2">Netflix Basico</span>
                                 </td>
                                 <td class="py-2 px-4 border-b border-b-gray-50">
                                     <span class="text-[13px] font-medium text-gray-600">S/ 80.00</span>
@@ -302,191 +352,259 @@
                 </div>
             </div>
 
-            <!-- Selección de medio de pago -->
+            <!-- Selección de medio de pago mejorada -->
             <div x-data="{
                 selectedMethod: '',
                 copyToClipboard(text) {
                     navigator.clipboard.writeText(text)
-                        .then(() => alert('Información copiada al portapapeles'))
-                        .catch(err => console.error('Error al copiar:', err));
+                        .then(() => {
+                            window.dispatchEvent(new CustomEvent('notify', {
+                                detail: {
+                                    message: 'Información copiada al portapapeles'
+                                }
+                            }));
+                        })
+                        .catch(err => {
+                            window.dispatchEvent(new CustomEvent('notify', {
+                                detail: {
+                                    message: 'Error al copiar la información'
+                                }
+                            }));
+                        });
                 }
-            }" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Medio de Pago</label>
-                    <select x-model="selectedMethod"
-                        class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            }" class="mb-6">
+                <div class="font-medium mb-4">Seleccione un método de pago</div>
+                
+                <!-- Selector de método de pago -->
+                <div class="mb-4">
+                    <select x-model="selectedMethod" class="w-full sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         <option value="">Seleccione medio de pago</option>
                         <option value="bcp">BCP</option>
                         <option value="bbva">BBVA</option>
                         <option value="nacion">Banco de la Nación</option>
+                        <option value="piura">Caja Piura</option>
                         <option value="yape">Yape</option>
                         <option value="plin">Plin</option>
                     </select>
                 </div>
 
-                <!-- Información de pago dinámica -->
+                <!-- Contenedor de tarjetas -->
                 <div class="relative">
-                    <!-- Tarjeta por defecto -->
-                    <div x-show="!selectedMethod"
-                        class="w-full h-46 bg-gray-100 rounded-xl relative text-gray-600 shadow-md transition-all">
-                        <div class="w-full px-6 absolute top-6">
-                            <div class="flex items-center justify-center h-34">
-                                <p class="text-sm font-medium">Seleccione un medio de pago para ver los detalles</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta BCP -->
-                    <div x-show="selectedMethod === 'bcp'" x-transition
-                        class="w-full h-46 bg-[#0038A7] rounded-xl relative text-white shadow-md transition-all duration-300 transform hover:scale-105 overflow-hidden">
-                        <div class="absolute top-3 right-3">
-                            <button class="text-white/80 hover:text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16m-7 6h7" />
+                    <!-- Contenedor con altura fija -->
+                    <div class="relative h-[200px]">
+                        <!-- Mensaje cuando no hay método seleccionado -->
+                        <div x-show="!selectedMethod" 
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            class="absolute inset-0 bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="mb-2">
+                                <svg class="w-12 h-12 text-gray-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                                 </svg>
-                            </button>
+                            </div>
+                            <p class="text-gray-600 font-medium">Seleccione un método de pago</p>
+                            <p class="text-gray-400 text-sm">Para ver los detalles de la cuenta</p>
                         </div>
-                        <div class="w-full px-6 pt-4">
-                            <div class="flex flex-col space-y-3">
-                                <div>
-                                    <p class="text-xs font-light text-white/80">Banco</p>
-                                    <p class="text-lg font-semibold tracking-wide">Banco de Crédito BCP</p>
+
+                        <!-- Tarjeta BCP -->
+                        <div x-show="selectedMethod === 'bcp'" 
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute inset-0 bg-[#005696] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-lg font-semibold">BCP</p>
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/paymethods/bcp.png') }}" alt="BCP" class="w-10 h-10">
                                 </div>
+                            </div>
+                            <div class="space-y-2">
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Cuenta Corriente</p>
+                                    <p class="text-xs text-white/80">Cuenta Corriente</p>
                                     <div class="flex items-center gap-2">
-                                        <p class="text-lg font-medium tracking-wider">193-1234567-0-89</p>
-                                        <button @click="copyToClipboard('193-1234567-0-89')"
-                                            class="bg-white/10 hover:bg-white/20 rounded-full p-1 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                                <path
-                                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                                            </svg>
+                                        <p class="text-sm font-medium">193-1234567-0-89</p>
+                                        <button @click="copyToClipboard('193-1234567-0-89')" 
+                                            class="text-white/80 hover:text-white">
+                                            <i class="fas fa-copy text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Titular</p>
-                                    <p class="text-sm font-medium">NEXUS TELECOM S.A.C</p>
+                                    <p class="text-xs text-white/80">Titular</p>
+                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Tarjeta BBVA -->
-                    <div x-show="selectedMethod === 'bbva'" x-transition
-                        class="w-full h-48 bg-[#072146] rounded-xl relative text-white shadow-md transition-all duration-300 transform hover:scale-105 overflow-hidden">
-                        <div class="absolute top-3 right-3">
-                            <button class="text-white/80 hover:text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16m-7 6h7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="w-full px-6 pt-4">
-                            <div class="flex flex-col space-y-3">
-                                <div>
-                                    <p class="text-xs font-light text-white/80">Banco</p>
-                                    <p class="text-lg font-semibold tracking-wide">BBVA</p>
+                        <!-- Tarjeta BBVA -->
+                        <div x-show="selectedMethod === 'bbva'"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute inset-0 bg-[#00427F] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-lg font-semibold">BBVA</p>
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/paymethods/bbva.png') }}" alt="BBVA" class="w-10 h-10">
                                 </div>
+                            </div>
+                            <div class="space-y-2">
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Cuenta Corriente</p>
+                                    <p class="text-xs text-white/80">Cuenta Corriente</p>
                                     <div class="flex items-center gap-2">
-                                        <p class="text-lg font-medium tracking-wider">0011-0123-0123456789</p>
+                                        <p class="text-sm font-medium">0011-0123-0123456789</p>
                                         <button @click="copyToClipboard('0011-0123-0123456789')"
-                                            class="bg-white/10 hover:bg-white/20 rounded-full p-1 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                                <path
-                                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                                            </svg>
+                                            class="text-white/80 hover:text-white">
+                                            <i class="fas fa-copy text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Titular</p>
-                                    <p class="text-sm font-medium">NEXUS TELECOM S.A.C</p>
+                                    <p class="text-xs text-white/80">Titular</p>
+                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Tarjeta Yape -->
-                    <div x-show="selectedMethod === 'yape'" x-transition
-                        class="w-full h-46 bg-[#742284] rounded-xl relative text-white shadow-md transition-all duration-300 transform hover:scale-105 overflow-hidden">
-                        <div class="absolute top-3 right-3">
-                            <button class="text-white/80 hover:text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16m-7 6h7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="w-full px-6 pt-4">
-                            <div class="flex flex-col space-y-3">
+                        <!-- Tarjeta Banco de la Nación -->
+                        <div x-show="selectedMethod === 'nacion'"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute inset-0 bg-[#D12C1F] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="flex items-center justify-between mb-4">
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Método de Pago</p>
-                                    <p class="text-lg font-semibold tracking-wide">Yape</p>
+                                    <p class="text-lg font-semibold no-wrap">Banco de la Nación</p>
+                                </div>
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/paymethods/bcn.png') }}" alt="Banco de la Nación" class="w-10 h-10">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div>
+                                    <p class="text-xs text-white/80">Cuenta Corriente</p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-medium">04-074-875432</p>
+                                        <button @click="copyToClipboard('04074875432')"
+                                            class="text-white/80 hover:text-white">
+                                            <i class="fas fa-copy text-xs"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Número de Teléfono</p>
+                                    <p class="text-xs text-white/80">Titular</p>
+                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Caja Piura -->
+                        <div x-show="selectedMethod === 'piura'"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute inset-0 bg-gradient-to-r from-[#003C7F] to-[#0056B3] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-lg font-semibold no-wrap">Caja Piura</p>
+                                </div>
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/paymethods/piura.png') }}" alt="Caja Piura" class="w-10 h-10">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div>
+                                    <p class="text-xs text-white/80">Cuenta de Ahorros</p>
                                     <div class="flex items-center gap-2">
-                                        <p class="text-lg font-medium tracking-wider">987 654 321</p>
+                                        <p class="text-sm font-medium">110-01-2345678</p>
+                                        <button @click="copyToClipboard('110012345678')"
+                                            class="text-white/80 hover:text-white">
+                                            <i class="fas fa-copy text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-white/80">Titular</p>
+                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Yape -->
+                        <div x-show="selectedMethod === 'yape'"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute inset-0 bg-[#742284] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-lg font-semibold">Yape</p>
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/paymethods/yape.png') }}" alt="Yape" class="w-10 h-10">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div>
+                                    <p class="text-xs text-white/80">Número de Teléfono</p>
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-sm font-medium">987 654 321</p>
                                         <button @click="copyToClipboard('987654321')"
-                                            class="bg-white/10 hover:bg-white/20 rounded-full p-1 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                                <path
-                                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                                            </svg>
+                                            class="text-white/80 hover:text-white">
+                                            <i class="fas fa-copy text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Titular</p>
-                                    <p class="text-sm font-medium">Juan Pérez</p>
+                                    <p class="text-xs text-white/80">Titular</p>
+                                    <p class="text-sm">Juan Pérez</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Tarjeta Plin -->
-                    <div x-show="selectedMethod === 'plin'" x-transition
-                        class="w-full h-46 bg-[#00A94E] rounded-xl relative text-white shadow-md transition-all duration-300 transform hover:scale-105 overflow-hidden">
-                        <div class="absolute top-3 right-3">
-                            <button class="text-white/80 hover:text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16m-7 6h7" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="w-full px-6 pt-4">
-                            <div class="flex flex-col space-y-3">
-                                <div>
-                                    <p class="text-xs font-light text-white/80">Método de Pago</p>
-                                    <p class="text-lg font-semibold tracking-wide">Plin</p>
+                        <!-- Tarjeta Plin -->
+                        <div x-show="selectedMethod === 'plin'"
+                            x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95"
+                            class="absolute inset-0 bg-[#6AB4E0] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-lg font-semibold">Plin</p>
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/paymethods/plin.png') }}" alt="Plin" class="w-10 h-10">
                                 </div>
+                            </div>
+                            <div class="space-y-2">
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Número de Teléfono</p>
+                                    <p class="text-xs text-white/80">Número de Teléfono</p>
                                     <div class="flex items-center gap-2">
-                                        <p class="text-lg font-medium tracking-wider">999 888 777</p>
+                                        <p class="text-sm font-medium">999 888 777</p>
                                         <button @click="copyToClipboard('999888777')"
-                                            class="bg-white/10 hover:bg-white/20 rounded-full p-1 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                                <path
-                                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                                            </svg>
+                                            class="text-white/80 hover:text-white">
+                                            <i class="fas fa-copy text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-light text-white/80">Titular</p>
-                                    <p class="text-sm font-medium">Juan Pérez</p>
+                                    <p class="text-xs text-white/80">Titular</p>
+                                    <p class="text-sm">Juan Pérez</p>
                                 </div>
                             </div>
                         </div>

@@ -32,6 +32,11 @@ class PanelController extends Controller
         return view('panel.historial-pago');
     }
 
+    public function comprobantes()
+    {
+        return view('panel.comprobantes');
+    }
+
     public function misPagos()
     {
         return view('panel.mis-pagos');

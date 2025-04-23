@@ -477,3 +477,4 @@ Route::get('/dashboard', [PanelController::class, 'dashboard'])->name('panel.das
 Route::get('/historial-pagos', [PanelController::class, 'historialPagos'])->name('panel.historial-pagos');
 Route::get('/realizar-pago', [PanelController::class, 'realizarPago'])->name('panel.realizar-pago');
 Route::get('/mi-perfil', [PanelController::class, 'miPerfil'])->name('panel.mi-perfil');
+Route::get('/comprobantes', [PanelController::class, 'comprobantes'])->name('panel.comprobantes');

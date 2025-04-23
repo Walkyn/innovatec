@@ -23,7 +23,7 @@
         <li class="mb-1 group">
             <a href=""
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
-                <i class='bx bx-user mr-3 text-lg'></i>
+                <i class='bx bx-server mr-3 text-base'></i>
                 <span class="text-sm">Servicios</span>
                 <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
             </a>
@@ -67,7 +67,7 @@
             </ul>
         </li>
         <li class="mb-1 group">
-            <a href=""
+            <a href="{{ route('panel.comprobantes') }}"
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-archive mr-3 text-lg'></i>
                 <span class="text-sm">Comprobantes</span>
