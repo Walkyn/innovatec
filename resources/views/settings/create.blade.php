@@ -236,25 +236,31 @@
                                                 <i class="fab fa-facebook-square text-xl text-blue-600"></i>
                                             </span>
                                             <input type="url" name="facebook" id="facebook"
-                                                class="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                placeholder="" value="{{ $configuracion->facebook ?? '' }}">
+                                                class="w-full rounded border {{ $errors->has('facebook') ? 'border-red-500' : 'border-stroke' }} bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                placeholder="" value="{{ old('facebook', $configuracion->facebook ?? '') }}">
                                         </div>
+                                        @error('facebook')
+                                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
-                                    <!-- Campo para Instagram -->
+                                    <!-- Campo para WhatsApp -->
                                     <div class="mb-5.5">
-                                        <label for="instagram"
+                                        <label for="whatsapp"
                                             class="block mb-2 text-sm font-medium text-black dark:text-white">
-                                            Instagram
+                                            WhatsApp
                                         </label>
                                         <div class="relative">
                                             <span class="absolute left-4.5 top-1/2 transform -translate-y-1/2">
-                                                <i class="fab fa-instagram-square text-xl text-pink-600"></i>
+                                                <i class="fab fa-whatsapp-square text-xl text-green-600"></i>
                                             </span>
-                                            <input type="url" name="instagram" id="instagram"
-                                                class="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                placeholder="" value="{{ $configuracion->instagram ?? '' }}">
+                                            <input type="text" name="whatsapp" id="whatsapp"
+                                                class="w-full rounded border {{ $errors->has('whatsapp') ? 'border-red-500' : 'border-stroke' }} bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                placeholder="" value="{{ old('whatsapp', $configuracion->whatsapp ?? '') }}">
                                         </div>
+                                        @error('whatsapp')
+                                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <!-- Campo para LinkedIn -->
@@ -268,9 +274,12 @@
                                                 <i class="fab fa-linkedin text-xl text-blue-500"></i>
                                             </span>
                                             <input type="url" name="linkedin" id="linkedin"
-                                                class="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                placeholder="" value="{{ $configuracion->linkedin ?? '' }}">
+                                                class="w-full rounded border {{ $errors->has('linkedin') ? 'border-red-500' : 'border-stroke' }} bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                placeholder="" value="{{ old('linkedin', $configuracion->linkedin ?? '') }}">
                                         </div>
+                                        @error('linkedin')
+                                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <!-- Campo para Sitio Web -->
@@ -284,9 +293,12 @@
                                                 <i class="fas fa-globe-americas text-xl text-green-500"></i>
                                             </span>
                                             <input type="url" name="website" id="website"
-                                                class="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                placeholder="" value="{{ $configuracion->website ?? '' }}">
+                                                class="w-full rounded border {{ $errors->has('website') ? 'border-red-500' : 'border-stroke' }} bg-gray py-3 pl-11.5 pr-4.5 font-medium text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                placeholder="" value="{{ old('website', $configuracion->website ?? '') }}">
                                         </div>
+                                        @error('website')
+                                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <!-- Botones de acción -->

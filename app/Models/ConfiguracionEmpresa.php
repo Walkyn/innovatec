@@ -20,7 +20,7 @@ class ConfiguracionEmpresa extends Model
         'logo',
         'portada',
         'facebook',
-        'instagram',
+        'whatsapp',
         'linkedin',
         'website',
     ];

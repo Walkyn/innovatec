@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('logo')->nullable();
             $table->string('portada')->nullable();
             $table->string('facebook')->nullable();
-            $table->string('instagram')->nullable();
+            $table->string('whatsapp')->nullable();
             $table->string('linkedin')->nullable();
             $table->string('website')->nullable();
             $table->timestamps();
@@ -38,7 +38,7 @@ return new class extends Migration
             'direccion' => 'Av. Principal ' . rand(1, 1000) . ', Lima',
             'descripcion' => 'Sistema de gestión empresarial para pequeñas y medianas empresas',
             'facebook' => 'https://facebook.com/businessmanager',
-            'instagram' => 'https://instagram.com/businessmanager',
+            'whatsapp' => '+51917319939',
             'linkedin' => 'https://linkedin.com/company/businessmanager',
             'website' => 'https://businessmanager.com',
             'created_at' => now(),

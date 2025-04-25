@@ -130,7 +130,7 @@ class SettingsController extends Controller
                 'direccion' => 'nullable|string|max:255',
                 'descripcion' => 'nullable|string',
                 'facebook' => 'nullable|url|max:255',
-                'instagram' => 'nullable|url|max:255',
+                'whatsapp' => 'nullable|string|max:50',
                 'linkedin' => 'nullable|url|max:255',
                 'website' => 'nullable|url|max:255',
             ]);
@@ -154,18 +154,29 @@ class SettingsController extends Controller
     public function storeRedesSociales(Request $request)
     {
         try {
-            $request->validate([
+            $validator = Validator::make($request->all(), [
                 'facebook' => 'nullable|url|max:255',
-                'instagram' => 'nullable|url|max:255',
+                'whatsapp' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\s-]+$/'],
                 'linkedin' => 'nullable|url|max:255',
                 'website' => 'nullable|url|max:255',
+            ], [
+                'whatsapp.regex' => 'El número de WhatsApp solo debe contener números, espacios, + o -',
+                'facebook.url' => 'La URL de Facebook no es válida',
+                'linkedin.url' => 'La URL de LinkedIn no es válida',
+                'website.url' => 'La URL del sitio web no es válida',
             ]);
+
+            if ($validator->fails()) {
+                return redirect()->route('settings.create')
+                    ->withErrors($validator)
+                    ->withInput();
+            }
 
             $configuracion = ConfiguracionEmpresa::updateOrCreate(
                 ['id' => $request->id],
                 [
                     'facebook' => $request->facebook,
-                    'instagram' => $request->instagram,
+                    'whatsapp' => $request->whatsapp,
                     'linkedin' => $request->linkedin,
                     'website' => $request->website,
                 ]
@@ -173,12 +184,12 @@ class SettingsController extends Controller
 
             return redirect()->route('settings.create')->with([
                 'successMessage' => 'Éxito',
-                'successDetails' => 'Redes sociales actualizados con éxito',
+                'successDetails' => 'Redes sociales actualizadas con éxito',
             ]);
         } catch (\Exception $e) {
             return redirect()->route('settings.create')
                 ->withInput()
-                ->with('errorDetails', 'Complete los campos antes de guardar');
+                ->withErrors(['error' => 'Complete los campos antes de guardar']);
         }
     }
 

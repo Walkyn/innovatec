@@ -207,14 +207,14 @@
                                         </span>
                                     @endif
 
-                                    @if (!empty($company->instagram))
-                                        <a href="{{ $company->instagram }}" target="_blank" class="hover:text-pink-600"
-                                            aria-label="Instagram">
-                                            <i class="fab fa-instagram-square text-2xl text-pink-500"></i>
+                                    @if (!empty($company->whatsapp))
+                                        <a href="{{ $company->whatsapp }}" target="_blank" class="hover:text-pink-600"
+                                            aria-label="WhatsApp">
+                                            <i class="fab fa-whatsapp-square text-2xl text-green-500"></i>
                                         </a>
                                     @else
-                                        <span aria-label="Instagram">
-                                            <i class="fab fa-instagram-square text-2xl text-pink-500"></i>
+                                        <span aria-label="WhatsApp">
+                                            <i class="fab fa-whatsapp-square text-2xl text-green-500"></i>
                                         </span>
                                     @endif
 

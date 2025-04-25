@@ -41,7 +41,7 @@
                 </li>
             </ul>
         </li>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.meses-pendientes') ? 'active' : '' }}">
             <a href="{{ route('panel.meses-pendientes') }}"
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-calendar-exclamation mr-3 text-lg'></i>
@@ -49,7 +49,7 @@
             </a>
         </li>
         <span class="text-gray-400 font-bold">PAGOS</span>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.realizar-pago') || request()->routeIs('panel.historial-pagos') ? 'active' : '' }}">
             <a href=""
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
                 <i class='bx bxl-blogger mr-3 text-lg'></i>
@@ -69,7 +69,7 @@
                 </li>
             </ul>
         </li>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.comprobantes') ? 'active' : '' }}">
             <a href="{{ route('panel.comprobantes') }}"
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-archive mr-3 text-lg'></i>
@@ -77,14 +77,14 @@
             </a>
         </li>
         <span class="text-gray-400 font-bold">PERSONAL</span>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.cambiar-password') ? 'active' : '' }}">
             <a href="{{ route('panel.cambiar-password') }}"
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-lock mr-3 text-lg'></i>
                 <span class="text-sm">Cambiar contraseña</span>
             </a>
         </li>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.mensajes') ? 'active' : '' }}">
             <a href="{{ route('panel.mensajes') }}"
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-envelope mr-3 text-lg'></i>

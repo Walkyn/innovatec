@@ -15,7 +15,8 @@ class PanelController extends Controller
 
     public function dashboard()
     {
-        return view('panel.dashboard');
+        $configuracion = ConfiguracionEmpresa::first();
+        return view('panel.dashboard', compact('configuracion'));
     }
 
     public function miPerfil()
