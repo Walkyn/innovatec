@@ -3,7 +3,7 @@
 
 @section('content')
     <!--Start Content -->
-    <div class="relative p-4 w-full max-h-full mx-auto">
+    <div class="container mx-auto p-4">
         <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
             <!-- Encabezado -->
             <div class="flex justify-between mb-4 items-start">
@@ -34,7 +34,7 @@
                             </div>
                         </div>
                         <div class="mt-3 text-sm text-gray-600">
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3 ml-6">
                                 <div class="flex items-center gap-2">
                                     <div>
                                         <span class="text-xs text-gray-500">Servicio</span>
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         <div class="mt-3 text-sm text-gray-600">
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3 ml-6">
                                 <div class="flex items-center gap-2">
                                     <div>
                                         <span class="text-xs text-gray-500">Servicio</span>
@@ -132,7 +132,7 @@
                             </div>
                         </div>
                         <div class="mt-3 text-sm text-gray-600">
-                            <div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3 ml-6">
                                 <div class="flex items-center gap-2">
                                     <div>
                                         <span class="text-xs text-gray-500">Servicio</span>

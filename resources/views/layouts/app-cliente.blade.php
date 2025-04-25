@@ -1344,7 +1344,7 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
         
         .dots::after {
             content: '';
-            animation: dots 3.5s infinite;
+            animation: dots 1.5s infinite;
         }
     </style>
 </head>
@@ -1410,20 +1410,45 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
             sidebarOverlay.classList.add('hidden')
             sidebarMenu.classList.add('-translate-x-full')
         })
-        document.querySelectorAll('.sidebar-dropdown-toggle').forEach(function(item) {
-            item.addEventListener('click', function(e) {
-                e.preventDefault()
-                const parent = item.closest('.group')
-                if (parent.classList.contains('selected')) {
-                    parent.classList.remove('selected')
-                } else {
-                    document.querySelectorAll('.sidebar-dropdown-toggle').forEach(function(i) {
-                        i.closest('.group').classList.remove('selected')
-                    })
-                    parent.classList.add('selected')
-                }
-            })
-        })
+        document.addEventListener('DOMContentLoaded', function() {
+            // Función para manejar los submenús
+            function handleSubmenus() {
+                const currentPath = window.location.pathname;
+                
+                document.querySelectorAll('.sidebar-dropdown-toggle').forEach(function(item) {
+                    // Agregar el evento click
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const parent = item.closest('.group');
+                        
+                        if (parent.classList.contains('selected')) {
+                            parent.classList.remove('selected');
+                        } else {
+                            parent.classList.add('selected');
+                        }
+                    });
+
+                    // Verificar si el submenú debe estar abierto basado en la ruta actual
+                    const parent = item.closest('.group');
+                    const submenu = parent.querySelector('ul');
+                    if (submenu) {
+                        const submenuLinks = submenu.querySelectorAll('a');
+                        const isActive = Array.from(submenuLinks).some(link => {
+                            let href = link.getAttribute('href');
+                            href = href.replace(window.location.origin, '');
+                            return currentPath.includes(href);
+                        });
+
+                        if (isActive) {
+                            parent.classList.add('selected');
+                        }
+                    }
+                });
+            }
+
+            // Inicializar los submenús
+            handleSubmenus();
+        });
         // end: Sidebar
 
 
@@ -1510,7 +1535,6 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
         // end: Popper
 
 
-
         // start: Tab
         document.querySelectorAll('[data-tab]').forEach(function(item) {
             item.addEventListener('click', function(e) {
@@ -1547,38 +1571,13 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
                 mainContent.classList.remove('hidden');
             }
 
-            // Ocultar el preloader cuando la página termine de cargar
-            window.addEventListener('load', function() {
-                hidePreloader();
-            });
-
-            // Mostrar el preloader en cada navegación
-            document.addEventListener('turbolinks:before-visit', showPreloader);
-            document.addEventListener('turbolinks:load', hidePreloader);
-
-            // Para peticiones AJAX con Axios
-            axios.interceptors.request.use(function (config) {
+            // Mostrar preloader solo en la carga inicial
+            if (!document.hidden) {
                 showPreloader();
-                return config;
-            }, function (error) {
-                hidePreloader();
-                return Promise.reject(error);
-            });
-
-            axios.interceptors.response.use(function (response) {
-                hidePreloader();
-                return response;
-            }, function (error) {
-                hidePreloader();
-                return Promise.reject(error);
-            });
-
-            // Para formularios tradicionales
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    showPreloader();
-                });
-            });
+                setTimeout(function() {
+                    hidePreloader();
+                }, 1000);
+            }
         });
     </script>
 

@@ -4,7 +4,7 @@
 @section('content')
 
     <!-- Contenido principal -->
-    <div class="container mx-auto p-4">
+    <div class="relative p-4 w-full max-h-full mx-auto">
         <!-- Tarjeta principal -->
         <div class="bg-white rounded shadow-sm border border-gray-100 overflow-hidden">
             <!-- Encabezado -->

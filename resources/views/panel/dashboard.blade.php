@@ -4,7 +4,7 @@
 @section('content')
 
     <!-- Contenido principal -->
-    <div class="container mx-auto p-4">
+    <div class="relative p-4 w-full max-h-full mx-auto">
         <!-- Portada de la empresa -->
         <div class="relative z-20 h-35 md:h-65">
 

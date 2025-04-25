@@ -405,6 +405,9 @@ Route::middleware('auth')->group(function () {
         ->name('obtener.datos.periodo');
 
     Route::get('/obtener-datos-chart02', [ChartController::class, 'obtenerDatosChart02'])->name('obtener.datos.chart02');
+
+    Route::post('/panel/update-password', [PanelController::class, 'updatePassword'])
+        ->name('panel.update-password');
 });
 
 // Rutas que devuelven datos
@@ -480,3 +483,4 @@ Route::get('/mi-perfil', [PanelController::class, 'miPerfil'])->name('panel.mi-p
 Route::get('/comprobantes', [PanelController::class, 'comprobantes'])->name('panel.comprobantes');
 Route::get('/meses-pendientes', [PanelController::class, 'mesesPendientes'])->name('panel.meses-pendientes');
 Route::get('/mensajes', [PanelController::class, 'mensajes'])->name('panel.mensajes');
+Route::get('/cambiar-password', [PanelController::class, 'cambiarPassword'])->name('panel.cambiar-password');

@@ -16,6 +16,7 @@ class Cliente extends Model
         'nombres',
         'apellidos',
         'identificacion',
+        'clave_acceso',
         'direccion',
         'telefono',
         'gps',

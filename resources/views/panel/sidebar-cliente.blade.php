@@ -7,23 +7,23 @@
     </a>
     <ul class="mt-4">
         <span class="text-gray-400 font-bold">DASHBOARD</span>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.dashboard') ? 'active' : '' }}">
             <a href="{{ route('panel.dashboard') }}"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 transition-colors duration-200">
                 <i class="ri-home-2-line mr-3 text-lg"></i>
                 <span class="text-sm">Inicio</span>
             </a>
         </li>
-        <li class="mb-1 group">
+        <li class="mb-1 group {{ request()->routeIs('panel.mi-perfil') ? 'active' : '' }}">
             <a href="{{ route('panel.mi-perfil') }}"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 transition-colors duration-200">
                 <i class='bx bx-user mr-3 text-lg'></i>
                 <span class="text-sm">Mi Perfil</span>
             </a>
         </li>
         <li class="mb-1 group">
             <a href="#"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
                 <i class='bx bx-server mr-3 text-base'></i>
                 <span class="text-sm">Servicios</span>
                 <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
@@ -43,7 +43,7 @@
         </li>
         <li class="mb-1 group">
             <a href="{{ route('panel.meses-pendientes') }}"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-calendar-exclamation mr-3 text-lg'></i>
                 <span class="text-sm">Meses pendientes</span>
             </a>
@@ -51,7 +51,7 @@
         <span class="text-gray-400 font-bold">PAGOS</span>
         <li class="mb-1 group">
             <a href=""
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
                 <i class='bx bxl-blogger mr-3 text-lg'></i>
                 <span class="text-sm">Mis pagos</span>
                 <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
@@ -71,15 +71,22 @@
         </li>
         <li class="mb-1 group">
             <a href="{{ route('panel.comprobantes') }}"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-archive mr-3 text-lg'></i>
                 <span class="text-sm">Comprobantes</span>
             </a>
         </li>
         <span class="text-gray-400 font-bold">PERSONAL</span>
         <li class="mb-1 group">
+            <a href="{{ route('panel.cambiar-password') }}"
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                <i class='bx bx-lock mr-3 text-lg'></i>
+                <span class="text-sm">Cambiar contraseña</span>
+            </a>
+        </li>
+        <li class="mb-1 group">
             <a href="{{ route('panel.mensajes') }}"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-800 group-[.active]:text-white group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-envelope mr-3 text-lg'></i>
                 <span class="text-sm">Mensajes</span>
                 <span
