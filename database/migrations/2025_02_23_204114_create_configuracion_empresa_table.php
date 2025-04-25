@@ -37,10 +37,10 @@ return new class extends Migration
             'telefono' => '9' . rand(1000000, 9999999),
             'direccion' => 'Av. Principal ' . rand(1, 1000) . ', Lima',
             'descripcion' => 'Sistema de gestión empresarial para pequeñas y medianas empresas',
-            'facebook' => 'https://facebook.com/businessmanager',
+            'facebook' => 'https://facebook.com/ztx.es',
             'whatsapp' => '+51917319939',
-            'linkedin' => 'https://linkedin.com/company/businessmanager',
-            'website' => 'https://businessmanager.com',
+            'linkedin' => 'https://linkedin.com/company/ztx.es',
+            'website' => 'https://ztx.es',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

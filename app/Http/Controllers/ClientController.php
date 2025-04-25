@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Cliente;
 use App\Models\Region;
 use App\Models\Pueblo;
+use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
@@ -124,6 +125,7 @@ class ClientController extends Controller
                 'nombres' => $request->nombres,
                 'apellidos' => $request->apellidos,
                 'identificacion' => $request->identificacion,
+                'clave_acceso' => Hash::make($request->identificacion),
                 'telefono' => $request->telefono,
                 'direccion' => $request->direccion,
                 'gps' => $request->gps,

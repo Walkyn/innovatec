@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class ClientesImport implements ToModel, WithStartRow, WithEvents
 {
@@ -194,6 +195,7 @@ class ClientesImport implements ToModel, WithStartRow, WithEvents
                 'nombres' => $nombres,
                 'apellidos' => $apellidos,
                 'identificacion' => $dni,
+                'clave_acceso' => Hash::make($dni),
                 'direccion' => $direccion,
                 'telefono' => $telefono,
                 'gps' => null,

@@ -34,7 +34,7 @@
         <!-- Tarjeta de información principal -->
         <div class="bg-white rounded-b-lg shadow-sm border border-gray-100 p-6 mb-8">
             <!-- Encabezado -->
-            <div class="flex items-center gap-4 mb-6">
+            <div class="flex items-center gap-2 mb-6">
                 <div class="hidden md:flex w-30 h-20 rounded-lg bg-gray-50 items-center justify-center">
                     <img src="{{ $configuracion->logo ? asset('storage/logos/' . $configuracion->logo) : asset('images/logo/logo.png') }}"
                         alt="Logo Empresa" class="w-30 h-20 object-contain">
