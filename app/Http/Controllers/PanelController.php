@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ConfiguracionEmpresa;
+use App\Models\Cliente;
+use Illuminate\Support\Facades\Hash;
+
 class PanelController extends Controller
 {
 
@@ -72,7 +75,7 @@ class PanelController extends Controller
 
         try {
             // Obtener el usuario autenticado
-            $user = auth()->user();
+            $user = auth()->cliente();
 
             // Verificar que el DNI coincida con el usuario
             if ($user->dni !== $request->dni) {
@@ -87,5 +90,44 @@ class PanelController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Ocurrió un error al actualizar la contraseña');
         }
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'required',
+            'clave_acceso' => 'required'
+        ], [
+            'identificacion.required' => 'Por favor, ingrese su identificación',
+            'clave_acceso.required' => 'Por favor, ingrese su contraseña'
+        ]);
+
+        try {
+            $cliente = Cliente::where('identificacion', $request->identificacion)
+                             ->where('estado_cliente', 'activo')
+                             ->first();
+
+            if (!$cliente || !Hash::check($request->clave_acceso, $cliente->clave_acceso)) {
+                return back()->with('errorDetails', 'Credenciales incorrectas')->withInput();
+            }
+
+            // Limpiar cualquier sesión existente antes de iniciar la nueva
+            session()->forget(['cliente_id', 'cliente_nombre']);
+            
+            // Iniciar sesión del cliente
+            session(['cliente_id' => $cliente->id]);
+            session(['cliente_nombre' => $cliente->nombres . ' ' . $cliente->apellidos]);
+
+            return redirect()->route('panel.dashboard');
+            
+        } catch (\Exception $e) {
+            return back()->with('errorDetails', 'Error al iniciar sesión. Por favor, intente nuevamente.')->withInput();
+        }
+    }
+
+    public function logout()
+    {
+        session()->forget(['cliente_id', 'cliente_nombre']);
+        return redirect()->route('login-cliente')->with('success', 'Sesión cerrada correctamente');
     }
 }

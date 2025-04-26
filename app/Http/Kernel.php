@@ -66,4 +66,9 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.permissions' => \App\Http\Middleware\CheckUserPermissions::class,
     ];
+
+    protected $routeMiddleware = [
+        // ... otros middlewares ...
+        'auth.cliente' => \App\Http\Middleware\AuthenticateCliente::class,
+    ];
 }

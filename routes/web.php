@@ -408,6 +408,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/panel/update-password', [PanelController::class, 'updatePassword'])
         ->name('panel.update-password');
+
+    Route::post('/panel/login', [PanelController::class, 'login'])->name('panel.login');
 });
 
 // Rutas que devuelven datos
@@ -475,12 +477,19 @@ Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
 
 Route::post('/backup/database', [BackupController::class, 'backupDatabase'])->name('backup.database');
 
+// Rutas públicas del panel
 Route::get('/mis-pagos', [PanelController::class, 'index'])->name('login-cliente');
-Route::get('/dashboard', [PanelController::class, 'dashboard'])->name('panel.dashboard');
-Route::get('/historial-pagos', [PanelController::class, 'historialPagos'])->name('panel.historial-pagos');
-Route::get('/realizar-pago', [PanelController::class, 'realizarPago'])->name('panel.realizar-pago');
-Route::get('/mi-perfil', [PanelController::class, 'miPerfil'])->name('panel.mi-perfil');
-Route::get('/comprobantes', [PanelController::class, 'comprobantes'])->name('panel.comprobantes');
-Route::get('/meses-pendientes', [PanelController::class, 'mesesPendientes'])->name('panel.meses-pendientes');
-Route::get('/mensajes', [PanelController::class, 'mensajes'])->name('panel.mensajes');
-Route::get('/cambiar-password', [PanelController::class, 'cambiarPassword'])->name('panel.cambiar-password');
+Route::post('/panel/login', [PanelController::class, 'login'])->name('panel.login');
+
+// Rutas protegidas del panel
+Route::middleware(['auth.cliente'])->group(function () {
+    Route::get('/dashboard', [PanelController::class, 'dashboard'])->name('panel.dashboard');
+    Route::get('/historial-pagos', [PanelController::class, 'historialPagos'])->name('panel.historial-pagos');
+    Route::get('/realizar-pago', [PanelController::class, 'realizarPago'])->name('panel.realizar-pago');
+    Route::get('/mi-perfil', [PanelController::class, 'miPerfil'])->name('panel.mi-perfil');
+    Route::get('/comprobantes', [PanelController::class, 'comprobantes'])->name('panel.comprobantes');
+    Route::get('/meses-pendientes', [PanelController::class, 'mesesPendientes'])->name('panel.meses-pendientes');
+    Route::get('/mensajes', [PanelController::class, 'mensajes'])->name('panel.mensajes');
+    Route::get('/cambiar-password', [PanelController::class, 'cambiarPassword'])->name('panel.cambiar-password');
+    Route::post('/panel/cerrar-sesion', [PanelController::class, 'logout'])->name('panel.cerrar-sesion');
+});
