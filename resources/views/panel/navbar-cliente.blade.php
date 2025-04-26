@@ -31,38 +31,51 @@
             <button type="button" class="dropdown-toggle flex items-center">
                 <div class="flex-shrink-0 w-10 h-10 relative">
                     <div class="p-1 bg-white rounded-full focus:outline-none focus:ring">
-                        <img class="w-8 h-8 rounded-full"
-                            src="https://laravelui.spruko.com/tailwind/ynex/build/assets/images/faces/9.jpg"
-                            alt="" />
-                        <div
-                            class="top-0 left-7 absolute w-3 h-3 bg-lime-400 border-2 border-white rounded-full animate-ping">
-                        </div>
-                        <div class="top-0 left-7 absolute w-3 h-3 bg-lime-500 border-2 border-white rounded-full">
-                        </div>
+                        @php
+                            $cliente_id = session('cliente_id');
+                            $cliente = \App\Models\Cliente::find($cliente_id);
+                            if ($cliente) {
+                                $iniciales = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
+                                $colores = ['bg-gray-800'];
+                                $colorAleatorio = $colores[array_rand($colores)];
+                            }
+                        @endphp
+                        @if($cliente)
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $colorAleatorio }} text-white text-sm font-medium">
+                                {{ $iniciales }}
+                            </div>
+                            <div class="top-0 left-7 absolute w-3 h-3 bg-lime-400 border-2 border-white rounded-full animate-ping">
+                            </div>
+                            <div class="top-0 left-7 absolute w-3 h-3 bg-lime-500 border-2 border-white rounded-full">
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="p-2 md:block text-left">
-                    <h2 class="text-sm font-semibold text-gray-200">Brayan Capa Medina</h2>
-                    <p class="text-xs text-gray-300">Cliente</p>
+                    @if($cliente)
+                        <h2 class="text-sm font-semibold text-gray-200">{{ $cliente->nombres . ' ' . $cliente->apellidos }}</h2>
+                        <p class="text-xs text-gray-300">Cliente</p>
+                    @endif
                 </div>
             </button>
             <ul
                 class="dropdown-menu shadow-md shadow-black/5 z-30 hidden py-1.5 rounded-md bg-white border border-gray-100 w-full max-w-[140px]">
                 <li>
-                    <a href="#"
-                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-[#f84525] hover:bg-gray-50">Profile</a>
+                    <a href="{{ route('panel.mi-perfil') }}"
+                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-[#f84525] hover:bg-gray-50">Mi Perfil</a>
                 </li>
                 <li>
-                    <a href="#"
-                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-[#f84525] hover:bg-gray-50">Settings</a>
+                    <a href="{{ route('panel.mensajes') }}"
+                        class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-[#f84525] hover:bg-gray-50">Mensajes</a>
                 </li>
                 <li>
-                    <form method="POST" action="">
+                    <form method="POST" action="{{ route('panel.cerrar-sesion') }}">
+                        @csrf
                         <a role="menuitem"
                             class="flex items-center text-[13px] py-1.5 px-4 text-gray-600 hover:text-[#f84525] hover:bg-gray-50 cursor-pointer"
                             onclick="event.preventDefault();
                                     this.closest('form').submit();">
-                            Log Out
+                            Cerrar Sesión
                         </a>
                     </form>
                 </li>

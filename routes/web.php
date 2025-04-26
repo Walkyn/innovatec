@@ -410,6 +410,10 @@ Route::middleware('auth')->group(function () {
         ->name('panel.update-password');
 
     Route::post('/panel/login', [PanelController::class, 'login'])->name('panel.login');
+
+    Route::get('/panel/historial-servicios', function () {
+        return view('panel.historial-servicios');
+    })->name('panel.historial-servicios');
 });
 
 // Rutas que devuelven datos
@@ -492,4 +496,5 @@ Route::middleware(['auth.cliente'])->group(function () {
     Route::get('/mensajes', [PanelController::class, 'mensajes'])->name('panel.mensajes');
     Route::get('/cambiar-password', [PanelController::class, 'cambiarPassword'])->name('panel.cambiar-password');
     Route::post('/panel/cerrar-sesion', [PanelController::class, 'logout'])->name('panel.cerrar-sesion');
+    Route::get('/historial-servicios', [PanelController::class, 'historialServicios'])->name('panel.historial-servicios');
 });

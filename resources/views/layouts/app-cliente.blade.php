@@ -1336,12 +1336,26 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
         }
 
         @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60% {
+                content: '...';
+            }
+
+            80%,
+            100% {
+                content: '';
+            }
         }
-        
+
         .dots::after {
             content: '';
             animation: dots 1.5s infinite;
@@ -1364,14 +1378,20 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
         <!-- ===== Content Start ===== -->
         <section>
             <!-- Preloader Elegante -->
-            <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-95">
+            <div id="preloader" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-100">
                 <div class="relative">
                     <!-- Anillos animados -->
                     <div class="flex items-center justify-center">
                         <div class="absolute w-16 h-16 border-4 border-blue-200 rounded-full animate-ping"></div>
-                        <div class="absolute w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
-                        <div class="absolute w-12 h-12 border-4 border-transparent border-t-blue-400 rounded-full animate-spin"></div>
-                        <div class="absolute w-8 h-8 border-4 border-transparent border-t-blue-300 rounded-full animate-spin"></div>
+                        <div
+                            class="absolute w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin">
+                        </div>
+                        <div
+                            class="absolute w-12 h-12 border-4 border-transparent border-t-blue-400 rounded-full animate-spin">
+                        </div>
+                        <div
+                            class="absolute w-8 h-8 border-4 border-transparent border-t-blue-300 rounded-full animate-spin">
+                        </div>
                     </div>
                     <!-- Texto con animación de pulso -->
                     <div class="mt-8 text-sm text-gray-600 text-center animate-pulse">
@@ -1414,13 +1434,13 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
             // Función para manejar los submenús
             function handleSubmenus() {
                 const currentPath = window.location.pathname;
-                
+
                 document.querySelectorAll('.sidebar-dropdown-toggle').forEach(function(item) {
                     // Agregar el evento click
                     item.addEventListener('click', function(e) {
                         e.preventDefault();
                         const parent = item.closest('.group');
-                        
+
                         if (parent.classList.contains('selected')) {
                             parent.classList.remove('selected');
                         } else {

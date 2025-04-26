@@ -21,25 +21,12 @@
                 <span class="text-sm">Mi Perfil</span>
             </a>
         </li>
-        <li class="mb-1 group">
-            <a href="#"
-                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100 sidebar-dropdown-toggle">
-                <i class='bx bx-server mr-3 text-base'></i>
-                <span class="text-sm">Servicios</span>
-                <i class="ri-arrow-right-s-line ml-auto group-[.selected]:rotate-90"></i>
+        <li class="mb-1 group {{ request()->routeIs('panel.historial-servicios') ? 'active' : '' }}">
+            <a href="{{ route('panel.historial-servicios') }}"
+                class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
+                <i class='bx bx-server mr-3 text-lg'></i>
+                <span class="text-sm">Historial de servicios</span>
             </a>
-            <ul class="pl-7 mt-2 hidden group-[.selected]:block">
-                <li class="mb-4">
-                    <a href="#"
-                        class="text-gray-200 text-sm flex items-center hover:text-[#f84525] before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3">Internet
-                        Basico</a>
-                </li>
-                <li class="mb-4">
-                    <a href="#"
-                        class="text-gray-200 text-sm flex items-center hover:text-[#f84525] before:contents-[''] before:w-1 before:h-1 before:rounded-full before:bg-gray-300 before:mr-3">Netflix
-                        Basico</a>
-                </li>
-            </ul>
         </li>
         <li class="mb-1 group {{ request()->routeIs('panel.meses-pendientes') ? 'active' : '' }}">
             <a href="{{ route('panel.meses-pendientes') }}"
@@ -99,7 +86,7 @@
                 onclick="openLogoutModal()"
                 class="w-full flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md">
                 <i class='bx bx-log-out mr-3 text-lg'></i>
-                <span class="text-sm">Cerrar sesión</span>
+                <span class="text-sm">Salir</span>
             </button>
         </li>
     </ul>

@@ -57,6 +57,11 @@ class PanelController extends Controller
         return view('panel.mensajes');
     }
 
+    public function historialServicios()
+    {
+        return view('panel.historial-servicios');
+    }
+
     public function misPagos()
     {
         return view('panel.mis-pagos');
@@ -128,6 +133,6 @@ class PanelController extends Controller
     public function logout()
     {
         session()->forget(['cliente_id', 'cliente_nombre']);
-        return redirect()->route('login-cliente')->with('success', 'Sesión cerrada correctamente');
+        return redirect()->route('login-cliente')->with('successDetails', 'Sesión cerrada correctamente');
     }
 }

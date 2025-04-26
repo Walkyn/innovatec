@@ -21,9 +21,13 @@
                         <div class="flex items-start gap-5 h-full">
                             <!-- Avatar -->
                             <div class="relative flex-shrink-0 hidden md:block">
+                                @php
+                                    $cliente = \App\Models\Cliente::find(session('cliente_id'));
+                                    $iniciales = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
+                                @endphp
                                 <div
                                     class="w-18 h-18 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                                    <span class="text-xl font-bold text-white">JL</span>
+                                    <span class="text-xl font-bold text-white">{{ $iniciales }}</span>
                                 </div>
                                 <div
                                     class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white">
@@ -33,43 +37,105 @@
                             <!-- Información básica -->
                             <div class="flex flex-col justify-between h-full">
                                 <div>
-                                    <h2 class="text-xl font-light text-gray-900 mb-1">Juan López Martínez</h2>
+                                    <h2 class="text-xl font-light text-gray-900 mb-1">{{ $cliente->nombres . ' ' . $cliente->apellidos }}</h2>
                                     <div class="flex items-center text-xs text-gray-500 mb-2 ml-1">
-                                        Registrado el 15 de Marzo del 2022
+                                        @php
+                                            $meses = [
+                                                1 => 'enero', 2 => 'febrero', 3 => 'marzo', 4 => 'abril',
+                                                5 => 'mayo', 6 => 'junio', 7 => 'julio', 8 => 'agosto',
+                                                9 => 'septiembre', 10 => 'octubre', 11 => 'noviembre', 12 => 'diciembre'
+                                            ];
+                                            $mes = $meses[$cliente->created_at->format('n')];
+                                            $fecha = $cliente->created_at->format('d') . ' de ' . $mes . ' del ' . $cliente->created_at->format('Y');
+                                        @endphp
+                                        Registrado el {{ $fecha }}
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap gap-2 mt-2">
                                     <span
-                                        class="px-2.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full">75849632</span>
-                                    <span class="px-2.5 py-0.5 bg-gray-50 text-gray-600 text-xs rounded-full">Lima, San
-                                        Isidro</span>
+                                        class="px-2.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full">{{ $cliente->identificacion }}</span>
+                                    <span class="px-2.5 py-0.5 bg-gray-50 text-gray-600 text-xs rounded-full">
+                                        {{ optional($cliente->region)->nombre }}, {{ optional($cliente->provincia)->nombre }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    @php
+                        use App\Models\Contrato;
+                        use App\Models\ContratoServicio;
+
+                        $servicioMostrado = null;
+                        $planMostrado = null;
+                        $estadoMostrado = null;
+
+                        // Obtener todos los contratos del cliente
+                        $contratos = Contrato::where('cliente_id', $cliente->id)->get();
+
+                        // Buscar el primer servicio activo entre todos los contratos
+                        $servicioActivo = ContratoServicio::whereIn('contrato_id', $contratos->pluck('id'))
+                            ->where('estado_servicio_cliente', 'activo')
+                            ->orderBy('fecha_servicio', 'asc')
+                            ->with(['servicio', 'plan'])
+                            ->first();
+
+                        if ($servicioActivo) {
+                            $servicioMostrado = $servicioActivo->servicio;
+                            $planMostrado = $servicioActivo->plan;
+                            $estadoMostrado = 'activo';
+                        } else {
+                            // Si no hay activos, buscar el último suspendido
+                            $servicioSuspendido = ContratoServicio::whereIn('contrato_id', $contratos->pluck('id'))
+                                ->where('estado_servicio_cliente', 'suspendido')
+                                ->orderBy('fecha_suspension_servicio', 'desc')
+                                ->with(['servicio', 'plan'])
+                                ->first();
+
+                            if ($servicioSuspendido) {
+                                $servicioMostrado = $servicioSuspendido->servicio;
+                                $planMostrado = $servicioSuspendido->plan;
+                                $estadoMostrado = 'suspendido';
+                            }
+                        }
+                    @endphp
+
                     <!-- Estado del servicio -->
                     <div class="bg-white p-5 rounded-lg border border-gray-100 shadow-xs flex-1">
                         <div class="flex items-start space-x-3 h-full">
                             <!-- Icono minimalista -->
-                            <i class="fas fa-wifi text-green-500 dark:text-green-300"></i>
+                            <i class="fas fa-wifi {{ $estadoMostrado === 'activo' ? 'text-green-500 dark:text-green-300' : 'text-gray-400 dark:text-gray-500' }}"></i>
 
                             <!-- Contenido -->
                             <div class="flex flex-col justify-between flex-1 h-full">
                                 <div>
                                     <div class="flex items-center justify-between gap-2">
-                                        <span class="text-xs font-medium text-gray-500 tracking-wider">SERVICIO
-                                            CONTRATADO</span>
-                                        <span
-                                            class="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full ">
-                                            <i class="fas fa-check-circle"></i>
-                                            Activo</span>
+                                        <span class="text-xs font-medium text-gray-500 tracking-wider">SERVICIO CONTRATADO</span>
+                                        @if($estadoMostrado === 'activo')
+                                            <span class="text-xs font-semibold text-green-600 bg-green-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                <i class="fas fa-check-circle"></i>
+                                                Activo
+                                            </span>
+                                        @elseif($estadoMostrado === 'suspendido')
+                                            <span class="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                <i class="fas fa-times-circle"></i>
+                                                Suspendido
+                                            </span>
+                                        @else
+                                            <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                Sin servicios
+                                            </span>
+                                        @endif
                                     </div>
-                                    <h3 class="text-base font-normal text-gray-800 mt-1.5">Internet Básico</h3>
+                                    <h3 class="text-base font-normal text-gray-800 mt-1.5">
+                                        {{ $servicioMostrado ? $servicioMostrado->nombre : 'Sin servicio' }}
+                                    </h3>
                                 </div>
                                 <div class="flex justify-between items-baseline mt-2">
                                     <span class="text-sm text-gray-500">Precio Mensual</span>
-                                    <span class="text-base font-medium text-gray-900">S/120.00</span>
+                                    <span class="text-base font-medium text-gray-900">
+                                        {{ $planMostrado ? 'S/' . number_format($planMostrado->precio, 2) : '--' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -88,9 +154,9 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Teléfono</p>
-                            <a href="tel:987654321"
+                            <a href="tel:{{ $cliente->telefono }}"
                                 class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium text-sm">
-                                987 654 321
+                                {{ $cliente->telefono }}
                             </a>
                         </div>
                     </div>
@@ -103,7 +169,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Instalación</p>
-                            <p class="text-gray-800 dark:text-white font-medium text-sm">15/03/2022</p>
+                            <p class="text-gray-800 dark:text-white font-medium text-sm">{{ $cliente->created_at->format('d/m/Y') }}</p>
                         </div>
                     </div>
 
@@ -115,8 +181,9 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Provincia</p>
-                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="provincia">
-                                --</p>
+                            <p class="text-gray-800 dark:text-white font-medium text-sm">
+                                {{ optional($cliente->provincia)->nombre ?? '--' }}
+                            </p>
                         </div>
                     </div>
 
@@ -128,8 +195,9 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Distrito</p>
-                            <p class="text-gray-800 dark:text-white font-medium text-sm" data-field="distrito">
-                                --</p>
+                            <p class="text-gray-800 dark:text-white font-medium text-sm">
+                                {{ optional($cliente->distrito)->nombre ?? '--' }}
+                            </p>
                         </div>
                     </div>
 
@@ -140,9 +208,9 @@
                             <i class="fas fa-map-pin text-purple-500 dark:text-purple-300"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Zona</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Pueblo</p>
                             <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                Zona Comercial
+                                {{ optional($cliente->pueblo)->nombre ?? '--' }}
                             </p>
                         </div>
                     </div>
@@ -156,7 +224,7 @@
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Dirección Completa</p>
                             <p class="text-gray-800 dark:text-white font-medium text-sm">
-                                Av. Los Incas 123, 2do piso, San Isidro
+                                {{ $cliente->direccion }}
                             </p>
                         </div>
                     </div>
@@ -167,99 +235,90 @@
                     <h4 class="text-lg font-medium text-gray-800 mb-4">Servicios Contratados</h4>
 
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Servicio</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Plan</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Fecha</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Estado</th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                        d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Internet</div>
-                                                <div class="text-sm text-gray-500">Fibra Óptica</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">S/120.00 mensual</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15/03/2022
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full ">
-                                            <i class="fas fa-check-circle"></i>
-                                            Activo</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Detalles</a>
-                                        <a href="#" class="text-blue-600 hover:text-blue-900">Renovar</a>
-                                    </td>
-                                </tr>
+                        @php
+                            // Obtener todos los contratos activos del cliente
+                            $contratosActivos = \App\Models\Contrato::where('cliente_id', $cliente->id)
+                                ->where('estado_contrato', 'activo')
+                                ->get();
 
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div
-                                                class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="1.5"
-                                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Televisión</div>
-                                                <div class="text-sm text-gray-500">Cable Digital</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">S/80.00 mensual</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        15/03/2022
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full ">
-                                            <i class="fas fa-check-circle"></i>
-                                            Activo</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Detalles</a>
-                                        <a href="#" class="text-blue-600 hover:text-blue-900">Renovar</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            // Filtrar solo los contratos que tienen servicios activos
+                            $contratosConServiciosActivos = $contratosActivos->filter(function($contrato) {
+                                return $contrato->contratoServicios()
+                                    ->where('estado_servicio_cliente', 'activo')
+                                    ->count() > 0;
+                            });
+                        @endphp
+
+                        @forelse($contratosConServiciosActivos as $contrato)
+                            <div class="mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-sm font-medium text-gray-600">
+                                        Contrato {{ 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full inline-flex items-center bg-green-100 text-green-700">
+                                        <i class="fas fa-check-circle mr-1"></i> Activo
+                                    </span>
+                                </div>
+
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicio</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach($contrato->contratoServicios()->where('estado_servicio_cliente', 'activo')->get() as $cs)
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
+                                                            <i class="fas fa-network-wired"></i>
+                                                        </div>
+                                                        <div class="ml-4">
+                                                            <div class="text-sm font-medium text-gray-900">
+                                                                {{ $cs->servicio ? $cs->servicio->nombre : '--' }}
+                                                                @if($cs->plan)
+                                                                    - {{ $cs->plan->nombre }}
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm text-gray-900">
+                                                        {{ $cs->plan ? 'S/' . number_format($cs->plan->precio, 2) : '--' }}
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    @php
+                                                        $fecha = $cs->fecha_servicio;
+                                                        if ($fecha) {
+                                                            $fechaObj = \Carbon\Carbon::parse($fecha);
+                                                            $mes = $meses[$fechaObj->format('n')];
+                                                            echo $fechaObj->format('d') . ' de ' . $mes . ' del ' . $fechaObj->format('Y');
+                                                        } else {
+                                                            echo '--';
+                                                        }
+                                                    @endphp
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+                                                        <i class="fas fa-check-circle"></i> Activo
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @empty
+                            <div class="text-center text-gray-400 py-4">
+                                No tienes servicios activos actualmente.
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </div>

@@ -85,4 +85,9 @@ class Cliente extends Model
     {
         return $this->belongsTo(Pueblo::class, 'pueblo_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
