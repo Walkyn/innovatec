@@ -253,7 +253,7 @@
                             <div class="mb-6">
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="text-sm font-medium text-gray-600">
-                                        Contrato {{ 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}
+                                        {{ 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}
                                     </span>
                                     <span class="text-xs px-2 py-0.5 rounded-full inline-flex items-center bg-green-100 text-green-700">
                                         <i class="fas fa-check-circle mr-1"></i> Activo

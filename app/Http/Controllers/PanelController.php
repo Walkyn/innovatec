@@ -44,7 +44,11 @@ class PanelController extends Controller
 
     public function mesesPendientes()
     {
-        return view('panel.meses-pendientes');
+        $cliente = \App\Models\Cliente::find(session('cliente_id'));
+        $contratos = \App\Models\Contrato::where('cliente_id', $cliente->id)
+            ->orderByDesc('fecha_contrato')
+            ->get();
+        return view('panel.meses-pendientes', compact('contratos'));
     }
 
     public function cambiarPassword()
@@ -69,32 +73,7 @@ class PanelController extends Controller
 
     public function updatePassword(Request $request)
     {
-        // Validar los datos
-        $request->validate([
-            'password' => 'required|string|min:8|confirmed',
-        ], [
-            'password.required' => 'La contraseña es obligatoria',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
-            'password.confirmed' => 'Las contraseñas no coinciden',
-        ]);
-
-        try {
-            // Obtener el usuario autenticado
-            $user = auth()->cliente();
-
-            // Verificar que el DNI coincida con el usuario
-            if ($user->dni !== $request->dni) {
-                return back()->with('error', 'El DNI ingresado no coincide con tu cuenta');
-            }
-
-            // Actualizar la contraseña
-            $user->password = bcrypt($request->password);
-            $user->save();
-
-            return redirect()->back()->with('success', 'Contraseña actualizada correctamente');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Ocurrió un error al actualizar la contraseña');
-        }
+        return view('panel.cambiar-password');
     }
 
     public function login(Request $request)

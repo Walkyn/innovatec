@@ -4,7 +4,7 @@
 @section('content')
 
     <!-- Contenido principal -->
-    <div class="container mx-auto p-4">
+    <div class="relative p-4 w-full max-h-full mx-auto">
 
         <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
             <div class="flex justify-between mb-4 items-start">

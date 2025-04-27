@@ -8,7 +8,6 @@
                 <h3 class="text-xl font-semibold text-gray-800">Historial de Servicios</h3>
             </div>
             <div class="p-6">
-                <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
                 @php
                     use App\Models\Cliente;
                     use App\Models\Contrato;
@@ -29,8 +28,8 @@
                     <div class="mb-4" x-data="{ open: {{ $index === 0 ? 'true' : 'false' }} }">
                         <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-t transition text-left">
                             <div class="flex items-center gap-4">
-                                <span class="font-semibold text-gray-700">
-                                    Contrato {{ 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}
+                                <span class="font-semibold text-gray-700 whitespace-nowrap">
+                                    {{ 'CTR-' . str_pad($contrato->id, 5, '0', STR_PAD_LEFT) }}
                                 </span>
                                 <span class="text-xs text-gray-500">
                                     Fecha: 
@@ -63,8 +62,8 @@
                                         <tr>
                                             <th class="px-4 py-2 text-left font-semibold">Servicio</th>
                                             <th class="px-4 py-2 text-left font-semibold">Plan</th>
-                                            <th class="px-4 py-2 text-left font-semibold">Fecha</th>
-                                            <th class="px-4 py-2 text-left font-semibold">Fecha de suspensión</th>
+                                            <th class="px-4 py-2 text-left font-semibold">Activación</th>
+                                            <th class="px-4 py-2 text-left font-semibold">Suspensión</th>
                                             <th class="px-4 py-2 text-left font-semibold">Estado</th>
                                             <th class="px-4 py-2 text-center font-semibold">Renovar</th>
                                         </tr>
@@ -72,7 +71,7 @@
                                     <tbody>
                                         @forelse($contrato->contratoServicios()->with(['servicio', 'plan'])->orderByDesc('fecha_servicio')->get() as $cs)
                                             <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                                                <td class="px-4 py-2">
+                                                <td class="px-4 py-2 whitespace-nowrap">
                                                     {{ $cs->servicio ? $cs->servicio->nombre : '--' }}
                                                     @if($cs->plan)
                                                         - {{ $cs->plan->nombre }}
