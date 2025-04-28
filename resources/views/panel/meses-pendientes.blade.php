@@ -37,7 +37,7 @@
                                     <i class="fas fa-check-circle mr-1"></i>
                                     {{ ucfirst($contrato->estado_contrato) }}
                                 </span>
-                            </div>
+                        </div>
                             <span>
                                 <i :class="open ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
                             </span>
@@ -102,8 +102,8 @@
                                             <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $stateClasses }}">
                                                 <i class="fas {{ $stateIcon }} mr-1"></i> {{ ucfirst($state) }}
                                             </span>
-                                        </div>
-                                        
+                    </div>
+
                                         <!-- Flecha del acordeón -->
                                         <svg :class="openServiceId === {{ $cs->id }} ? 'transform rotate-180' : ''"
                                              class="w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform"
@@ -115,179 +115,214 @@
 
                                     <!-- Contenido de meses (colapsable) -->
                                     <div x-show="openServiceId === {{ $cs->id }}" x-transition class="mt-3">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                            @foreach($meses as $mes)
-                                                @php
-                                                    // Parsear fechas del mes y hoy
-                                                    $fechaInicioMes = \Carbon\Carbon::parse($mes->fecha_inicio);
-                                                    $fechaFinMes    = \Carbon\Carbon::parse($mes->fecha_fin);
-                                                    $hoy            = \Carbon\Carbon::now();
+                                        {{-- Acordeón por años --}}
+                                        @php
+                                            $anioInicio = $fechaInicio->year;
+                                            $anioActual = now()->year;
+                                            $years      = range($anioInicio, $anioActual);
+                                            // Invertimos el orden para mostrar primero el año más reciente
+                                            $years      = array_reverse($years);
+                                        @endphp
+                                        <div x-data="{ openYear: null }">
+                                            @foreach($years as $year)
+                                                <div class="mb-4">
+                                                    <button
+                                                        @click="openYear = openYear === '{{ $cs->id }}-{{ $year }}' ? null : '{{ $cs->id }}-{{ $year }}'"
+                                                        class="w-full flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded transition text-left">
+                                                        <span class="font-medium">Año {{ $year }}</span>
+                                                        <i :class="openYear === '{{ $cs->id }}-{{ $year }}' 
+                                                                  ? 'fas fa-chevron-up' 
+                                                                  : 'fas fa-chevron-down'"></i>
+                                                    </button>
 
-                                                    // Fecha de instalación y mes actual/inicio del servicio
-                                                    $fechaInicio   = \Carbon\Carbon::parse($cs->fecha_servicio);
-                                                    $mesActual     = (int)\Carbon\Carbon::now()->format('n');
-                                                    $mesInicio     = (int)$fechaInicio->format('n');
-                                                @endphp
+                                                    <div x-show="openYear === '{{ $cs->id }}-{{ $year }}'" x-transition class="mt-2">
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                                            @php
+                                                                $mesesYear = \App\Models\Mes::where('anio', $year)
+                                                                                ->orderBy('numero')
+                                                                                ->get();
+                                                            @endphp
 
-                                                {{-- 1) Si está suspendido y el mes es posterior a la suspensión, lo omitimos --}}
-                                                @if($fechaSuspension && $mes->numero > $mesSuspension)
-                                                    @continue
-                                                @endif
+                                                            @foreach($mesesYear as $mesYear)
+                                                                @php
+                                                                    // Verificar si debemos omitir este mes (posterior a suspensión)
+                                                                    $omitirMes = false;
+                                                                    if ($fechaSuspension) {
+                                                                        // Omitir meses posteriores al mes de suspensión en el mismo año
+                                                                        if ($year === $fechaSuspension->year && $mesYear->numero > $mesSuspension) {
+                                                                            $omitirMes = true;
+                                                                        }
+                                                                        // Omitir todos los meses de años posteriores al año de suspensión
+                                                                        if ($year > $fechaSuspension->year) {
+                                                                            $omitirMes = true;
+                                                                        }
+                                                                    }
+                                                                    
+                                                                    // Si debemos omitir este mes, continuamos con el siguiente
+                                                                    if ($omitirMes) continue;
+                                                                    
+                                                                    // Parsear fechas del mes y hoy
+                                                                    $fechaInicioMes = \Carbon\Carbon::parse($mesYear->fecha_inicio);
+                                                                    $fechaFinMes    = \Carbon\Carbon::parse($mesYear->fecha_fin);
+                                                                    $hoy            = \Carbon\Carbon::now();
 
-                                                @php
-                                                    // 2) Determinar estado (no_aplica, pagado, en_curso, futuro, pendiente)
-                                                    if ($mes->numero < $mesInicio) {
-                                                        $estado = 'no_aplica';
-                                                    } elseif (\Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
-                                                                 ->where('contrato_servicio_id', $cs->id)
-                                                                 ->where('mes_id', $mes->id)
-                                                                 ->where('estado_pago', 'pagado')
-                                                                 ->exists()) {
-                                                        $estado = 'pagado';
-                                                    } elseif ($fechaSuspension && $mes->numero === $mesSuspension) {
-                                                        $estado = \Carbon\Carbon::now()->gte($fechaSuspension) 
-                                                                  ? 'pendiente' 
-                                                                  : 'en_curso';
-                                                    } elseif ($mes->numero === $mesActual) {
-                                                        $estado = 'en_curso';
-                                                    } elseif ($mes->numero > $mesActual) {
-                                                        $estado = 'futuro';
-                                                    } else {
-                                                        $estado = 'pendiente';
-                                                    }
+                                                                    // Variables del servicio
+                                                                    $fechaInicio = \Carbon\Carbon::parse($cs->fecha_servicio);
+                                                                    $mesActual   = (int) \Carbon\Carbon::now()->format('n');
+                                                                    $mesInicio   = (int) $fechaInicio->format('n');
 
-                                                    // 3) Cálculo de precio a mostrar
-                                                    if ($mes->numero === $mesInicio) {
-                                                        // mes de inicio: misma lógica de prorrateo de instalación
-                                                        $fechaInicioMes = \Carbon\Carbon::parse($mes->fecha_inicio);
-                                                        $fechaFinMes    = \Carbon\Carbon::parse($mes->fecha_fin);
-                                                        $ultimoDiaMes   = (int)$fechaFinMes->format('j');
-                                                        $diaInstalacion = (int)$fechaInicio->format('j');
-                                                        $diasRestantes  = $ultimoDiaMes - $diaInstalacion;
+                                                                    // 1) Determinar estado
+                                                                    // Primero verificamos si existe un registro en cobranza con algún estado
+                                                                    if (\Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+                                                                        ->where('contrato_servicio_id', $cs->id)
+                                                                        ->where('mes_id', $mesYear->id)
+                                                                        ->where('estado_pago', 'pagado')
+                                                                        ->exists()) {
+                                                                        $estado = 'pagado';
+                                                                    } elseif (\Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+                                                                        ->where('contrato_servicio_id', $cs->id)
+                                                                        ->where('mes_id', $mesYear->id)
+                                                                        ->where('estado_pago', 'no_aplica')
+                                                                        ->exists()) {
+                                                                        $estado = 'no_aplica';
+                                                                    // Si no hay registro, aplicamos las reglas automáticas
+                                                                    } elseif ($year === $anioInicio && $mesYear->numero < $mesInicio) {
+                                                                        $estado = 'no_aplica';
+                                                                    } elseif ($fechaSuspension && $year === $fechaSuspension->year && $mesYear->numero === $mesSuspension) {
+                                                                        $estado = now()->gte($fechaSuspension) ? 'pendiente' : 'en_curso';
+                                                                    } elseif ($year === now()->year && $mesYear->numero === $mesActual) {
+                                                                        $estado = 'en_curso';
+                                                                    } elseif ($year > now()->year || ($year === now()->year && $mesYear->numero > $mesActual)) {
+                                                                        $estado = 'futuro';
+                                                                    } else {
+                                                                        $estado = 'pendiente';
+                                                                    }
 
-                                                        if ($diasRestantes < 5) {
-                                                            $estado        = 'no_aplica';
-                                                            $precioMostrar = 0;
-                                                        } else {
-                                                            if ($diaInstalacion <= 5) {
-                                                                $precioMostrar = $cs->plan->precio;
-                                                            } else {
-                                                                $diasTotales = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
-                                                                $diasServ    = $fechaInicio->diffInDays($fechaFinMes) + 1;
-                                                                $precioMostrar = ($cs->plan->precio / $diasTotales) * $diasServ;
-                                                            }
-                                                        }
+                                                                    // 2) Cálculo de precioMostrar
+                                                                    if ($year === $anioInicio && $mesYear->numero === $mesInicio) {
+                                                                        // prorrateo primer mes
+                                                                        $ultimoDia     = (int) $fechaFinMes->format('j');
+                                                                        $diaInstalacion = (int) $fechaInicio->format('j');
+                                                                        $diasRestantes = $ultimoDia - $diaInstalacion;
+                                                                        if ($diasRestantes < 5) {
+                                                                            $estado        = 'no_aplica';
+                                                                            $precioMostrar = 0;
+                                                                        } else {
+                                                                            if ($diaInstalacion <= 5) {
+                                                                                $precioMostrar = $cs->plan->precio;
+                                                                            } else {
+                                                                                $diasTotales = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
+                                                                                $diasServ    = $fechaInicio->diffInDays($fechaFinMes) + 1;
+                                                                                $precioMostrar = ($cs->plan->precio / $diasTotales) * $diasServ;
+                                                                            }
+                                                                        }
+                                                                    } elseif ($fechaSuspension && $year === $fechaSuspension->year && $mesYear->numero === $mesSuspension) {
+                                                                        // prorrateo mes de suspensión
+                                                                        $diasTotales   = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
+                                                                        $diasHastaSusp = $fechaInicioMes->diffInDays($fechaSuspension) + 1;
+                                                                        $precioMostrar = ($cs->plan->precio / $diasTotales) * $diasHastaSusp;
+                                                                    } else {
+                                                                        // resto meses cobran precio completo
+                                                                        $precioMostrar = $cs->plan->precio;
+                                                                    }
+                                                                    $precioMostrar = round($precioMostrar, 2, PHP_ROUND_HALF_UP);
 
-                                                    } elseif ($fechaSuspension && $mes->numero === $mesSuspension) {
-                                                        // mes de suspensión: prorratear desde inicio de mes hasta fechaSuspension
-                                                        $fechaInicioMes = \Carbon\Carbon::parse($mes->fecha_inicio);
-                                                        $fechaFinMes    = \Carbon\Carbon::parse($mes->fecha_fin);
-                                                        $diasTotales    = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
-                                                        $diasHastaSusp  = $fechaInicioMes->diffInDays($fechaSuspension) + 1;
-                                                        $precioMostrar  = ($cs->plan->precio / $diasTotales) * $diasHastaSusp;
+                                                                    // 3) Clases CSS según estado
+                                                                    switch ($estado) {
+                                                                        case 'pagado':
+                                                                            $bgClasses    = 'bg-green-50 dark:bg-green-900/20 border-green-100';
+                                                                            $barClasses   = 'bg-green-500';
+                                                                            $badgeClasses = 'bg-green-100 text-green-700';
+                                                                            break;
+                                                                        case 'en_curso':
+                                                                            $bgClasses    = 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-100';
+                                                                            $barClasses   = 'bg-yellow-500';
+                                                                            $badgeClasses = 'bg-yellow-100 text-yellow-700';
+                                                                            break;
+                                                                        case 'no_aplica':
+                                                                        case 'futuro':
+                                                                            $bgClasses    = 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600';
+                                                                            $barClasses   = 'bg-gray-300 dark:bg-gray-500';
+                                                                            $badgeClasses = 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200';
+                                                                            break;
+                                                                        default: // pendiente
+                                                                            $bgClasses    = 'bg-red-50 dark:bg-red-900/20 border-red-100';
+                                                                            $barClasses   = 'bg-red-500';
+                                                                            $badgeClasses = 'bg-red-100 text-red-700';
+                                                                    }
 
-                                                    } else {
-                                                        // resto de meses (pendientes o pagados): precio completo
-                                                        $precioMostrar = $cs->plan->precio;
-                                                    }
+                                                                    // 4) Cálculo de progreso
+                                                                    if (in_array($estado, ['pagado','pendiente'])) {
+                                                                        $progressPercent = 100;
+                                                                    } elseif ($estado === 'en_curso') {
+                                                                        $totalDias = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
+                                                                        if ($hoy->lt($fechaInicioMes)) {
+                                                                            $progressPercent = 0;
+                                                                        } elseif ($hoy->gt($fechaFinMes)) {
+                                                                            $progressPercent = 100;
+                                                                        } else {
+                                                                            $trans = $fechaInicioMes->diffInDays($hoy) + 1;
+                                                                            $progressPercent = round(($trans / $totalDias) * 100);
+                                                                        }
+                                                                    } else {
+                                                                        $progressPercent = 0;
+                                                                    }
 
-                                                    // 4) Clases CSS según estado (igual que antes)…
-                                                    switch ($estado) {
-                                                        case 'pagado':
-                                                            $bgClasses    = 'bg-green-50 dark:bg-green-900/20 border-green-100';
-                                                            $barClasses   = 'bg-green-500';
-                                                            $badgeClasses = 'bg-green-100 text-green-700';
-                                                            break;
-                                                        case 'en_curso':
-                                                            $bgClasses    = 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-100';
-                                                            $barClasses   = 'bg-yellow-500';
-                                                            $badgeClasses = 'bg-yellow-100 text-yellow-700';
-                                                            break;
-                                                        case 'no_aplica':
-                                                        case 'futuro':
-                                                            $bgClasses    = 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600';
-                                                            $barClasses   = 'bg-gray-300 dark:bg-gray-500';
-                                                            $badgeClasses = 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200';
-                                                            break;
-                                                        default: // pendiente
-                                                            $bgClasses    = 'bg-red-50 dark:bg-red-900/20 border-red-100';
-                                                            $barClasses   = 'bg-red-500';
-                                                            $badgeClasses = 'bg-red-100 text-red-700';
-                                                    }
+                                                                    // 5) Icono y etiqueta
+                                                                    if ($estado === 'no_aplica') {
+                                                                        $label = 'No aplica';
+                                                                        $icon  = 'fas fa-ban';
+                                                                    } elseif ($estado === 'futuro') {
+                                                                        $label = 'Próximo';
+                                                                        $icon  = 'fas fa-calendar';
+                                                                    } elseif ($estado === 'en_curso') {
+                                                                        $label = 'En curso';
+                                                                        $icon  = 'fas fa-hourglass-half';
+                                                                    } elseif ($estado === 'pendiente') {
+                                                                        $label = 'Pendiente';
+                                                                        $icon  = 'fas fa-clock';
+                                                                    } else {
+                                                                        $label = 'Pagado';
+                                                                        $icon  = 'fas fa-check-circle';
+                                                                    }
+                                                                @endphp
 
-                                                    // 5) Cálculo de progressPercent (plena para pagado y pendiente, dinámico para en_curso)… 
-                                                    $fechaInicioBar = \Carbon\Carbon::parse($mes->fecha_inicio);
-                                                    $fechaFinBar    = \Carbon\Carbon::parse($mes->fecha_fin);
-                                                    $hoy            = \Carbon\Carbon::now();
-                                                    if (in_array($estado, ['pagado','pendiente'])) {
-                                                        $progressPercent = 100;
-                                                    } elseif ($estado === 'en_curso') {
-                                                        $totalDias = $fechaInicioBar->diffInDays($fechaFinBar) + 1;
-                                                        if ($hoy->lt($fechaInicioBar)) {
-                                                            $progressPercent = 0;
-                                                        } elseif ($hoy->gt($fechaFinBar)) {
-                                                            $progressPercent = 100;
-                                                        } else {
-                                                            $trans    = $fechaInicioBar->diffInDays($hoy) + 1;
-                                                            $progressPercent = round(($trans / $totalDias) * 100);
-                                                        }
-                                                    } else {
-                                                        $progressPercent = 0;
-                                                    }
+                                                                <div class="p-4 rounded-lg {{ $bgClasses }} border">
+                                                                    <!-- Barra de progreso -->
+                                                                    <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3">
+                                                                        <div class="h-1.5 rounded-full {{ $barClasses }}"
+                                                                             style="width: {{ $progressPercent }}%"></div>
+                                                                    </div>
 
-                                                    // <-- NUEVO: redondear siempre a 2 decimales -->
-                                                    $precioMostrar = round($precioMostrar, 2, PHP_ROUND_HALF_UP);
-                                                @endphp
+                                                                    <!-- Nombre + badge -->
+                                                                    <div class="flex justify-between items-start">
+                                                                        <h4 class="text-sm font-bold text-gray-700">
+                                                                            {{ ucfirst($mesYear->nombre) }}
+                                                                        </h4>
+                                                                        <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $badgeClasses }}">
+                                                                            <i class="{{ $icon }} mr-1"></i> {{ $label }}
+                                                                        </span>
+                                                                    </div>
 
-                                                <div class="p-4 rounded-lg {{ $bgClasses }} border">
-                                                    <!-- Barra de progreso -->
-                                                    <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3 dark:bg-gray-600">
-                                                        <div class="h-1.5 rounded-full {{ $barClasses }}"
-                                                             style="width: {{ $progressPercent }}%"></div>
-                                                    </div>
-
-                                                    <!-- Nombre + badge -->
-                                                    <div class="flex justify-between items-start">
-                                                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-200">
-                                                            {{ ucfirst($mes->nombre) }}
-                                                        </h4>
-
-                                                        @php
-                                                            // Definir etiqueta e icono según estado
-                                                            if (in_array($estado, ['no_aplica', 'futuro'])) {
-                                                                $label = 'No aplica';
-                                                                $icon  = 'fas fa-ban';
-                                                            } elseif ($estado === 'en_curso') {
-                                                                $label = 'En curso';
-                                                                $icon  = 'fas fa-hourglass-half';
-                                                            } elseif ($estado === 'pendiente') {
-                                                                $label = 'Pendiente';
-                                                                $icon  = 'fas fa-clock';
-                                                            } else {
-                                                                $label = 'Pagado';
-                                                                $icon  = 'fas fa-check-circle';
-                                                            }
-                                                        @endphp
-
-                                                        <span class="text-xs font-semibold px-2 py-1 rounded-full {{ $badgeClasses }}">
-                                                            <i class="{{ $icon }} mr-1"></i> {{ $label }}
-                                                        </span>
-                                                    </div>
-
-                                                    <!-- Vence y monto -->
-                                                    <div class="mt-3 flex items-center justify-between text-xs">
-                                                        <span class="text-gray-500 dark:text-gray-400">
-                                                            Vence: {{ $fechaFinMes->format('d/m/Y') }}
-                                                        </span>
-                                                        @if(in_array($estado, ['pagado','pendiente','en_curso']))
-                                                            <span class="text-gray-800 dark:text-gray-100 font-medium">
-                                                                S/ {{ number_format($precioMostrar, 0, '.', '') }}
-                                                            </span>
-                                                        @endif
+                                                                    <!-- Vence y monto -->
+                                                                    <div class="mt-3 flex items-center justify-between text-xs">
+                                                                        <span class="text-gray-500">
+                                                                            Vence: {{ \Carbon\Carbon::parse($mesYear->fecha_fin)->format('d/m/Y') }}
+                                                                        </span>
+                                                                        @if(in_array($estado, ['pagado','pendiente','en_curso']))
+                                                                            <span class="text-gray-800 font-medium">
+                                                                                S/ {{ number_format($precioMostrar, 0, '.', '') }}
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
                                                     </div>
                                                 </div>
                                             @endforeach
                                         </div>
+                                        {{-- Fin acordeón de años --}}
                                     </div>
                                 </div>
                             @endforeach

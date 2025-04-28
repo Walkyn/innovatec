@@ -29,6 +29,8 @@ use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PanelController;
+use App\Models\Mes;
+use Carbon\Carbon;
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -198,156 +200,122 @@ Route::middleware('auth')->group(function () {
     })->middleware('check.permissions:manage,all');
 
     Route::get('/meses-pendientes/{contratoServicioId}', function ($contratoServicioId) {
-        $contratoServicio = DB::table('contrato_servicio')->find($contratoServicioId);
+        // 1) Buscamos el contrato-servicio
+        $cs = ContratoServicio::findOrFail($contratoServicioId);
 
-        if (!$contratoServicio) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Contrato de servicio no encontrado',
-                'meses_pendientes' => [],
-                'precio_plan' => 0,
-                'monto_proporcional' => 0
-            ]);
-        }
-
-        $fechaInicioServicio = $contratoServicio->fecha_servicio;
-        $fechaSuspension = $contratoServicio->fecha_suspension_servicio;
-        $estadoServicio = $contratoServicio->estado_servicio_cliente;
-        $planId = $contratoServicio->plan_id;
-        $precioPlan = DB::table('planes')->where('id', $planId)->value('precio') ?? 0;
-
-        // Verificar si existe la tabla meses
-        $tablaMesesExiste = Schema::hasTable('meses');
-
-        if (!$tablaMesesExiste) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tabla de meses no existe en la base de datos',
-                'meses_pendientes' => [],
-                'precio_plan' => $precioPlan,
-                'monto_proporcional' => 0
-            ]);
-        }
-
-        // Obtener el mes de inicio del servicio
-        $mesInicioServicio = DB::table('meses')
-            ->where('fecha_inicio', '<=', $fechaInicioServicio)
-            ->where('fecha_fin', '>=', $fechaInicioServicio)
-            ->first();
-
-        if (!$mesInicioServicio) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No hay meses generados para el cálculo',
-                'meses_pendientes' => [],
-                'precio_plan' => $precioPlan,
-                'monto_proporcional' => 0
-            ]);
-        }
-
-        // Obtener el mes de suspensión si existe
-        $mesSuspension = null;
-        if ($estadoServicio === 'suspendido' && $fechaSuspension) {
-            $mesSuspension = DB::table('meses')
-                ->where('fecha_inicio', '<=', $fechaSuspension)
-                ->where('fecha_fin', '>=', $fechaSuspension)
-                ->first();
-        }
-
-        // Construir la consulta base para obtener meses pendientes
-        $query = DB::table('meses')
-            ->where('id', '>=', $mesInicioServicio->id)
-            ->whereNotIn('id', function ($query) use ($contratoServicioId) {
-                $query->select('mes_id')
-                    ->from('cobranza_contratoservicio')
-                    ->where('contrato_servicio_id', $contratoServicioId)
-                    ->whereIn('estado_pago', ['pagado', 'no_aplica']);
-            });
-
-        // Si el servicio está suspendido, solo incluir meses hasta la fecha de suspensión
-        if ($estadoServicio === 'suspendido' && $mesSuspension) {
-            $query->where('id', '<=', $mesSuspension->id);
-        }
-
-        // Obtener los meses pendientes ordenados
-        $mesesPendientes = $query->orderBy('anio')
-            ->orderBy('numero')
-            ->get();
-
-        // Convertir a colección de Laravel
-        $mesesPendientes = collect($mesesPendientes);
-
-        // Calcular montos proporcionales
+        // 2) Fecha real de inicio y verificación de suspensión
+        $fechaInicio = Carbon::parse($cs->fecha_servicio);
+        $fechaSuspension = $cs->estado_servicio_cliente === 'suspendido' && $cs->fecha_suspension_servicio
+            ? Carbon::parse($cs->fecha_suspension_servicio)
+            : null;
+        
+        $diaInstalacion = (int) $fechaInicio->format('j');
+        $ultimoDiaMesInstalacion = (int) $fechaInicio->copy()->endOfMonth()->format('j');
+        
+        // Variables para el cálculo proporcional
+        $mesInicioId = null;
         $montoProporcional = 0;
-        if ($mesesPendientes->isNotEmpty()) {
-            $primerMes = $mesesPendientes->first();
-            $ultimoMes = $mesesPendientes->last();
-
-            // Cálculo para el primer mes (mes de inicio)
-            if ($primerMes->id == $mesInicioServicio->id) {
-                $diasTotalesMes = (strtotime($mesInicioServicio->fecha_fin) - strtotime($mesInicioServicio->fecha_inicio)) / (60 * 60 * 24) + 1;
-                $diaInstalacion = date('j', strtotime($fechaInicioServicio));
-                $ultimosDiasMes = date('j', strtotime($mesInicioServicio->fecha_fin));
-                $diasRestantesMes = $ultimosDiasMes - $diaInstalacion;
-
-                // Si la instalación fue en los últimos 5 días del mes, no se cobra este mes
-                if ($diasRestantesMes < 5) {
-                    // Eliminar el primer mes de la colección si la instalación fue en los últimos 5 días
-                    $mesesPendientes = $mesesPendientes->filter(function ($mes) use ($mesInicioServicio) {
-                        return $mes->id !== $mesInicioServicio->id;
-                    })->values(); // Agregar values() para reindexar la colección
-                    $montoProporcional = 0;
-                } else {
-                    if ($diaInstalacion <= 5) {
-                        $montoProporcional = $precioPlan;
+        
+        // 3) Traemos todos los Meses desde ese año/mes en adelante
+        $anioInicio = $fechaInicio->year;
+        $mesInicio = $fechaInicio->month;
+        
+        $meses = Mes::where(function($q) use ($anioInicio, $mesInicio) {
+                    $q->where('anio', '>', $anioInicio)
+                      ->orWhere(function($q2) use ($anioInicio, $mesInicio) {
+                          $q2->where('anio', $anioInicio)
+                             ->where('numero', '>=', $mesInicio);
+                      });
+                })
+                ->orderBy('anio')
+                ->orderBy('numero')
+                ->get();
+        
+        // 4) Excluir meses cuyo estado sea 'pagado' o 'no_aplica'
+        $excluidos = DB::table('cobranza_contratoservicio')
+                    ->where('contrato_servicio_id', $contratoServicioId)
+                    ->whereIn('estado_pago', ['pagado','no_aplica'])
+                    ->pluck('mes_id')
+                    ->toArray();
+        
+        // 5) Calcular precio proporcional para el primer mes
+        foreach ($meses as $index => $mes) {
+            if ($mes->anio == $anioInicio && $mes->numero == $mesInicio) {
+                $mesInicioId = $mes->id;
+                
+                $fechaInicioMes = Carbon::parse($mes->fecha_inicio);
+                $fechaFinMes = Carbon::parse($mes->fecha_fin);
+                $restantes = $ultimoDiaMesInstalacion - $diaInstalacion;
+                
+                // Calcular el monto proporcional solo si no está en los excluidos
+                if (!in_array($mes->id, $excluidos)) {
+                    if ($restantes < 5) {
+                        // Si quedan menos de 5 días, no se cobra este mes
+                        $excluidos[] = $mes->id; // Agregamos a excluidos
                     } else {
-                        $diasRestantes = (strtotime($mesInicioServicio->fecha_fin) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
-                        $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasRestantes;
+                        if ($diaInstalacion <= 5) {
+                            // Si es en los primeros 5 días, se cobra el mes completo
+                            $montoProporcional = $cs->plan->precio;
+                        } else {
+                            // Si no, se cobra proporcional a los días restantes
+                            $totales = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
+                            $servicioDias = $fechaInicio->diffInDays($fechaFinMes) + 1;
+                            $montoProporcional = ($cs->plan->precio / $totales) * $servicioDias;
+                            $montoProporcional = round($montoProporcional, 2, PHP_ROUND_HALF_UP);
+                        }
                     }
                 }
-            }
-
-            // Cálculo para el último mes si es el mes de suspensión
-            if ($mesSuspension && $ultimoMes->id == $mesSuspension->id) {
-                $diasTotalesMes = (strtotime($mesSuspension->fecha_fin) - strtotime($mesSuspension->fecha_inicio)) / (60 * 60 * 24) + 1;
-                $diasHastaSuspension = (strtotime($fechaSuspension) - strtotime($mesSuspension->fecha_inicio)) / (60 * 60 * 24) + 1;
-
-                // Si es el mismo mes que el de inicio, mantener el cálculo anterior
-                if ($mesSuspension->id == $mesInicioServicio->id) {
-                    $diasHastaSuspension = (strtotime($fechaSuspension) - strtotime($fechaInicioServicio)) / (60 * 60 * 24) + 1;
-                    $montoProporcional = ($precioPlan / $diasTotalesMes) * $diasHastaSuspension;
-                } else {
-                    // Calcular el precio proporcional para el mes de suspensión
-                    $precioMesSuspension = ($precioPlan / $diasTotalesMes) * $diasHastaSuspension;
-
-                    // Actualizar el precio del último mes en la colección
-                    $mesesPendientes = $mesesPendientes->map(function ($mes) use ($mesSuspension, $precioMesSuspension, $precioPlan) {
-                        if ($mes->id == $mesSuspension->id) {
-                            $precioRedondeado = round($precioMesSuspension, 2);
-                            $mes->precio_proporcional = $precioRedondeado;
-                            $mes->monto = $precioRedondeado;
-                        } else {
-                            $mes->precio_proporcional = $precioPlan;
-                            $mes->monto = $precioPlan;
-                        }
-                        return $mes;
-                    });
-                }
-            } else {
-                // Si no hay mes de suspensión, asignar el precio completo a todos los meses
-                $mesesPendientes = $mesesPendientes->map(function ($mes) use ($precioPlan) {
-                    $mes->precio_proporcional = $precioPlan;
-                    $mes->monto = $precioPlan;
-                    return $mes;
-                });
+                break;
             }
         }
-
+        
+        // 6) Filtrar meses posteriores a suspensión y ajustar precio para meses incluidos
+        $mesesConPrecio = [];
+        
+        foreach ($meses as $mes) {
+            // Omitir meses excluidos o posteriores a la suspensión
+            if (in_array($mes->id, $excluidos)) {
+                continue;
+            }
+            
+            // Si hay suspensión, omitir meses posteriores
+            if ($fechaSuspension) {
+                if (($mes->anio == $fechaSuspension->year && $mes->numero > $fechaSuspension->month) ||
+                    ($mes->anio > $fechaSuspension->year)) {
+                    continue;
+                }
+            }
+            
+            $precio = $cs->plan->precio;
+            
+            // Si es mes de suspensión, calcular precio proporcional
+            if ($fechaSuspension && 
+                $mes->anio == $fechaSuspension->year && 
+                $mes->numero == $fechaSuspension->month) {
+                
+                $fechaInicioMes = Carbon::parse($mes->fecha_inicio);
+                $fechaFinMes = Carbon::parse($mes->fecha_fin);
+                
+                // Estos cálculos deben coincidir exactamente con los de meses-pendientes.blade.php
+                $diasTotales = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
+                $diaSuspension = (int) $fechaSuspension->format('j'); // Día del mes en que se suspendió
+                $diasHastaSusp = $diaSuspension; // Contamos hasta el día de suspensión inclusive
+                
+                $precio = ($cs->plan->precio / $diasTotales) * $diasHastaSusp;
+                $precio = round($precio, 2, PHP_ROUND_HALF_UP);
+            }
+            
+            $mes->precio_proporcional = $precio;
+            $mesesConPrecio[] = $mes;
+        }
+        
+        // 7) Preparamos la respuesta JSON
         return response()->json([
             'success' => true,
-            'meses_pendientes' => $mesesPendientes,
-            'precio_plan' => $precioPlan,
-            'monto_proporcional' => round($montoProporcional, 2)
+            'meses_pendientes' => $mesesConPrecio,
+            'precio_plan' => $cs->plan->precio,
+            'monto_proporcional' => $montoProporcional,
+            'mes_inicio_id' => $mesInicioId
         ]);
     })->middleware('check.permissions:manage,all');
 
