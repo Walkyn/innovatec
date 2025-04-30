@@ -208,7 +208,7 @@
                             <i class="fas fa-map-pin text-purple-500 dark:text-purple-300"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Pueblo</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Zona</p>
                             <p class="text-gray-800 dark:text-white font-medium text-sm">
                                 {{ optional($cliente->pueblo)->nombre ?? '--' }}
                             </p>
@@ -232,7 +232,7 @@
 
                 <!-- Historial de servicios -->
                 <div class="pt-4">
-                    <h4 class="text-lg font-medium text-gray-800 mb-4">Servicios Contratados</h4>
+                    <h4 class="text-lg font-medium text-gray-800 mb-4">Servicios Activos</h4>
 
                     <div class="overflow-x-auto">
                         @php

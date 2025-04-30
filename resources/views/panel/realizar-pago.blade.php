@@ -5,14 +5,16 @@
 
     <!--Start Content -->
     <div class="relative p-4 w-full max-h-full mx-auto">
-        <!-- Toast notification centrado -->
+        <!-- Toast notification centrado con fondos de color por tipo -->
         <div x-data="{ 
             show: false,
             message: '',
+            type: 'success',
             progress: 0,
             progressInterval: null,
-            showToast(msg) {
+            showToast(msg, type = 'success') {
                 this.message = msg;
+                this.type = type;
                 this.show = true;
                 this.progress = 0;
                 
@@ -36,28 +38,79 @@
                     clearInterval(this.progressInterval);
                 }, duration);
             }
-        }" @notify.window="showToast($event.detail.message)"
+        }" @notify.window="showToast($event.detail.message, $event.detail.type || 'success')"
         class="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
             <div x-show="show" x-transition:enter="transform ease-out duration-300 transition"
                 x-transition:enter-start="translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
                 x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="max-w-sm w-full mx-4 bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+                class="max-w-sm w-full mx-4 shadow-lg rounded-lg pointer-events-auto ring-1 ring-opacity-5 overflow-hidden"
+                :class="{
+                    'bg-green-50 ring-green-300 border border-green-200': type === 'success',
+                    'bg-red-50 ring-red-300 border border-red-200': type === 'error',
+                    'bg-yellow-50 ring-yellow-300 border border-yellow-200': type === 'warning',
+                    'bg-blue-50 ring-blue-300 border border-blue-200': type === 'info',
+                    'bg-gray-800 ring-gray-700 border border-gray-700 text-white': type === 'dark'
+                }">
                 <div class="p-4">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <svg class="h-6 w-6 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            <!-- Icono de éxito (checkmark) -->
+                            <svg x-show="type === 'success'" class="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
+                            
+                            <!-- Icono de error (X en círculo) -->
+                            <svg x-show="type === 'error'" class="h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            
+                            <!-- Icono de advertencia (exclamación) -->
+                            <svg x-show="type === 'warning'" class="h-6 w-6 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            
+                            <!-- Icono de información (i) -->
+                            <svg x-show="type === 'info'" class="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            
+                            <!-- Icono para modo oscuro (campana) -->
+                            <svg x-show="type === 'dark'" class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
                         </div>
                         <div class="ml-3 w-0 flex-1">
-                            <p class="text-sm font-medium text-gray-900" x-text="message"></p>
+                            <p class="text-sm font-medium" 
+                                :class="{
+                                    'text-green-800': type === 'success',
+                                    'text-red-800': type === 'error',
+                                    'text-yellow-800': type === 'warning',
+                                    'text-blue-800': type === 'info',
+                                    'text-white': type === 'dark'
+                                }" 
+                                x-text="message"></p>
                         </div>
                         <div class="ml-4 flex-shrink-0 flex">
                             <button @click="show = false"
-                                class="rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none">
+                                class="rounded-md inline-flex focus:outline-none"
+                                :class="{
+                                    'text-green-500 hover:text-green-600': type === 'success',
+                                    'text-red-500 hover:text-red-600': type === 'error',
+                                    'text-yellow-500 hover:text-yellow-600': type === 'warning',
+                                    'text-blue-500 hover:text-blue-600': type === 'info',
+                                    'text-gray-300 hover:text-white': type === 'dark'
+                                }">
                                 <span class="sr-only">Cerrar</span>
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                     fill="currentColor">
@@ -68,8 +121,16 @@
                             </button>
                         </div>
                     </div>
-                    <div class="mt-3 w-full bg-gray-200 rounded-full h-1">
-                        <div class="bg-green-500 h-1 rounded-full transition-all duration-10 ease-linear"
+                    <div class="mt-3 w-full bg-gray-200 rounded-full h-1" 
+                        :class="{'bg-gray-600': type === 'dark'}">
+                        <div class="h-1 rounded-full transition-all duration-10 ease-linear"
+                            :class="{
+                                'bg-green-500': type === 'success',
+                                'bg-red-500': type === 'error',
+                                'bg-yellow-500': type === 'warning',
+                                'bg-blue-500': type === 'info',
+                                'bg-gray-300': type === 'dark'
+                            }"
                             :style="'width: ' + progress + '%'">
                         </div>
                     </div>
@@ -239,7 +300,131 @@
                 servicios: [],
                 selectedServicio: '',
                 anios: [],
-                openAnio: null
+                openAnio: null,
+                
+                // Método para manejar la selección de meses de forma continua
+                handleMonthSelection: function(event, mesActual, mesesAnio) {
+                    var checkbox = event.target;
+                    
+                    // Filtrar y ordenar meses pendientes
+                    var mesesPendientes = mesesAnio
+                        .filter(function(m) { return m.estado === 'pendiente'; })
+                        .sort(function(a, b) { return a.numero - b.numero; });
+                    
+                    // Si está desmarcando, verificar que no haya meses posteriores marcados
+                    if (!checkbox.checked) {
+                        var mesIndex = -1;
+                        for (var i = 0; i < mesesPendientes.length; i++) {
+                            if (mesesPendientes[i].id === mesActual.id) {
+                                mesIndex = i;
+                                break;
+                            }
+                        }
+                        
+                        // Verificar si hay meses posteriores marcados
+                        for (var i = mesIndex + 1; i < mesesPendientes.length; i++) {
+                            var nextCheckbox = document.getElementById('month-' + mesesPendientes[i].id);
+                            if (nextCheckbox && nextCheckbox.checked) {
+                                // Si un mes posterior está marcado, impedir desmarcar este
+                                checkbox.checked = true;
+                                
+                                // Notificar al usuario
+                                window.dispatchEvent(new CustomEvent('notify', {
+                                    detail: {
+                                        message: 'Debe desmarcar los meses posteriores primero'
+                                    }
+                                }));
+                                
+                                return;
+                            }
+                        }
+                        
+                        return;
+                    }
+                    
+                    // Si está marcando, encontrar el índice del mes actual
+                    var mesIndex = -1;
+                    for (var i = 0; i < mesesPendientes.length; i++) {
+                        if (mesesPendientes[i].id === mesActual.id) {
+                            mesIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // Marcar automáticamente todos los meses anteriores
+                    for (var i = 0; i < mesIndex; i++) {
+                        document.getElementById('month-' + mesesPendientes[i].id).checked = true;
+                    }
+                },
+                
+                // Método para cargar y desplegar automáticamente el año con deuda más antiguo
+                cargarServicio: function(servicioId) {
+                    this.selectedServicio = servicioId;
+                    this.anios = this.mesesServicios[servicioId] || [];
+                    
+                    // Si hay años con meses pendientes, abrir automáticamente el más antiguo
+                    if (this.anios.length > 0) {
+                        // Copiar el array y revertirlo para buscar desde el más antiguo
+                        var aniosInvertidos = this.anios.slice().reverse();
+                        var anioConDeuda = null;
+                        
+                        for (var i = 0; i < aniosInvertidos.length; i++) {
+                            if (aniosInvertidos[i].tienePendientes) {
+                                anioConDeuda = aniosInvertidos[i];
+                                break;
+                            }
+                        }
+                        
+                        if (anioConDeuda) {
+                            this.openAnio = anioConDeuda.anio;
+                        } else {
+                            // Si no hay pendientes pero hay en curso, abrir el más reciente
+                            this.openAnio = this.anios[0].anio;
+                        }
+                    }
+                },
+                
+                // Seleccionar todos los meses pendientes de un año
+                seleccionarTodosMesesAno: function(anio) {
+                    var mesesPendientes = anio.meses.filter(function(m) { 
+                        return m.estado === 'pendiente'; 
+                    });
+                    
+                    for (var i = 0; i < mesesPendientes.length; i++) {
+                        var checkbox = document.getElementById('month-' + mesesPendientes[i].id);
+                        if (checkbox) checkbox.checked = true;
+                    }
+                },
+                
+                // Método para verificar si todos los meses pendientes están seleccionados
+                verificarSeleccionCompleta: function() {
+                    var todosSeleccionados = true;
+                    var algunoSeleccionado = false;
+                    
+                    // Recorrer todos los años
+                    for (var a = 0; a < this.anios.length; a++) {
+                        var anio = this.anios[a];
+                        // Filtrar los meses pendientes
+                        var mesesPendientes = anio.meses.filter(function(m) {
+                            return m.estado === 'pendiente';
+                        });
+                        
+                        // Verificar si todos los meses pendientes están seleccionados
+                        for (var m = 0; m < mesesPendientes.length; m++) {
+                            var mes = mesesPendientes[m];
+                            var checkbox = document.getElementById('month-' + mes.id);
+                            if (checkbox) {
+                                if (checkbox.checked) {
+                                    algunoSeleccionado = true;
+                                } else {
+                                    todosSeleccionados = false;
+                                }
+                            }
+                        }
+                    }
+                    
+                    return { todosSeleccionados: todosSeleccionados, algunoSeleccionado: algunoSeleccionado };
+                }
             })" class="grid grid-cols-1 mb-2">
                 {{-- Select Contrato --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -247,7 +432,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Contrato</label>
                         <select x-model="selectedContrato"
                             @change=" 
-                                servicios = contratos.find(c => c.id == selectedContrato)?.contrato_servicios || [];
+                                servicios = contratos.find(function(c) { return c.id == selectedContrato; })?.contrato_servicios || [];
                                 selectedServicio = '';
                                 anios = [];
                                 openAnio = null;
@@ -255,7 +440,7 @@
                             class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                             <option value="">Seleccione un contrato</option>
                             <template x-for="c in contratos" :key="c.id">
-                                <option :value="c.id" x-text="`CTR-${String(c.id).padStart(5,'0')}`"></option>
+                                <option :value="c.id" x-text="'CTR-' + String(c.id).padStart(5,'0')"></option>
                             </template>
                         </select>
                     </div>
@@ -264,12 +449,12 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Servicio</label>
                         <select x-model="selectedServicio" 
-                            @change="anios = mesesServicios[selectedServicio] || []"
+                            @change="cargarServicio($event.target.value)"
                             class="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                             <option value="">Seleccione un servicio</option>
                             <template x-for="s in servicios" :key="s.id">
                                 <option :value="s.id"
-                                    x-text="`${s.servicio.nombre} ${s.plan.nombre} (S/ ${Number(s.plan.precio).toFixed(2)})`">
+                                    x-text="s.servicio.nombre + ' ' + s.plan.nombre + ' (S/ ' + Number(s.plan.precio).toFixed(2) + ')'">
                             </template>
                         </select>
                     </div>
@@ -280,8 +465,15 @@
                     <template x-for="(anio, index) in anios" :key="index">
                         <div class="mb-4">
                             <button @click="openAnio = openAnio === anio.anio ? null : anio.anio"
-                                class="w-full flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-md transition text-left">
-                                <span class="font-semibold" x-text="`Año ${anio.anio}`"></span>
+                                class="w-full flex items-center justify-between px-4 py-2 rounded-md transition text-left"
+                                :class="anio.tienePendientes ? 'bg-red-50 hover:bg-red-100' : 'bg-gray-50 hover:bg-gray-100'">
+                                <div class="flex items-center">
+                                    <span class="font-semibold" x-text="'Año ' + anio.anio"></span>
+                                    <span x-show="anio.tienePendientes" 
+                                          class="ml-2 text-xs px-2 py-0.5 bg-red-100 text-red-800 rounded-full">
+                                        Pendiente
+                                    </span>
+                                </div>
                                 <svg :class="openAnio === anio.anio ? 'transform rotate-180' : ''"
                                      class="w-4 h-4 text-gray-500 transition-transform"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,13 +483,24 @@
                             </button>
 
                             <div x-show="openAnio === anio.anio" x-transition>
-                                <label class="block text-sm font-medium text-gray-700 mt-3 mb-1">Meses a pagar</label>
+                                <div class="flex justify-between items-center mt-3 mb-1">
+                                    <label class="block text-sm font-medium text-gray-700">Meses a pagar</label>
+                                    
+                                    <!-- Botón de seleccionar todos -->
+                                    <button x-show="anio.tienePendientes"
+                                        @click="seleccionarTodosMesesAno(anio)"
+                                        class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200">
+                                        Seleccionar todos
+                                    </button>
+                                </div>
+                                
                                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 mt-2">
                                     <template x-for="mes in anio.meses" :key="mes.id">
                                         <div class="relative">
-                                            <input type="checkbox" :id="`month-${mes.id}`" class="hidden peer"
-                                                :disabled="mes.estado !== 'pendiente'">
-                                            <label :for="`month-${mes.id}`"
+                                            <input type="checkbox" :id="'month-' + mes.id" class="hidden peer"
+                                                :disabled="mes.estado !== 'pendiente'"
+                                                @click="handleMonthSelection($event, mes, anio.meses)">
+                                            <label :for="'month-' + mes.id"
                                                 class="flex items-center justify-between p-2 border-2 rounded-lg"
                                                 :class="mes.estado === 'pagado' ?
                                                     'border-green-200 bg-green-50 cursor-not-allowed text-gray-700' :
@@ -307,15 +510,32 @@
                                                     'border-yellow-200 bg-yellow-50 cursor-not-allowed text-gray-700' :
                                                     'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400'">
                                                 <span class="text-sm font-medium" x-text="mes.nombre"></span>
+                                                
+                                                <!-- Mostrar "No aplica" solo para estados no_aplica y futuro -->
                                                 <span x-show="['no_aplica','futuro'].includes(mes.estado)"
                                                     class="text-xs text-gray-400 ml-2">
                                                     No aplica
                                                 </span>
-                                                <span x-show="mes.estado === 'en_curso'" class="text-xs text-yellow-600 ml-2"
-                                                    x-text="`S/ ${mes.precioMostrar}`"></span>
-                                                <span x-show="['pagado','pendiente'].includes(mes.estado)" class="text-xs ml-2"
-                                                    :class="mes.estado === 'pagado' ? 'text-green-600' : 'text-red-600'"
-                                                    x-text="`S/ ${mes.precioMostrar}`"></span>
+                                                
+                                                <!-- Mostrar precio para mes pagado -->
+                                                <span x-show="mes.estado === 'pagado'" 
+                                                    class="text-xs text-green-600 ml-2"
+                                                    x-text="'S/ ' + mes.precioMostrar">
+                                                </span>
+                                                
+                                                <!-- Mostrar precio para mes en curso -->
+                                                <span x-show="mes.estado === 'en_curso'" 
+                                                    class="text-xs text-yellow-600 ml-2"
+                                                    x-text="'S/ ' + mes.precioMostrar">
+                                                </span>
+                                                
+                                                <!-- Mostrar precio para mes pendiente -->
+                                                <span x-show="mes.estado === 'pendiente'" 
+                                                    class="text-xs text-red-600 ml-2"
+                                                    x-text="'S/ ' + mes.precioMostrar">
+                                                </span>
+                                                
+                                                <!-- Indicador de estado (punto de color) -->
                                                 <span class="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white"
                                                     :class="mes.estado === 'pagado' ?
                                                         'bg-green-500' :
@@ -323,7 +543,8 @@
                                                         'bg-red-500' :
                                                         mes.estado === 'en_curso' ?
                                                         'bg-yellow-500' :
-                                                        'bg-gray-400'"></span>
+                                                        'bg-gray-400'">
+                                                </span>
                                             </label>
                                         </div>
                                     </template>
@@ -337,7 +558,7 @@
                          class="flex flex-col items-center justify-center mb-2 p-8 bg-white border border-gray-100 rounded-xl shadow-sm">
                         
                         <!-- Para servicios activos y al día -->
-                        <template x-if="servicios.find(s => s.id == selectedServicio)?.estado_servicio_cliente === 'activo'">
+                        <template x-if="servicios.find(function(s) { return s.id == selectedServicio; })?.estado_servicio_cliente === 'activo'">
                             <div class="flex flex-col items-center">
                                 <!-- Icono de check -->
                                 <div class="w-16 h-16 mb-4 rounded-full bg-green-100 flex items-center justify-center">
@@ -370,7 +591,7 @@
                         </template>
 
                         <!-- Para servicios suspendidos -->
-                        <template x-if="servicios.find(s => s.id == selectedServicio)?.estado_servicio_cliente === 'suspendido'">
+                        <template x-if="servicios.find(function(s) { return s.id == selectedServicio; })?.estado_servicio_cliente === 'suspendido'">
                             <div class="flex flex-col items-center">
                                 <!-- Icono de advertencia -->
                                 <div class="w-16 h-16 mb-4 rounded-full bg-red-100 flex items-center justify-center">
@@ -399,7 +620,7 @@
                         </template>
 
                         <!-- Para servicios cancelados -->
-                        <template x-if="servicios.find(s => s.id == selectedServicio)?.estado_servicio_cliente === 'cancelado'">
+                        <template x-if="servicios.find(function(s) { return s.id == selectedServicio; })?.estado_servicio_cliente === 'cancelado'">
                             <div class="flex flex-col items-center">
                                 <!-- Icono de cancelado -->
                                 <div class="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -430,9 +651,10 @@
                 </div>
             </div>
 
-            <!-- Botón Agregar -->
+            <!-- Botón Agregar con solución directa en el onclick -->
             <div class="flex justify-center mb-6">
-                <button
+                <button type="button" id="botonAgregar" 
+                    onclick="agregarServicioDirecto()"
                     class="bg-gray-600 hover:bg-gray-700 text-white text-sm py-3 px-4 items-center justify-center font-medium lg:w-1/2 xl:w-1/3 w-full rounded-md flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -451,12 +673,12 @@
                             <tr>
                                 <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
-                                    Accion</th>
+                                    Acción</th>
                                 <th
-                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Contrato</th>
                                 <th
-                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tl-md rounded-bl-md">
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Servicio</th>
                                 <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
@@ -470,64 +692,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded bg-red-100 flex items-center justify-center">
-                                            <i class="fas fa-trash text-red-500 text-sm"></i>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-gray-600 text-sm font-medium ml-2">CTR-00001</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-gray-600 text-sm font-medium ml-2">Internet Basico</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-[13px] font-medium text-gray-600">S/ 120.00</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-[13px] font-medium text-gray-600">Enero, Febrero</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50 text-right">
-                                    <span class="text-[13px] font-medium text-emerald-500">S/ 240.00</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded bg-red-100 flex items-center justify-center">
-                                            <i class="fas fa-trash text-red-500 text-sm"></i>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-gray-600 text-sm font-medium ml-2">CTR-00002</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-gray-600 text-sm font-medium ml-2">Internet Basico</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-[13px] font-medium text-gray-600">S/ 80.00</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50">
-                                    <span class="text-[13px] font-medium text-gray-600">Marzo</span>
-                                </td>
-                                <td class="py-2 px-4 border-b border-b-gray-50 text-right">
-                                    <span class="text-[13px] font-medium text-emerald-500">S/ 80.00</span>
-                                </td>
-                            </tr>
+                            <!-- Contenido dinámico aquí -->
                         </tbody>
                         <tfoot>
                             <tr>
                                 <td colspan="5"
                                     class="py-2 px-4 border-b border-b-gray-50 text-right font-medium text-gray-600">
                                     Total a pagar:</td>
-                                <td class="py-2 px-4 border-b border-b-gray-50 font-bold text-emerald-500 text-right">S/
-                                    320.00</td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 font-bold text-emerald-500 text-right">S/ 0.00</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -844,22 +1016,330 @@
     </div>
     <!--End Content -->
 
-    <!-- Agregar este script al final del archivo o en la sección de scripts -->
-    @push('scripts')
-        <script>
-            // Agregar función de clipboard personalizada
-            document.addEventListener('alpine:init', () => {
-                Alpine.magic('clipboard', () => {
-                    return (text) => {
-                        navigator.clipboard.writeText(text).then(() => {
-                            alert('Información copiada al portapapeles');
-                        }).catch(err => {
-                            console.error('Error al copiar:', err);
-                        });
+    <!-- Script con la función del botón agregar con soporte para toasts de color -->
+    <script>
+        // Variables globales para almacenar los servicios y el total
+        var serviciosAgregados = [];
+        var totalPagar = 0;
+        
+        // Función para mostrar notificaciones toast con iconos específicos según el tipo
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            window.dispatchEvent(new CustomEvent('notify', {
+                detail: {
+                    message: mensaje,
+                    type: tipo
+                }
+            }));
+        }
+        
+        // Función para verificar si un mes ya está en la tabla detalles
+        function verificarMesExistente(contratoNumero, servicioNombre, nombreMes) {
+            for (var i = 0; i < serviciosAgregados.length; i++) {
+                var servicio = serviciosAgregados[i];
+                if (servicio.contratoNumero === contratoNumero && 
+                    servicio.servicioNombre === servicioNombre && 
+                    servicio.mesesTexto.includes(nombreMes)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        // Modificar la función agregarServicioDirecto
+        function agregarServicioDirecto() {
+            console.log('Función agregarServicioDirecto ejecutada');
+            
+            // 1. Obtener el contrato seleccionado
+            var selectContrato = document.querySelector('select[x-model="selectedContrato"]');
+            if (!selectContrato || selectContrato.selectedIndex === 0) {
+                mostrarNotificacion('Por favor, seleccione un contrato primero', 'error');
+                return;
+            }
+            var contratoTexto = selectContrato.options[selectContrato.selectedIndex].text;
+            
+            // 2. Obtener el servicio seleccionado
+            var selectServicio = document.querySelector('select[x-model="selectedServicio"]');
+            if (!selectServicio || selectServicio.selectedIndex === 0) {
+                mostrarNotificacion('Por favor, seleccione un servicio primero', 'error');
+                return;
+            }
+            var servicioTextoCompleto = selectServicio.options[selectServicio.selectedIndex].text;
+            var servicioNombre = servicioTextoCompleto.replace(/\s*\(S\/\s*[0-9.]+\)/, '').trim();
+            
+            // 3. Verificar meses seleccionados
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            var algunMesSeleccionado = false;
+            var mesesDuplicados = [];
+            
+            for (var i = 0; i < checkboxes.length; i++) {
+                var checkbox = checkboxes[i];
+                if (checkbox.checked && !checkbox.disabled && checkbox.id.startsWith('month-')) {
+                    algunMesSeleccionado = true;
+                    var label = document.querySelector('label[for="' + checkbox.id + '"]');
+                    if (label) {
+                        var nombreSpan = label.querySelector('span:first-child');
+                        if (nombreSpan) {
+                            var nombreMes = nombreSpan.textContent.trim();
+                            // Verificar si el mes ya está en la tabla
+                            if (verificarMesExistente(contratoTexto, servicioNombre, nombreMes)) {
+                                mesesDuplicados.push(nombreMes);
+                                checkbox.checked = false;
+                            }
+                        }
                     }
-                })
-            })
-        </script>
-    @endpush
+                }
+            }
+            
+            // Si hay meses duplicados, mostrar notificación y detener
+            if (mesesDuplicados.length > 0) {
+                mostrarNotificacion(
+                    'Los siguientes meses ya están agregados: ' + mesesDuplicados.join(', '), 
+                    'warning'
+                );
+                return;
+            }
+            
+            // Si no hay meses seleccionados
+            if (!algunMesSeleccionado) {
+                mostrarNotificacion('Por favor, seleccione al menos un mes para pagar', 'warning');
+                return;
+            }
+            
+            // Extraer precio del servicio del texto del select
+            var precioMatch = servicioTextoCompleto.match(/\(S\/\s*([0-9.]+)\)/);
+            if (precioMatch && precioMatch[1]) {
+                var precioServicio = precioMatch[1].trim();
+            } else {
+                mostrarNotificacion('Por favor, ingrese el precio del servicio', 'error');
+                return;
+            }
+            
+            // 4. Obtener los meses seleccionados con un método más directo
+            var mesesSeleccionados = [];
+            var mesesTexto = [];
+            var subtotal = 0;
+            
+            // Busca todos los checkboxes (independientemente del framework)
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            console.log('Encontrados ' + checkboxes.length + ' checkboxes en total');
+            
+            // Iterar por todos los checkboxes encontrados
+            var mesesEncontrados = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                var checkbox = checkboxes[i];
+                if (checkbox.checked && !checkbox.disabled && checkbox.id.startsWith('month-')) {
+                    // Buscar el label que contiene el nombre del mes
+                    var labelId = checkbox.id;
+                    var label = document.querySelector('label[for="' + labelId + '"]');
+                    
+                    if (label) {
+                        // Obtener el nombre del mes
+                        var nombreSpan = label.querySelector('span:first-child');
+                        if (nombreSpan) {
+                            var nombreMes = nombreSpan.textContent.trim();
+                            mesesEncontrados++;
+                            
+                            // Buscar el precio en cualquier span dentro del label
+                            var precio = 0;
+                            var precioTexto = "";
+                            
+                            // Primero intentamos buscar en spans con clase específica para meses pendientes
+                            var precioSpan = label.querySelector('span.text-red-600');
+                            if (precioSpan) {
+                                precioTexto = precioSpan.textContent.replace('S/', '').trim();
+                                precio = parseFloat(precioTexto);
+                                if (!isNaN(precio)) {
+                                    subtotal += precio;
+                                }
+                            } else {
+                                // Buscar en span para meses en curso
+                                precioSpan = label.querySelector('span.text-yellow-600');
+                                if (precioSpan) {
+                                    precioTexto = precioSpan.textContent.replace('S/', '').trim();
+                                    precio = parseFloat(precioTexto);
+                                    if (!isNaN(precio)) {
+                                        subtotal += precio;
+                                    }
+                                } else {
+                                    var spans = label.querySelectorAll('span');
+                                    for (var j = 0; j < spans.length; j++) {
+                                        var span = spans[j];
+                                        if (span.textContent.includes('S/')) {
+                                            precioTexto = span.textContent.replace('S/', '').trim();
+                                            precio = parseFloat(precioTexto);
+                                            if (!isNaN(precio)) {
+                                                subtotal += precio;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // Agregamos el mes al array con su nombre y precio
+                            if (precio > 0) {
+                                mesesSeleccionados.push({
+                                    nombre: nombreMes,
+                                    precio: precio
+                                });
+                                mesesTexto.push(nombreMes + ' (S/ ' + precio + ')');
+                            } else {
+                                mesesSeleccionados.push({
+                                    nombre: nombreMes,
+                                    precio: 0
+                                });
+                                mesesTexto.push(nombreMes);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (mesesSeleccionados.length === 0) {
+                mostrarNotificacion('Por favor, seleccione al menos un mes para pagar', 'warning');
+                return;
+            }
+            
+            // 5. Crear objeto del servicio y agregarlo a la lista
+            var nuevoServicio = {
+                id: Date.now(),
+                contratoNumero: contratoTexto,
+                servicioNombre: servicioNombre,
+                precio: precioServicio,
+                mesesTexto: mesesTexto.join(', '),
+                subtotal: subtotal.toFixed(2)
+            };
+            
+            serviciosAgregados.push(nuevoServicio);
+            
+            // 6. Actualizar el total
+            totalPagar = 0;
+            for (var i = 0; i < serviciosAgregados.length; i++) {
+                totalPagar += parseFloat(serviciosAgregados[i].subtotal);
+            }
+            
+            // 7. Actualizar la tabla de detalles
+            actualizarTablaDetalles();
+            
+            // 8. Limpiar selecciones
+            limpiarSelecciones();
+            
+            // 9. Mostrar notificación de éxito
+            mostrarNotificacion('Servicio agregado correctamente', 'success');
+            
+            console.log('Servicio agregado correctamente');
+        }
+        
+        // Función para actualizar la tabla de detalles
+        function actualizarTablaDetalles() {
+            var tabla = document.querySelector('.overflow-x-auto table');
+            if (!tabla) {
+                console.error('No se encontró la tabla');
+                return;
+            }
+            
+            var tbody = tabla.querySelector('tbody');
+            var tfootTotal = tabla.querySelector('tfoot td:last-child');
+            
+            if (!tbody || !tfootTotal) {
+                console.error('No se encontraron elementos de la tabla');
+                return;
+            }
+            
+            // Limpiar tabla
+            tbody.innerHTML = '';
+            
+            // Verificar si hay servicios
+            if (serviciosAgregados.length === 0) {
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="6" class="py-4 text-center text-gray-500">' +
+                    'No hay servicios agregados. Seleccione un servicio y los meses a pagar.' +
+                    '</td>';
+                tbody.appendChild(tr);
+            } else {
+                // Agregar cada servicio a la tabla
+                for (var i = 0; i < serviciosAgregados.length; i++) {
+                    var servicio = serviciosAgregados[i];
+                    var index = i;
+                    
+                    // Extraer solo los nombres de los meses (sin precios)
+                    var mesesSoloNombres = servicio.mesesTexto.split(',')
+                        .map(function(mes) {
+                            return mes.split('(')[0].trim();
+                        })
+                        .join(', ');
+                    
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = '<td class="py-2 px-4 border-b border-b-gray-50">' +
+                        '<div class="flex items-center">' +
+                        '<button onclick="eliminarServicio(' + index + ')" class="w-8 h-8 rounded bg-red-100 flex items-center justify-center hover:bg-red-200">' +
+                        '<i class="fas fa-trash text-red-500 text-sm"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>' +
+                        '<td class="py-2 px-2 border-b border-b-gray-50">' +
+                        '<span class="text-gray-600 text-sm font-medium ml-2">' + servicio.contratoNumero + '</span>' +
+                        '</td>' +
+                        '<td class="py-2 px-2 border-b border-b-gray-50">' +
+                        '<span class="text-gray-600 text-sm font-medium ml-2 break-words" style="word-wrap: break-word; max-width: 200px; display: block;">' + 
+                        servicio.servicioNombre + 
+                        '</span>' +
+                        '</td>' +
+                        '<td class="py-2 px-4 border-b border-b-gray-50">' +
+                        '<span class="text-[13px] font-medium text-gray-600">S/ ' + servicio.precio + '</span>' +
+                        '</td>' +
+                        '<td class="py-2 px-4 border-b border-b-gray-50">' +
+                        '<span class="text-[13px] font-medium text-gray-600">' + mesesSoloNombres + '</span>' +
+                        '</td>' +
+                        '<td class="py-2 px-4 border-b border-b-gray-50 text-right">' +
+                        '<span class="text-[13px] font-medium text-emerald-500">S/ ' + servicio.subtotal + '</span>' +
+                        '</td>';
+                    tbody.appendChild(tr);
+                }
+            }
+            
+            // Actualizar el total
+            tfootTotal.textContent = 'S/ ' + totalPagar.toFixed(2);
+        }
+        
+        // Función para eliminar un servicio
+        function eliminarServicio(index) {
+            serviciosAgregados.splice(index, 1);
+            totalPagar = 0;
+            for (var i = 0; i < serviciosAgregados.length; i++) {
+                totalPagar += parseFloat(serviciosAgregados[i].subtotal);
+            }
+            actualizarTablaDetalles();
+            mostrarNotificacion('Servicio eliminado correctamente', 'dark');
+        }
+        
+        // Función para limpiar selecciones
+        function limpiarSelecciones() {
+            // Desmarcar todos los checkboxes
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (!checkboxes[i].disabled) {
+                    checkboxes[i].checked = false;
+                }
+            }
+            
+            // Intentar limpiar la selección del servicio (compatible con Alpine)
+            var selectServicio = document.querySelector('select[x-model="selectedServicio"]');
+            if (selectServicio) {
+                selectServicio.value = '';
+                try {
+                    selectServicio.dispatchEvent(new Event('change'));
+                } catch (e) {
+                    console.error('Error al disparar evento change:', e);
+                }
+            }
+        }
+        
+        // Inicializar tabla al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarTablaDetalles();
+            console.log('Tabla inicializada');
+        });
+    </script>
 
 @endsection
