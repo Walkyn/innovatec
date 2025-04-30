@@ -65,7 +65,7 @@
                                         <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
                                     </div>
                                     <input type="text" id="selected-client" value=""
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                        class="bg-white border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                         required readonly />
                                     <input type="hidden" id="selected-client-id" name="cliente_id" value="">
                                 </div>
@@ -79,8 +79,8 @@
                                     Buscar Cliente
                                 </label>
                                 <button id="toggleDropdown" type="button"
-                                    class="inline-flex items-center p-3 text-sm font-outfit text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-2 focus:outline-none focus:ring-slate-500 dark:focus:ring-slate-500 rounded w-full">
-                                    <span class="flex-1 text-left">Seleccionar</span>
+                                    class="inline-flex items-center p-3 text-ellipsis font-outfit text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-2 focus:outline-none focus:ring-slate-500 dark:focus:ring-slate-500 rounded w-full">
+                                    <span class="flex-1 text-left dark:text-gray-300">Seleccionar</span>
                                     <i class="fas fa-chevron-down text-xs ml-2.5"></i>
                                 </button>
                             </div>
@@ -94,7 +94,7 @@
                                 </label>
                                 <div class="relative">
                                     <select
-                                        class="block appearance-none w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 text-sm dark:text-gray-300 py-3.5 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3.5 px-4 pr-8 text-ellipsis rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                         id="tipo_pago">
                                         <option value="efectivo">Efectivo</option>
                                         <option value="deposito">Depósito</option>
@@ -114,7 +114,7 @@
                                         <i class="fas fa-search w-4 h-4 text-gray-500 dark:text-gray-400"></i>
                                     </div>
                                     <input type="text" id="searchInput"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                         placeholder="Buscar cliente" />
                                 </div>
                             </div>
@@ -140,7 +140,7 @@
 
                             </ul>
                             <div
-                                class="p-3 border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 rounded-b-lg">
+                                class="p-3 border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-700 rounded-b-lg">
                                 <a id="clearClient"
                                     class="flex items-center p-2 text-sm font-medium text-red-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-red-500 hover:underline cursor-pointer">
                                     <i class="fas fa-trash-alt text-xs w-4 h-4 me-2"></i>
@@ -159,7 +159,7 @@
                                 </label>
                                 <div class="relative">
                                     <input
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                         id="identificacion" placeholder="" disabled>
                                 </div>
                             </div>
@@ -172,7 +172,7 @@
                                 </label>
                                 <div class="relative">
                                     <input
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                         id="telefono" placeholder="" disabled>
                                 </div>
                             </div>
@@ -191,7 +191,7 @@
                                 </label>
                                 <div class="relative">
                                     <select
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                        class="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                         id="contrato">
                                     </select>
                                 </div>
@@ -206,7 +206,7 @@
                                 </label>
                                 <div class="relative">
                                     <select
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden"
+                                        class="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden"
                                         id="servicio">
                                     </select>
                                 </div>
@@ -221,7 +221,7 @@
                                 </label>
                                 <div class="relative">
                                     <select
-                                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden"
+                                        class="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 whitespace-nowrap text-ellipsis overflow-hidden"
                                         id="mes">
                                     </select>
                                 </div>
@@ -251,7 +251,7 @@
                                     <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
                                 </div>
                                 <input type="text" id="glosa" name="glosa" placeholder="Notas adicionales"
-                                    class="bg-gray-50 border border-gray-100 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    class="bg-white border border-gray-100 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                     required />
                             </div>
                         </div>
@@ -334,7 +334,7 @@
                                         <div class="flex-1 flex flex-col items-end">
                                             <label class="block mb-2 text-sm font-semibold uppercase">CAMBIO</label>
                                             <span id="cambio"
-                                                class="block border border-gray-300 rounded p-3 w-full text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm font-semibold">
+                                                class="block border border-gray-500 rounded p-3 w-full text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm font-semibold">
                                                 0.00
                                             </span>
                                         </div>
@@ -454,9 +454,6 @@
                             </option>
                             <option value="pendiente" class="flex items-center">
                                 <i class="fas fa-clock text-yellow-500 mr-1"></i> Pendiente
-                            </option>
-                            <option value="anulado" class="flex items-center">
-                                <i class="fas fa-times-circle text-red-500 mr-1"></i> Anulado
                             </option>
                             <option value="no_aplica" class="flex items-center">
                                 <i class="fas fa-ban text-gray-500 mr-1"></i> No Aplica

@@ -19,7 +19,7 @@
                 if (this.progressInterval) clearInterval(this.progressInterval);
                 
                 const startTime = Date.now();
-                const duration = 3000; // 3 segundos
+                const duration = 3000;
                 
                 this.progressInterval = setInterval(() => {
                     const elapsed = Date.now() - startTime;
@@ -116,6 +116,7 @@
                             
                             $mesesTmp = [];
                             $tienePendientes = false;
+                            $tieneEnCurso = false;
                             
                             // Variables para este servicio en este año
                             $mesActual = (int) \Carbon\Carbon::now()->format('n');
@@ -130,10 +131,10 @@
                             foreach ($mesesAnio as $mes) {
                                 // Omitir meses posteriores a la suspensión
                                 if ($fechaSuspension && $anio == $fechaSuspension->year && $mes->numero > $mesSuspension) {
-                                    continue; // Saltar este mes
+                                    continue;
                                 }
                                 if ($fechaSuspension && $anio > $fechaSuspension->year) {
-                                    continue; // Saltar los años posteriores al año de suspensión
+                                    continue;
                                 }
                                 
                                 // 1) Determinar estado
@@ -153,8 +154,10 @@
                                     $estado = 'no_aplica';
                                 } elseif ($fechaSuspension && $anio == $fechaSuspension->year && $mes->numero === $mesSuspension) {
                                     $estado = \Carbon\Carbon::now()->gte($fechaSuspension) ? 'pendiente' : 'en_curso';
+                                    if ($estado === 'en_curso') $tieneEnCurso = true;
                                 } elseif ($anio == $anioActual && $mes->numero === $mesActual) {
                                     $estado = 'en_curso';
+                                    $tieneEnCurso = true;
                                 } elseif ($anio > $anioActual || ($anio == $anioActual && $mes->numero > $mesActual)) {
                                     $estado = 'futuro';
                                 } else {
@@ -211,12 +214,13 @@
                                 ];
                             }
                             
-                            // Solo agregar años que tienen meses (no aplica si todos son no_aplica)
-                            if (!empty($mesesTmp)) {
+                            // Solo agregar años que tienen meses pendientes o en curso
+                            if ($tienePendientes || $tieneEnCurso) {
                                 $anios[] = [
                                     'anio' => $anio,
                                     'meses' => $mesesTmp,
-                                    'tienePendientes' => $tienePendientes
+                                    'tienePendientes' => $tienePendientes,
+                                    'tieneEnCurso' => $tieneEnCurso
                                 ];
                             }
                         }
@@ -238,7 +242,7 @@
                 openAnio: null
             })" class="grid grid-cols-1 mb-2">
                 {{-- Select Contrato --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Contrato</label>
                         <select x-model="selectedContrato"
@@ -329,8 +333,99 @@
                     </template>
                     
                     <!-- Mensaje cuando no hay años/meses disponibles -->
-                    <div x-show="selectedServicio && anios.length === 0" class="text-center py-4 text-gray-500">
-                        No hay meses disponibles para este servicio.
+                    <div x-show="selectedServicio && anios.length === 0" 
+                         class="flex flex-col items-center justify-center mb-2 p-8 bg-white border border-gray-100 rounded-xl shadow-sm">
+                        
+                        <!-- Para servicios activos y al día -->
+                        <template x-if="servicios.find(s => s.id == selectedServicio)?.estado_servicio_cliente === 'activo'">
+                            <div class="flex flex-col items-center">
+                                <!-- Icono de check -->
+                                <div class="w-16 h-16 mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                
+                                <!-- Título -->
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                                    ¡Estás al día!
+                                </h3>
+                                
+                                <!-- Mensaje -->
+                                <p class="text-gray-500 text-center max-w-sm">
+                                    No tienes pagos pendientes para este servicio. Gracias por tu puntualidad.
+                                </p>
+                                
+                                <!-- Badge con el estado -->
+                                <div class="mt-4 inline-flex items-center px-4 py-2 rounded-full bg-green-50 text-sm text-green-700">
+                                    <span class="mr-1.5">•</span>
+                                    <span>Servicio al día</span>
+                                </div>
+                                
+                                <!-- Nota adicional -->
+                                <p class="mt-6 text-sm text-gray-400 text-center">
+                                    Tu próximo pago se habilitará cuando inicie el siguiente mes de servicio
+                                </p>
+                            </div>
+                        </template>
+
+                        <!-- Para servicios suspendidos -->
+                        <template x-if="servicios.find(s => s.id == selectedServicio)?.estado_servicio_cliente === 'suspendido'">
+                            <div class="flex flex-col items-center">
+                                <!-- Icono de advertencia -->
+                                <div class="w-16 h-16 mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                </div>
+                                
+                                <!-- Título -->
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                                    Servicio Suspendido
+                                </h3>
+                                
+                                <!-- Mensaje -->
+                                <p class="text-gray-500 text-center max-w-sm">
+                                    Este servicio se encuentra actualmente suspendido. Por favor, contacta con soporte para más información.
+                                </p>
+                                
+                                <!-- Badge con el estado -->
+                                <div class="mt-4 inline-flex items-center  font-bold text-xs px-4 py-2 rounded-full bg-red-50 text-red-700">
+                                    <i class="fas fa-ban mr-1"></i>
+                                    <span>Suspendido</span>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Para servicios cancelados -->
+                        <template x-if="servicios.find(s => s.id == selectedServicio)?.estado_servicio_cliente === 'cancelado'">
+                            <div class="flex flex-col items-center">
+                                <!-- Icono de cancelado -->
+                                <div class="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </div>
+                                
+                                <!-- Título -->
+                                <h3 class="text-xl font-semibold text-gray-800 mb-2">
+                                    Servicio Cancelado
+                                </h3>
+                                
+                                <!-- Mensaje -->
+                                <p class="text-gray-500 text-center max-w-sm">
+                                    Este servicio ha sido cancelado. Si deseas reactivarlo, por favor contacta con nuestro equipo de soporte.
+                                </p>
+                                
+                                <!-- Badge con el estado -->
+                                <div class="mt-4 inline-flex items-center px-4 py-2 rounded-full bg-gray-100 text-sm text-gray-700">
+                                    <span class="mr-1.5">•</span>
+                                    <span>Cancelado</span>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>

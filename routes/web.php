@@ -319,28 +319,119 @@ Route::middleware('auth')->group(function () {
         ]);
     })->middleware('check.permissions:manage,all');
 
+    // Esta es la función que proporciona los servicios para el modal de pagos
     Route::get('/contratos/{id}/servicios', function ($id) {
-        return response()->json(
-            ContratoServicio::where('contrato_id', $id)
-                ->whereIn('estado_servicio_cliente', ['activo', 'suspendido'])
-                ->with(['servicio', 'plan'])
-                ->get()
-                ->map(function ($contratoServicio) {
-                    $nombreServicio = $contratoServicio->servicio->nombre;
-                    $nombrePlan = $contratoServicio->plan ? $contratoServicio->plan->nombre : 'Sin Plan';
-
-                    return [
-                        'contrato_servicio_id' => $contratoServicio->id,
-                        'id' => $contratoServicio->servicio->id,
-                        'nombre' => $nombreServicio,
-                        'plan_nombre' => $nombrePlan,
-                        'fecha_servicio' => $contratoServicio->fecha_servicio,
-                        'estado_servicio' => $contratoServicio->estado_servicio_cliente,
-                        'fecha_suspension' => $contratoServicio->fecha_suspension_servicio
-                    ];
-                })
-        );
-    })->middleware('check.permissions:manage,all');
+        // Recoger todos los servicios activos - estos siempre se incluyen
+        $serviciosActivos = ContratoServicio::where('contrato_id', $id)
+            ->where('estado_servicio_cliente', 'activo')
+            ->with(['servicio', 'plan'])
+            ->get();
+        
+        // Recoger servicios suspendidos, pero solo los procesaremos si tienen meses pendientes
+        $serviciosSuspendidos = ContratoServicio::where('contrato_id', $id)
+            ->where('estado_servicio_cliente', 'suspendido')
+            ->with(['servicio', 'plan'])
+            ->get();
+        
+        // Filtramos los servicios suspendidos que tienen meses pendientes
+        $serviciosSuspendidosConPendientes = $serviciosSuspendidos->filter(function ($cs) {
+            // Fecha de servicio y suspensión
+            $fechaInicio = \Carbon\Carbon::parse($cs->fecha_servicio);
+            $fechaSuspension = $cs->fecha_suspension_servicio 
+                ? \Carbon\Carbon::parse($cs->fecha_suspension_servicio) 
+                : null;
+            
+            // Si no hay fecha de suspensión válida, excluimos
+            if (!$fechaSuspension) {
+                return false;
+            }
+            
+            // Buscar todos los meses en el rango de fechas (desde inicio hasta suspensión)
+            $meses = \App\Models\Mes::where(function($q) use ($fechaInicio, $fechaSuspension) {
+                // Mismo año
+                if ($fechaInicio->year == $fechaSuspension->year) {
+                    $q->where('anio', $fechaInicio->year)
+                      ->where('numero', '>=', $fechaInicio->month)
+                      ->where('numero', '<=', $fechaSuspension->month);
+                } else {
+                    // Años diferentes
+                    $q->where(function($q1) use ($fechaInicio) {
+                        // Meses del primer año
+                        $q1->where('anio', $fechaInicio->year)
+                           ->where('numero', '>=', $fechaInicio->month);
+                    })->orWhere(function($q2) use ($fechaSuspension) {
+                        // Meses del último año
+                        $q2->where('anio', $fechaSuspension->year)
+                           ->where('numero', '<=', $fechaSuspension->month);
+                    })->orWhere(function($q3) use ($fechaInicio, $fechaSuspension) {
+                        // Años intermedios
+                        $q3->where('anio', '>', $fechaInicio->year)
+                           ->where('anio', '<', $fechaSuspension->year);
+                    });
+                }
+            })->get();
+            
+            // Meses ya pagados o marcados como no_aplica
+            $mesesExcluidos = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+                ->where('contrato_servicio_id', $cs->id)
+                ->whereIn('estado_pago', ['pagado', 'no_aplica'])
+                ->pluck('mes_id')
+                ->toArray();
+            
+            // Verificar si el primer mes debe excluirse (menos de 5 días)
+            foreach ($meses as $mes) {
+                if ($mes->anio == $fechaInicio->year && $mes->numero == $fechaInicio->month) {
+                    $fechaFinMes = \Carbon\Carbon::parse($mes->fecha_fin);
+                    $diaInicio = (int) $fechaInicio->format('j');
+                    $ultimoDia = (int) $fechaFinMes->format('j');
+                    $diasRestantes = $ultimoDia - $diaInicio;
+                    
+                    if ($diasRestantes < 5) {
+                        $mesesExcluidos[] = $mes->id;
+                    }
+                    break;
+                }
+            }
+            
+            // Verificar si hay meses pendientes
+            $tienePendientes = false;
+            foreach ($meses as $mes) {
+                if (!in_array($mes->id, $mesesExcluidos)) {
+                    $tienePendientes = true;
+                    break;
+                }
+            }
+            
+            // DEBUG - registra información para diagnóstico
+            \Illuminate\Support\Facades\Log::info('Servicio suspendido ID: ' . $cs->id, [
+                'fecha_inicio' => $fechaInicio->toDateString(),
+                'fecha_suspension' => $fechaSuspension->toDateString(),
+                'meses_totales' => $meses->count(),
+                'meses_excluidos' => count($mesesExcluidos),
+                'tiene_pendientes' => $tienePendientes
+            ]);
+            
+            return $tienePendientes;
+        });
+        
+        // Combinar servicios activos y suspendidos con pendientes
+        $serviciosFiltrados = $serviciosActivos->concat($serviciosSuspendidosConPendientes);
+        
+        // Formatear respuesta
+        $resultados = $serviciosFiltrados->map(function ($cs) {
+            return [
+                'contrato_servicio_id' => $cs->id,
+                'id' => $cs->servicio->id,
+                'nombre' => $cs->servicio->nombre,
+                'plan_nombre' => $cs->plan ? $cs->plan->nombre : 'Sin Plan',
+                'fecha_servicio' => $cs->fecha_servicio,
+                'estado_servicio' => $cs->estado_servicio_cliente,
+                'fecha_suspension' => $cs->fecha_suspension_servicio
+            ];
+        });
+        
+        return response()->json($resultados);
+    });
 
     // Rutas de ubicación protegidas
     Route::get('/provincias/{regionId}', function ($regionId) {
@@ -399,26 +490,107 @@ Route::get('/contratos/{clientId}', function ($clientId) {
 });
 
 Route::get('/contratos/{id}/servicios', function ($id) {
-    return response()->json(
-        ContratoServicio::where('contrato_id', $id)
-            ->whereIn('estado_servicio_cliente', ['activo', 'suspendido'])
-            ->with(['servicio', 'plan'])
-            ->get()
-            ->map(function ($contratoServicio) {
-                $nombreServicio = $contratoServicio->servicio->nombre;
-                $nombrePlan = $contratoServicio->plan ? $contratoServicio->plan->nombre : 'Sin Plan';
-
-                return [
-                    'contrato_servicio_id' => $contratoServicio->id,
-                    'id' => $contratoServicio->servicio->id,
-                    'nombre' => $nombreServicio,
-                    'plan_nombre' => $nombrePlan,
-                    'fecha_servicio' => $contratoServicio->fecha_servicio,
-                    'estado_servicio' => $contratoServicio->estado_servicio_cliente,
-                    'fecha_suspension' => $contratoServicio->fecha_suspension_servicio
-                ];
-            })
-    );
+    // Recoger todos los servicios activos - estos siempre se incluyen
+    $serviciosActivos = ContratoServicio::where('contrato_id', $id)
+        ->where('estado_servicio_cliente', 'activo')
+        ->with(['servicio', 'plan'])
+        ->get();
+    
+    // Recoger servicios suspendidos, pero solo los procesaremos si tienen meses pendientes
+    $serviciosSuspendidos = ContratoServicio::where('contrato_id', $id)
+        ->where('estado_servicio_cliente', 'suspendido')
+        ->with(['servicio', 'plan'])
+        ->get();
+    
+    // Filtramos los servicios suspendidos que tienen meses pendientes
+    $serviciosSuspendidosConPendientes = $serviciosSuspendidos->filter(function ($cs) {
+        // Fecha de servicio y suspensión
+        $fechaInicio = \Carbon\Carbon::parse($cs->fecha_servicio);
+        $fechaSuspension = $cs->fecha_suspension_servicio 
+            ? \Carbon\Carbon::parse($cs->fecha_suspension_servicio) 
+            : null;
+        
+        // Si no hay fecha de suspensión válida, excluimos
+        if (!$fechaSuspension) {
+            return false;
+        }
+        
+        // Buscar todos los meses en el rango de fechas (desde inicio hasta suspensión)
+        $meses = \App\Models\Mes::where(function($q) use ($fechaInicio, $fechaSuspension) {
+            // Mismo año
+            if ($fechaInicio->year == $fechaSuspension->year) {
+                $q->where('anio', $fechaInicio->year)
+                  ->where('numero', '>=', $fechaInicio->month)
+                  ->where('numero', '<=', $fechaSuspension->month);
+            } else {
+                // Años diferentes
+                $q->where(function($q1) use ($fechaInicio) {
+                    // Meses del primer año
+                    $q1->where('anio', $fechaInicio->year)
+                       ->where('numero', '>=', $fechaInicio->month);
+                })->orWhere(function($q2) use ($fechaSuspension) {
+                    // Meses del último año
+                    $q2->where('anio', $fechaSuspension->year)
+                       ->where('numero', '<=', $fechaSuspension->month);
+                })->orWhere(function($q3) use ($fechaInicio, $fechaSuspension) {
+                    // Años intermedios
+                    $q3->where('anio', '>', $fechaInicio->year)
+                       ->where('anio', '<', $fechaSuspension->year);
+                });
+            }
+        })->get();
+        
+        // Meses ya pagados o marcados como no_aplica
+        $mesesExcluidos = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+            ->where('contrato_servicio_id', $cs->id)
+            ->whereIn('estado_pago', ['pagado', 'no_aplica'])
+            ->pluck('mes_id')
+            ->toArray();
+        
+        // Verificar si el primer mes debe excluirse (menos de 5 días)
+        foreach ($meses as $mes) {
+            if ($mes->anio == $fechaInicio->year && $mes->numero == $fechaInicio->month) {
+                $fechaFinMes = \Carbon\Carbon::parse($mes->fecha_fin);
+                $diaInicio = (int) $fechaInicio->format('j');
+                $ultimoDia = (int) $fechaFinMes->format('j');
+                $diasRestantes = $ultimoDia - $diaInicio;
+                
+                if ($diasRestantes < 5) {
+                    $mesesExcluidos[] = $mes->id;
+                }
+                break;
+            }
+        }
+        
+        // Verificar si hay meses pendientes
+        $tienePendientes = false;
+        foreach ($meses as $mes) {
+            if (!in_array($mes->id, $mesesExcluidos)) {
+                $tienePendientes = true;
+                break;
+            }
+        }
+        
+        return $tienePendientes;
+    });
+    
+    // Combinar servicios activos y suspendidos con pendientes
+    $serviciosFiltrados = $serviciosActivos->concat($serviciosSuspendidosConPendientes);
+    
+    // Formatear respuesta
+    $resultados = $serviciosFiltrados->map(function ($cs) {
+        return [
+            'contrato_servicio_id' => $cs->id,
+            'id' => $cs->servicio->id,
+            'nombre' => $cs->servicio->nombre,
+            'plan_nombre' => $cs->plan ? $cs->plan->nombre : 'Sin Plan',
+            'fecha_servicio' => $cs->fecha_servicio,
+            'estado_servicio' => $cs->estado_servicio_cliente,
+            'fecha_suspension' => $cs->fecha_suspension_servicio
+        ];
+    });
+    
+    return response()->json($resultados);
 });
 
 //Rutas para la Vista de Creación Cliente
