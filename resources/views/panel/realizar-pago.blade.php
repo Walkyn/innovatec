@@ -708,6 +708,7 @@
 
             <!-- Selección de medio de pago mejorada -->
             <div x-data="{
+                mediosPago: @js($mediosPago),
                 selectedMethod: '',
                 copyToClipboard(text) {
                     navigator.clipboard.writeText(text)
@@ -734,12 +735,9 @@
                     <select x-model="selectedMethod"
                         class="w-full sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                         <option value="">Seleccione medio de pago</option>
-                        <option value="bcp">BCP</option>
-                        <option value="bbva">BBVA</option>
-                        <option value="nacion">Banco de la Nación</option>
-                        <option value="piura">Caja Piura</option>
-                        <option value="yape">Yape</option>
-                        <option value="plin">Plin</option>
+                        <template x-for="medio in mediosPago" :key="medio.id">
+                            <option :value="medio.tipo_pago" x-text="medio.nombre_tipo_pago || medio.tipo_pago"></option>
+                        </template>
                     </select>
                 </div>
 
@@ -764,206 +762,50 @@
                             <p class="text-gray-400 text-sm">Para ver los detalles de la cuenta</p>
                         </div>
 
-                        <!-- Tarjeta BCP -->
-                        <div x-show="selectedMethod === 'bcp'" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute inset-0 bg-[#005696] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-lg font-semibold">BCP</p>
-                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                    <img src="{{ asset('images/paymethods/bcp.png') }}" alt="BCP" class="w-10 h-10">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-xs text-white/80">Cuenta Corriente</p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-medium">193-1234567-0-89</p>
-                                        <button @click="copyToClipboard('193-1234567-0-89')" 
-                                            class="text-white/80 hover:text-white">
-                                            <i class="fas fa-copy text-xs"></i>
-                                        </button>
+                        <!-- Tarjeta dinámica para cada medio de pago -->
+                        <template x-for="medio in mediosPago" :key="medio.id">
+                            <div x-show="selectedMethod === medio.tipo_pago" 
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 transform scale-95"
+                                x-transition:enter-end="opacity-100 transform scale-100"
+                                x-transition:leave="transition ease-in duration-200"
+                                x-transition:leave-start="opacity-100 transform scale-100"
+                                x-transition:leave-end="opacity-0 transform scale-95"
+                                :class="{
+                                    'bg-[#005696]': medio.tipo_pago === 'BCP',
+                                    'bg-[#00427F]': medio.tipo_pago === 'BBVA',
+                                    'bg-[#D12C1F]': medio.tipo_pago === 'BN',
+                                    'bg-gradient-to-r from-[#003C7F] to-[#0056B3]': medio.tipo_pago === 'CAJA_PIURA',
+                                    'bg-[#742284]': medio.tipo_pago === 'YAPE',
+                                    'bg-[#6AB4E0]': medio.tipo_pago === 'PLIN',
+                                }"
+                                class="absolute inset-0 rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                                <div class="flex items-center justify-between mb-4">
+                                    <p class="text-lg font-semibold" x-text="medio.nombre_tipo_pago || medio.tipo_pago"></p>
+                                    <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                                        <img :src="'{{ asset('images/paymethods/') }}/' + medio.tipo_pago.toLowerCase() + '.png'" 
+                                             :alt="medio.nombre_tipo_pago || medio.tipo_pago" 
+                                             class="w-10 h-10">
                                     </div>
                                 </div>
-                                <div>
-                                    <p class="text-xs text-white/80">Titular</p>
-                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta BBVA -->
-                        <div x-show="selectedMethod === 'bbva'" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute inset-0 bg-[#00427F] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-lg font-semibold">BBVA</p>
-                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                    <img src="{{ asset('images/paymethods/bbva.png') }}" alt="BBVA"
-                                        class="w-10 h-10">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-xs text-white/80">Cuenta Corriente</p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-medium">0011-0123-0123456789</p>
-                                        <button @click="copyToClipboard('0011-0123-0123456789')"
-                                            class="text-white/80 hover:text-white">
-                                            <i class="fas fa-copy text-xs"></i>
-                                        </button>
+                                <div class="space-y-2">
+                                    <div>
+                                        <p class="text-xs text-white/80" x-text="medio.tipo_pago === 'YAPE' || medio.tipo_pago === 'PLIN' ? 'Número de Teléfono' : 'Cuenta Corriente'"></p>
+                                        <div class="flex items-center gap-2">
+                                            <p class="text-sm font-medium" x-text="medio.numero_cuenta"></p>
+                                            <button @click="copyToClipboard(medio.numero_cuenta)" 
+                                                class="text-white/80 hover:text-white">
+                                                <i class="fas fa-copy text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-white/80">Titular</p>
+                                        <p class="text-sm" x-text="medio.titular"></p>
                                     </div>
                                 </div>
-                                <div>
-                                    <p class="text-xs text-white/80">Titular</p>
-                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
-                                </div>
                             </div>
-                        </div>
-
-                        <!-- Tarjeta Banco de la Nación -->
-                        <div x-show="selectedMethod === 'nacion'" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute inset-0 bg-[#D12C1F] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <p class="text-lg font-semibold no-wrap">Banco de la Nación</p>
-                                </div>
-                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                    <img src="{{ asset('images/paymethods/bcn.png') }}" alt="Banco de la Nación"
-                                        class="w-10 h-10">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-xs text-white/80">Cuenta Corriente</p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-medium">04-074-875432</p>
-                                        <button @click="copyToClipboard('04074875432')"
-                                            class="text-white/80 hover:text-white">
-                                            <i class="fas fa-copy text-xs"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-white/80">Titular</p>
-                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta Caja Piura -->
-                        <div x-show="selectedMethod === 'piura'" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute inset-0 bg-gradient-to-r from-[#003C7F] to-[#0056B3] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <p class="text-lg font-semibold no-wrap">Caja Piura</p>
-                                </div>
-                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                    <img src="{{ asset('images/paymethods/piura.png') }}" alt="Caja Piura"
-                                        class="w-10 h-10">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-xs text-white/80">Cuenta de Ahorros</p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-medium">110-01-2345678</p>
-                                        <button @click="copyToClipboard('110012345678')"
-                                            class="text-white/80 hover:text-white">
-                                            <i class="fas fa-copy text-xs"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-white/80">Titular</p>
-                                    <p class="text-sm">NEXUS TELECOM S.A.C</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta Yape -->
-                        <div x-show="selectedMethod === 'yape'" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute inset-0 bg-[#742284] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-lg font-semibold">Yape</p>
-                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                    <img src="{{ asset('images/paymethods/yape.png') }}" alt="Yape"
-                                        class="w-10 h-10">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-xs text-white/80">Número de Teléfono</p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-medium">987 654 321</p>
-                                        <button @click="copyToClipboard('987654321')"
-                                            class="text-white/80 hover:text-white">
-                                            <i class="fas fa-copy text-xs"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-white/80">Titular</p>
-                                    <p class="text-sm">Juan Pérez</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta Plin -->
-                        <div x-show="selectedMethod === 'plin'" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95"
-                            class="absolute inset-0 bg-[#6AB4E0] rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
-                            <div class="flex items-center justify-between mb-4">
-                                <p class="text-lg font-semibold">Plin</p>
-                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                                    <img src="{{ asset('images/paymethods/plin.png') }}" alt="Plin"
-                                        class="w-10 h-10">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div>
-                                    <p class="text-xs text-white/80">Número de Teléfono</p>
-                                    <div class="flex items-center gap-2">
-                                        <p class="text-sm font-medium">999 888 777</p>
-                                        <button @click="copyToClipboard('999888777')"
-                                            class="text-white/80 hover:text-white">
-                                            <i class="fas fa-copy text-xs"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-white/80">Titular</p>
-                                    <p class="text-sm">Juan Pérez</p>
-                                </div>
-                            </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -1057,7 +899,7 @@
             }
             var contratoTexto = selectContrato.options[selectContrato.selectedIndex].text;
             
-            // 2. Obtener el servicio seleccionado
+            // 2. Obtener el servicio seleccionado y su precio
             var selectServicio = document.querySelector('select[x-model="selectedServicio"]');
             if (!selectServicio || selectServicio.selectedIndex === 0) {
                 mostrarNotificacion('Por favor, seleccione un servicio primero', 'error');
@@ -1066,20 +908,41 @@
             var servicioTextoCompleto = selectServicio.options[selectServicio.selectedIndex].text;
             var servicioNombre = servicioTextoCompleto.replace(/\s*\(S\/\s*[0-9.]+\)/, '').trim();
             
+            // Extraer el precio del servicio del texto completo
+            var precioMatch = servicioTextoCompleto.match(/\(S\/\s*([0-9.]+)\)/);
+            var precioServicio = precioMatch ? precioMatch[1].trim() : '0.00';
+
             // 3. Verificar meses seleccionados
             var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            var algunMesSeleccionado = false;
             var mesesDuplicados = [];
             
             for (var i = 0; i < checkboxes.length; i++) {
                 var checkbox = checkboxes[i];
                 if (checkbox.checked && !checkbox.disabled && checkbox.id.startsWith('month-')) {
-                    algunMesSeleccionado = true;
-                    var label = document.querySelector('label[for="' + checkbox.id + '"]');
+                    var labelId = checkbox.id;
+                    var label = document.querySelector('label[for="' + labelId + '"]');
+                    
                     if (label) {
+                        // Encontrar el año del mes (buscando en los ancestros hasta encontrar el año)
+                        var anioElement = label.closest('[x-show="openAnio === anio.anio"]');
+                        var anio = anioElement ? 
+                            parseInt(anioElement.previousElementSibling.textContent.match(/\d+/)[0]) : 
+                            new Date().getFullYear();
+                        
                         var nombreSpan = label.querySelector('span:first-child');
                         if (nombreSpan) {
                             var nombreMes = nombreSpan.textContent.trim();
+                            var numeroMes = obtenerNumeroMes(nombreMes);
+                            
+                            // Buscar el precio
+                            var precio = 0;
+                            var precioSpan = label.querySelector('span.text-red-600') || 
+                                           label.querySelector('span.text-yellow-600');
+                            
+                            if (precioSpan) {
+                                precio = parseFloat(precioSpan.textContent.replace('S/', '').trim());
+                            }
+                            
                             // Verificar si el mes ya está en la tabla
                             if (verificarMesExistente(contratoTexto, servicioNombre, nombreMes)) {
                                 mesesDuplicados.push(nombreMes);
@@ -1099,106 +962,62 @@
                 return;
             }
             
-            // Si no hay meses seleccionados
-            if (!algunMesSeleccionado) {
-                mostrarNotificacion('Por favor, seleccione al menos un mes para pagar', 'warning');
-                return;
-            }
-            
-            // Extraer precio del servicio del texto del select
-            var precioMatch = servicioTextoCompleto.match(/\(S\/\s*([0-9.]+)\)/);
-            if (precioMatch && precioMatch[1]) {
-                var precioServicio = precioMatch[1].trim();
-            } else {
-                mostrarNotificacion('Por favor, ingrese el precio del servicio', 'error');
-                return;
-            }
-            
-            // 4. Obtener los meses seleccionados con un método más directo
+            // 4. Obtener los meses seleccionados con ordenamiento cronológico
             var mesesSeleccionados = [];
-            var mesesTexto = [];
-            var subtotal = 0;
+            checkboxes = document.querySelectorAll('input[type="checkbox"]');
             
-            // Busca todos los checkboxes (independientemente del framework)
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            console.log('Encontrados ' + checkboxes.length + ' checkboxes en total');
-            
-            // Iterar por todos los checkboxes encontrados
-            var mesesEncontrados = 0;
             for (var i = 0; i < checkboxes.length; i++) {
                 var checkbox = checkboxes[i];
                 if (checkbox.checked && !checkbox.disabled && checkbox.id.startsWith('month-')) {
-                    // Buscar el label que contiene el nombre del mes
                     var labelId = checkbox.id;
                     var label = document.querySelector('label[for="' + labelId + '"]');
                     
                     if (label) {
-                        // Obtener el nombre del mes
+                        // Encontrar el año del mes (buscando en los ancestros hasta encontrar el año)
+                        var anioElement = label.closest('[x-show="openAnio === anio.anio"]');
+                        var anio = anioElement ? 
+                            parseInt(anioElement.previousElementSibling.textContent.match(/\d+/)[0]) : 
+                            new Date().getFullYear();
+                        
                         var nombreSpan = label.querySelector('span:first-child');
                         if (nombreSpan) {
                             var nombreMes = nombreSpan.textContent.trim();
-                            mesesEncontrados++;
+                            var numeroMes = obtenerNumeroMes(nombreMes);
                             
-                            // Buscar el precio en cualquier span dentro del label
+                            // Buscar el precio
                             var precio = 0;
-                            var precioTexto = "";
+                            var precioSpan = label.querySelector('span.text-red-600') || 
+                                           label.querySelector('span.text-yellow-600');
                             
-                            // Primero intentamos buscar en spans con clase específica para meses pendientes
-                            var precioSpan = label.querySelector('span.text-red-600');
                             if (precioSpan) {
-                                precioTexto = precioSpan.textContent.replace('S/', '').trim();
-                                precio = parseFloat(precioTexto);
-                                if (!isNaN(precio)) {
-                                    subtotal += precio;
-                                }
-                            } else {
-                                // Buscar en span para meses en curso
-                                precioSpan = label.querySelector('span.text-yellow-600');
-                                if (precioSpan) {
-                                    precioTexto = precioSpan.textContent.replace('S/', '').trim();
-                                    precio = parseFloat(precioTexto);
-                                    if (!isNaN(precio)) {
-                                        subtotal += precio;
-                                    }
-                                } else {
-                                    var spans = label.querySelectorAll('span');
-                                    for (var j = 0; j < spans.length; j++) {
-                                        var span = spans[j];
-                                        if (span.textContent.includes('S/')) {
-                                            precioTexto = span.textContent.replace('S/', '').trim();
-                                            precio = parseFloat(precioTexto);
-                                            if (!isNaN(precio)) {
-                                                subtotal += precio;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
+                                precio = parseFloat(precioSpan.textContent.replace('S/', '').trim());
                             }
                             
-                            // Agregamos el mes al array con su nombre y precio
-                            if (precio > 0) {
-                                mesesSeleccionados.push({
-                                    nombre: nombreMes,
-                                    precio: precio
-                                });
-                                mesesTexto.push(nombreMes + ' (S/ ' + precio + ')');
-                            } else {
-                                mesesSeleccionados.push({
-                                    nombre: nombreMes,
-                                    precio: 0
-                                });
-                                mesesTexto.push(nombreMes);
-                            }
+                            mesesSeleccionados.push({
+                                nombre: nombreMes,
+                                precio: precio,
+                                anio: anio,
+                                numeroMes: numeroMes
+                            });
                         }
                     }
                 }
             }
             
-            if (mesesSeleccionados.length === 0) {
-                mostrarNotificacion('Por favor, seleccione al menos un mes para pagar', 'warning');
-                return;
-            }
+            // Ordenar meses cronológicamente
+            mesesSeleccionados.sort(function(a, b) {
+                if (a.anio !== b.anio) {
+                    return a.anio - b.anio;
+                }
+                return a.numeroMes - b.numeroMes;
+            });
+            
+            // Calcular subtotal y crear texto de meses
+            var subtotal = 0;
+            var mesesTexto = mesesSeleccionados.map(function(mes) {
+                subtotal += mes.precio;
+                return mes.nombre;
+            }).join(', ');
             
             // 5. Crear objeto del servicio y agregarlo a la lista
             var nuevoServicio = {
@@ -1206,7 +1025,7 @@
                 contratoNumero: contratoTexto,
                 servicioNombre: servicioNombre,
                 precio: precioServicio,
-                mesesTexto: mesesTexto.join(', '),
+                mesesTexto: mesesTexto,
                 subtotal: subtotal.toFixed(2)
             };
             
@@ -1340,6 +1159,25 @@
             actualizarTablaDetalles();
             console.log('Tabla inicializada');
         });
+
+        // Función auxiliar para obtener el número del mes
+        function obtenerNumeroMes(nombreMes) {
+            var meses = {
+                'Enero': 1,
+                'Febrero': 2,
+                'Marzo': 3,
+                'Abril': 4,
+                'Mayo': 5,
+                'Junio': 6,
+                'Julio': 7,
+                'Agosto': 8,
+                'Septiembre': 9,
+                'Octubre': 10,
+                'Noviembre': 11,
+                'Diciembre': 12
+            };
+            return meses[nombreMes] || 0;
+        }
     </script>
 
 @endsection

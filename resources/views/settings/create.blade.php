@@ -35,31 +35,33 @@
                         <div
                             class="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                             <div
-                                class="border-b flex items-center justify-between border-stroke px-7 py-4 dark:border-strokedark">
-                                <h3 class="font-medium text-black dark:text-white">
-                                    Información de la empresa
-                                </h3>
-                                <!-- Modal toggle -->
-                                <button data-modal-target="ticket-modal" data-modal-toggle="ticket-modal"
-                                    class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                    type="button">
-                                    <span class="flex items-center gap-2">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M19.5 12.5C19.5 11.12 20.62 10 22 10V9C22 5 21 4 17 4H7C3 4 2 5 2 9V9.5C3.38 9.5 4.5 10.62 4.5 12C4.5 13.38 3.38 14.5 2 14.5V15C2 19 3 20 7 20H17C21 20 22 19 22 15C20.62 15 19.5 13.88 19.5 12.5Z"
-                                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                            <path d="M9 14.75L15 8.75" stroke="currentColor" stroke-width="1.5"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M14.995 14.75H15.004" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                            <path d="M8.995 9.25H9.004" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        Ticket
-                                    </span>
-                                </button>
+                                class="border-b border-stroke px-7 py-4 dark:border-strokedark">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <h3 class="font-medium text-black dark:text-white">
+                                        Información de la empresa
+                                    </h3>
+                                    <!-- Modal toggle -->
+                                    <button data-modal-target="modal-medios-pago" data-modal-toggle="modal-medios-pago"
+                                        class="block text-white bg-primary hover:bg-opacity-90 focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded text-sm px-5 py-2.5 text-center dark:bg-primary dark:hover:bg-opacity-90 dark:focus:ring-primary"
+                                        type="button">
+                                        <span class="flex items-center gap-2">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M19.5 12.5C19.5 11.12 20.62 10 22 10V9C22 5 21 4 17 4H7C3 4 2 5 2 9V9.5C3.38 9.5 4.5 10.62 4.5 12C4.5 13.38 3.38 14.5 2 14.5V15C2 19 3 20 7 20H17C21 20 22 19 22 15C20.62 15 19.5 13.88 19.5 12.5Z"
+                                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                                <path d="M9 14.75L15 8.75" stroke="currentColor" stroke-width="1.5"
+                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M14.995 14.75H15.004" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                                <path d="M8.995 9.25H9.004" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            Medios de Pago
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="p-7">
@@ -320,132 +322,219 @@
                     </div>
 
                     <!-- Main modal -->
-                    <div id="ticket-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
+                    <div id="modal-medios-pago" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
                         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 py-20 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                        <div class="relative p-4 w-full max-w-lg max-h-full">
+                        <div class="relative p-4 w-full max-w-3xl max-h-full">
                             <!-- Modal content -->
                             <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
                                 <!-- Modal header -->
-                                <div
-                                    class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
                                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                        Información del Ticket
+                                        Agregar medios de Pago
                                     </h3>
                                     <button type="button"
                                         class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                        data-modal-toggle="ticket-modal">
-                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            fill="none" viewBox="0 0 14 14">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                        data-modal-toggle="modal-medios-pago">
+                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 14 14">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                                         </svg>
-                                        <span class="sr-only">Close modal</span>
+                                        <span class="sr-only">Cerrar modal</span>
                                     </button>
                                 </div>
 
                                 <!-- Modal body -->
                                 <div class="p-4 md:p-5">
-                                    <form action="{{ route('settings.storeInfoTicket') }}" method="POST">
+                                    @if(session('success'))
+                                        <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                                            {{ session('success') }}
+                                        </div>
+                                    @endif
+
+                                    @if(session('error'))
+                                        <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+                                    
+                                    <!-- Formulario para agregar medio de pago -->
+                                    <form action="{{ route('settings.storeMedioPago') }}" method="POST" class="mb-6" 
+                                        x-data="{
+                                            paymentType: '',
+                                            accountNumber: '',
+                                            errorMessage: '',
+                                            validateNumber() {
+                                                this.errorMessage = '';
+                                                
+                                                if (!this.accountNumber) return;
+                                                
+                                                if (this.paymentType === 'YAPE' || this.paymentType === 'PLIN') {
+                                                    if (!/^9\d{8}$/.test(this.accountNumber)) {
+                                                        this.errorMessage = 'El número de teléfono debe empezar con 9 y tener 9 dígitos';
+                                                    }
+                                                } else if (this.paymentType === 'BCP') {
+                                                    // Validar cuenta BCP (14 dígitos)
+                                                    if (!/^\d{14}$/.test(this.accountNumber)) {
+                                                        this.errorMessage = 'El número de cuenta debe tener 14 dígitos';
+                                                    }
+                                                } else if (this.paymentType === 'BBVA') {
+                                                    // Validar cuenta BBVA (20 dígitos)
+                                                    if (!/^\d{20}$/.test(this.accountNumber)) {
+                                                        this.errorMessage = 'El número de cuenta debe tener 20 dígitos';
+                                                    }
+                                                }
+                                            }
+                                        }">
                                         @csrf
-                                        <!-- Campo oculto para el ID -->
-                                        <input type="hidden" name="id" value="{{ $infoTicket->id ?? '' }}">
-
-                                        <!-- Nombre de la Empresa -->
-                                        <div class="col-span-2 mb-4">
-                                            <label for="companyName"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                Nombre de la Empresa
-                                            </label>
-                                            <input type="text" name="companyName" id="companyName"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                                placeholder="Ingrese el nombre de la empresa"
-                                                value="{{ $infoTicket->nombre_empresa ?? '' }}">
-                                        </div>
-
-                                        <!-- Eslogan de la Empresa -->
-                                        <div class="col-span-2 mb-4">
-                                            <label for="slogan"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                Eslogan de la Empresa
-                                            </label>
-                                            <input type="text" name="slogan" id="slogan"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                                placeholder="Ingrese el eslogan de la empresa"
-                                                value="{{ $infoTicket->eslogan_empresa ?? '' }}">
-                                        </div>
-
-                                        <!-- RUC y Teléfono en una fila -->
                                         <div class="grid grid-cols-2 gap-4 mb-4">
-                                            <!-- RUC -->
+                                            <!-- Tipo de Medio de Pago -->
                                             <div>
-                                                <label for="ruc"
-                                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                    RUC
+                                                <label for="payment_type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                    Medio de Pago
                                                 </label>
-                                                <input type="text" name="ruc" id="ruc"
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                                    placeholder="Ingrese el RUC" value="{{ $infoTicket->ruc ?? '' }}">
+                                                <select id="payment_type" name="payment_type" required
+                                                    x-model="paymentType"
+                                                    @change="accountNumber = ''; errorMessage = '';"
+                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                                                    <option value="">Seleccionar</option>
+                                                    <option value="BCP">BCP</option>
+                                                    <option value="BBVA">BBVA</option>
+                                                    <option value="BN">Banco de la Nación</option>
+                                                    <option value="CAJA_PIURA">Caja Piura</option>
+                                                    <option value="YAPE">Yape</option>
+                                                    <option value="PLIN">Plin</option>
+                                                </select>
+                                                <!-- Campo oculto para guardar el texto del medio de pago -->
+                                                <input type="hidden" name="payment_type_text" id="payment_type_text">
                                             </div>
-                                            <!-- Teléfono -->
+
+                                            <!-- Número de Cuenta/Teléfono -->
                                             <div>
-                                                <label for="phone"
-                                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                    Teléfono
+                                                <label for="account_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                    <span x-text="paymentType === 'YAPE' || paymentType === 'PLIN' ? 'Nº Teléfono' : 'Nº Cuenta'"></span>
                                                 </label>
-                                                <input type="text" name="phone" id="phone"
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                                    placeholder="Ingrese el teléfono"
-                                                    value="{{ $infoTicket->telefono ?? '' }}">
+                                                <input type="text" name="account_number" id="account_number" required
+                                                    x-model="accountNumber"
+                                                    @input="validateNumber"
+                                                    :placeholder="paymentType === 'YAPE' || paymentType === 'PLIN' ? 'Ingrese el número de teléfono' : 'Ingrese el número de cuenta'"
+                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                                    :class="{'border-red-500': errorMessage}">
+                                                <!-- Mensaje de error -->
+                                                <p x-show="errorMessage" x-text="errorMessage" class="mt-2 text-sm text-red-600 dark:text-red-500"></p>
+                                            </div>
+
+                                            <!-- Titular -->
+                                            <div class="col-span-2">
+                                                <label for="holder_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                    Titular
+                                                </label>
+                                                <input type="text" name="holder_name" id="holder_name" required
+                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                                    placeholder="Ingrese el nombre del titular">
                                             </div>
                                         </div>
 
-                                        <!-- Dirección -->
-                                        <div class="col-span-2 mb-4">
-                                            <label for="address"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                Dirección
-                                            </label>
-                                            <input type="text" name="address" id="address"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                                placeholder="Ingrese la dirección"
-                                                value="{{ $infoTicket->direccion ?? '' }}">
-                                        </div>
-
-                                        <!-- Agradecimiento -->
-                                        <div class="col-span-2 mb-4">
-                                            <label for="thankYouMessage"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                Mensaje de Agradecimiento
-                                            </label>
-                                            <textarea name="thankYouMessage" id="thankYouMessage" rows="4"
-                                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                                placeholder="Escriba un mensaje de agradecimiento">{{ $infoTicket->agradecimiento ?? '' }}</textarea>
-                                        </div>
-
-                                        <!-- Sitio Web -->
-                                        <div class="col-span-2 mb-4">
-                                            <label for="website"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                                Sitio Web
-                                            </label>
-                                            <input type="text" name="website" id="website"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                                placeholder="Ingrese el sitio web"
-                                                value="{{ $infoTicket->sitio_web ?? '' }}">
-                                        </div>
-
-                                        <!-- Botón de guardar -->
+                                        <!-- Botón Agregar -->
                                         <button type="submit"
-                                            class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                            :disabled="errorMessage !== ''"
+                                            :class="{'opacity-50 cursor-not-allowed': errorMessage !== ''}"
+                                            class="text-white inline-flex items-center bg-primary hover:bg-primary/90 focus:ring-4 focus:outline-none focus:ring-primary/30 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                                             <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <path fill-rule="evenodd"
                                                     d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                                                     clip-rule="evenodd"></path>
                                             </svg>
-                                            Guardar
+                                            Agregar Medio de Pago
                                         </button>
                                     </form>
+
+                                    <!-- Tabla de medios de pago -->
+                                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-3 whitespace-nowrap">
+                                                        Medio de Pago
+                                                    </th>
+                                                    <th scope="col" class="px-6 py-3 whitespace-nowrap">
+                                                        Nº Cuenta/Teléfono
+                                                    </th>
+                                                    <th scope="col" class="px-6 py-3 whitespace-nowrap">
+                                                        Titular
+                                                    </th>
+                                                    <th scope="col" class="px-6 py-3 whitespace-nowrap">
+                                                        Acciones
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($mediosPago as $medioPago)
+                                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                                        <td class="px-6 py-4">
+                                                            <div class="flex items-center">
+                                                                <div class="w-8 h-8 rounded-full mr-3 overflow-hidden">
+                                                                    <img src="{{ asset('images/paymethods/' . strtolower($medioPago->tipo_pago) . '.png') }}" 
+                                                                         alt="{{ $medioPago->nombre_tipo_pago }}" 
+                                                                         class="w-full h-full object-cover">
+                                                                </div>
+                                                                <span>{{ $medioPago->nombre_tipo_pago }}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-6 py-4">
+                                                            {{ $medioPago->numero_cuenta }}
+                                                        </td>
+                                                        <td class="px-6 py-4">
+                                                            {{ $medioPago->titular }}
+                                                        </td>
+                                                        <td class="px-6 py-4">
+                                                            <button type="button" 
+                                                                data-modal-target="modal-eliminar-{{ $medioPago->id }}"
+                                                                data-modal-toggle="modal-eliminar-{{ $medioPago->id }}"
+                                                                class="font-medium text-red-600 dark:text-red-500 hover:underline">
+                                                                Eliminar
+                                                            </button>
+                                                            
+                                                            <!-- Modal de confirmación para este medio de pago específico -->
+                                                            <div id="modal-eliminar-{{ $medioPago->id }}" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                                                                <div class="relative w-full max-w-md max-h-full">
+                                                                    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                                                                        <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="modal-eliminar-{{ $medioPago->id }}">
+                                                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                                                            </svg>
+                                                                            <span class="sr-only">Cerrar modal</span>
+                                                                        </button>
+                                                                        <div class="p-6 text-center">
+                                                                            <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                                                            </svg>
+                                                                            <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">¿Está seguro que desea eliminar este medio de pago?</h3>
+                                                                            <form action="{{ route('settings.deleteMedioPago', $medioPago->id) }}" method="POST" class="inline">
+                                                                                @csrf
+                                                                                @method('DELETE')
+                                                                                <button type="submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                                                                                    Sí, eliminar
+                                                                                </button>
+                                                                            </form>
+                                                                            <button data-modal-hide="modal-eliminar-{{ $medioPago->id }}" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">No, cancelar</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                                            No hay medios de pago registrados
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -457,5 +546,21 @@
         </div>
     </main>
     <!-- ===== Main Content End ===== -->
+
+    <!-- Agrega este script antes del cierre del main -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectPaymentType = document.getElementById('payment_type');
+            const inputPaymentTypeText = document.getElementById('payment_type_text');
+            
+            selectPaymentType.addEventListener('change', function() {
+                if (this.value) {
+                    inputPaymentTypeText.value = this.options[this.selectedIndex].text;
+                } else {
+                    inputPaymentTypeText.value = '';
+                }
+            });
+        });
+    </script>
 
 @endsection

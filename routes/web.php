@@ -109,9 +109,11 @@ Route::middleware('auth')->group(function () {
         Route::get('settings.create', 'create')->name('settings.create');
         Route::post('settings.store', 'store')->middleware('check.permissions:settings,guardar')->name('settings.store');
         Route::post('settings.redes-sociales', 'storeRedesSociales')->middleware('check.permissions:settings,guardar')->name('settings.storeRedesSociales');
-        Route::post('settings.info-ticket/store', 'storeInfoTicket')->middleware('check.permissions:settings,guardar')->name('settings.storeInfoTicket');
+
         Route::put('/company/update-cover', 'updateCover')->middleware('check.permissions:settings,actualizar')->name('company.update.cover');
         Route::put('/company/update-logo', 'updateLogo')->middleware('check.permissions:settings,actualizar')->name('company.update.logo');
+        Route::post('/settings/medio-pago', 'storeMedioPago')->middleware('check.permissions:settings,guardar')->name('settings.storeMedioPago');
+        Route::delete('/settings/medio-pago/{id}', [SettingsController::class, 'deleteMedioPago'])->name('settings.deleteMedioPago');
     });
 
     // Messages

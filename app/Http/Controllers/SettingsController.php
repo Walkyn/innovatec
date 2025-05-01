@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ConfiguracionEmpresa;
-use App\Models\InfoTicket;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Storage;
+use App\Models\MedioPago;
 
 class SettingsController extends Controller
 {
@@ -113,10 +113,25 @@ class SettingsController extends Controller
 
     public function create()
     {
+        $mediosPago = MedioPago::all();
+        
+        // Mapeo de códigos a nombres completos
+        $nombresMediosPago = [
+            'BCP' => 'BCP',
+            'BBVA' => 'BBVA',
+            'BN' => 'Banco de la Nación',
+            'CAJA_PIURA' => 'Caja Piura',
+            'YAPE' => 'Yape',
+            'PLIN' => 'Plin',
+        ];
+        
+        // Agregar el nombre legible a cada medio de pago
+        foreach ($mediosPago as $medioPago) {
+            $medioPago->nombre_tipo_pago = $nombresMediosPago[$medioPago->tipo_pago] ?? $medioPago->tipo_pago;
+        }
+        
         $configuracion = ConfiguracionEmpresa::first();
-        $infoTicket = InfoTicket::first();
-
-        return view('settings.create', compact('configuracion', 'infoTicket'));
+        return view('settings.create', compact('configuracion', 'mediosPago'));
     }
 
     public function store(Request $request)
@@ -151,26 +166,111 @@ class SettingsController extends Controller
         }
     }
 
+    public function storeMedioPago(Request $request)
+    {
+        $rules = [
+            'payment_type' => 'required|in:BCP,BBVA,BN,CAJA_PIURA,YAPE,PLIN',
+            'account_number' => [
+                'required',
+                'string',
+                'max:50',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Verificar si ya existe la combinación de tipo de pago y número de cuenta
+                    $exists = MedioPago::where('tipo_pago', $request->payment_type)
+                        ->where('numero_cuenta', $value)
+                        ->exists();
+
+                    if ($exists) {
+                        if (in_array($request->payment_type, ['YAPE', 'PLIN'])) {
+                            $fail('Este número de teléfono ya está registrado para ' . $request->payment_type);
+                        } else {
+                            $fail('Este número de cuenta ya está registrado para ' . $request->payment_type);
+                        }
+                    }
+                },
+            ],
+            'holder_name' => 'required|string|max:255',
+            'payment_type_text' => 'required|string|max:50',
+        ];
+
+        $messages = [
+            'payment_type.required' => 'Por favor, seleccione un medio de pago',
+            'payment_type.in' => 'El medio de pago seleccionado no es válido',
+            'account_number.required' => 'Por favor ingrese el número de cuenta o teléfono',
+            'account_number.max' => 'El número de cuenta o teléfono no debe exceder los 50 caracteres',
+            'holder_name.required' => 'Por favor ingrese el nombre del titular',
+            'holder_name.max' => 'El nombre del titular no debe exceder los 255 caracteres',
+        ];
+
+        // Validaciones específicas según el tipo de pago
+        if (in_array($request->payment_type, ['YAPE', 'PLIN'])) {
+            $rules['account_number'] = array_merge($rules['account_number'], [
+                'regex:/^9\d{8}$/'
+            ]);
+            $messages['account_number.regex'] = 'El número de teléfono debe empezar con 9 y tener 9 dígitos';
+        } elseif ($request->payment_type === 'BCP') {
+            $rules['account_number'] = array_merge($rules['account_number'], [
+                'regex:/^\d{14}$/'
+            ]);
+            $messages['account_number.regex'] = 'El número de cuenta debe tener 14 dígitos';
+        } elseif ($request->payment_type === 'BBVA') {
+            $rules['account_number'] = array_merge($rules['account_number'], [
+                'regex:/^\d{20}$/'
+            ]);
+            $messages['account_number.regex'] = 'El número de cuenta debe tener 20 dígitos';
+        }
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('errorDetails', $validator->errors()->first());
+        }
+
+        try {
+            MedioPago::create([
+                'tipo_pago' => $request->payment_type,
+                'numero_cuenta' => $request->account_number,
+                'titular' => $request->holder_name,
+            ]);
+
+            return redirect()->route('settings.create')->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Medio de pago agregado correctamente',
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('settings.create')
+                ->withInput()
+                ->with('errorDetails', 'Error al agregar el medio de pago: ' . $e->getMessage());
+        }
+    }
+
+    // Método para eliminar medio de pago
+    public function deleteMedioPago($id)
+    {
+        try {
+            $medioPago = MedioPago::findOrFail($id);
+            $medioPago->delete();
+
+            return redirect()->route('settings.create')
+                ->with('successMessage', 'Éxito')
+                ->with('successDetails', 'Medio de pago eliminado correctamente');
+        } catch (\Exception $e) {
+            return redirect()->route('settings.create')
+                ->with('errorDetails', 'Error al eliminar el medio de pago');
+        }
+    }
+
     public function storeRedesSociales(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $request->validate([
                 'facebook' => 'nullable|url|max:255',
-                'whatsapp' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\s-]+$/'],
+                'whatsapp' => 'nullable|string|max:50',
                 'linkedin' => 'nullable|url|max:255',
                 'website' => 'nullable|url|max:255',
-            ], [
-                'whatsapp.regex' => 'El número de WhatsApp solo debe contener números, espacios, + o -',
-                'facebook.url' => 'La URL de Facebook no es válida',
-                'linkedin.url' => 'La URL de LinkedIn no es válida',
-                'website.url' => 'La URL del sitio web no es válida',
             ]);
-
-            if ($validator->fails()) {
-                return redirect()->route('settings.create')
-                    ->withErrors($validator)
-                    ->withInput();
-            }
 
             $configuracion = ConfiguracionEmpresa::updateOrCreate(
                 ['id' => $request->id],
@@ -184,71 +284,12 @@ class SettingsController extends Controller
 
             return redirect()->route('settings.create')->with([
                 'successMessage' => 'Éxito',
-                'successDetails' => 'Redes sociales actualizadas con éxito',
+                'successDetails' => 'Redes sociales actualizadas correctamente',
             ]);
         } catch (\Exception $e) {
             return redirect()->route('settings.create')
                 ->withInput()
-                ->withErrors(['error' => 'Complete los campos antes de guardar']);
-        }
-    }
-
-    public function storeInfoTicket(Request $request)
-    {
-        $rules = [
-            'companyName' => 'required|string|max:255',
-            'slogan' => 'nullable|string|max:255',
-            'ruc' => 'required|string|max:20|unique:info_ticket,ruc,' . ($request->id ?? 'NULL'),
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
-            'thankYouMessage' => 'nullable|string',
-            'website' => ['nullable', 'max:255', 'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/'],
-        ];
-
-        $messages = [
-            'companyName.required' => 'Por favor, ingrese el nombre de la empresa',
-            'ruc.required' => 'Por favor ingrese el RUC',
-            'ruc.unique' => 'El RUC ya está en uso.',
-            'website.regex' => 'La URL del sitio web no es válida. Por favor, ingresa una URL válida.',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        if ($validator->fails()) {
-            $errorMessage = $validator->errors()->first();
-
-            return redirect()->route('settings.create')
-                ->with('errorDetails', $errorMessage)
-                ->withInput();
-        }
-
-        try {
-            $website = $request->website;
-            if ($website && !preg_match('/^https?:\/\//i', $website)) {
-                $website = 'http://' . $website;
-            }
-
-            $infoTicket = InfoTicket::updateOrCreate(
-                ['id' => $request->id],
-                [
-                    'nombre_empresa' => $request->companyName,
-                    'eslogan_empresa' => $request->slogan,
-                    'ruc' => $request->ruc,
-                    'telefono' => $request->phone,
-                    'direccion' => $request->address,
-                    'agradecimiento' => $request->thankYouMessage,
-                    'sitio_web' => $website,
-                ]
-            );
-
-            return redirect()->route('settings.create')->with([
-                'successMessage' => 'Éxito',
-                'successDetails' => 'Información del ticket guardada correctamente.',
-            ]);
-        } catch (\Exception $e) {
-            return redirect()->route('settings.create')->with([
-                'errorDetails' => 'Ocurrió un error al guardar la información del ticket.',
-            ]);
+                ->with('errorDetails', 'Error al actualizar las redes sociales.');
         }
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\ConfiguracionEmpresa;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Hash;
+use App\Models\MedioPago;
 
 class PanelController extends Controller
 {
@@ -29,7 +30,25 @@ class PanelController extends Controller
 
     public function realizarPago()
     {
-        return view('panel.realizar-pago');
+        // Obtener todos los medios de pago
+        $mediosPago = MedioPago::all();
+        
+        // Mapeo de códigos a nombres completos
+        $nombresMediosPago = [
+            'BCP' => 'BCP',
+            'BBVA' => 'BBVA', 
+            'BN' => 'Banco de la Nación',
+            'CAJA_PIURA' => 'Caja Piura',
+            'YAPE' => 'Yape',
+            'PLIN' => 'Plin',
+        ];
+        
+        // Agregar el nombre legible a cada medio de pago
+        foreach ($mediosPago as $medioPago) {
+            $medioPago->nombre_tipo_pago = $nombresMediosPago[$medioPago->tipo_pago] ?? $medioPago->tipo_pago;
+        }
+        
+        return view('panel.realizar-pago', compact('mediosPago'));
     }
 
     public function historialPagos()
