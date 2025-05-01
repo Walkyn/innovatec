@@ -475,6 +475,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/panel/historial-servicios', function () {
         return view('panel.historial-servicios');
     })->name('panel.historial-servicios');
+
+    // Ruta para guardar el pago
+    Route::post('/panel/guardar-pago', [App\Http\Controllers\PanelController::class, 'guardarPago'])->name('panel.guardar-pago');
+
+    // Ruta para ver lista de pagos
+    Route::get('/panel/pagos', [App\Http\Controllers\PanelController::class, 'listarPagos'])->name('panel.pagos');
+
+    // Ruta para ver historial de pagos
+    Route::get('/panel/historial-pago', [App\Http\Controllers\PanelController::class, 'historialPago'])->name('panel.historial-pago');
 });
 
 // Rutas que devuelven datos

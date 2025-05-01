@@ -168,26 +168,21 @@ class SettingsController extends Controller
 
     public function storeMedioPago(Request $request)
     {
+        // Primero verificamos si ya existe un medio de pago del mismo tipo
+        $existingPayment = MedioPago::where('tipo_pago', $request->payment_type)->first();
+        
+        if ($existingPayment) {
+            return redirect()->route('settings.create')
+                ->withInput()
+                ->with('errorDetails', 'Ya existe una cuenta para ' . $request->payment_type_text . '. Por favor, elimine la cuenta existente antes de agregar una nueva.');
+        }
+        
         $rules = [
             'payment_type' => 'required|in:BCP,BBVA,BN,CAJA_PIURA,YAPE,PLIN',
             'account_number' => [
                 'required',
                 'string',
                 'max:50',
-                function ($attribute, $value, $fail) use ($request) {
-                    // Verificar si ya existe la combinación de tipo de pago y número de cuenta
-                    $exists = MedioPago::where('tipo_pago', $request->payment_type)
-                        ->where('numero_cuenta', $value)
-                        ->exists();
-
-                    if ($exists) {
-                        if (in_array($request->payment_type, ['YAPE', 'PLIN'])) {
-                            $fail('Este número de teléfono ya está registrado para ' . $request->payment_type);
-                        } else {
-                            $fail('Este número de cuenta ya está registrado para ' . $request->payment_type);
-                        }
-                    }
-                },
             ],
             'holder_name' => 'required|string|max:255',
             'payment_type_text' => 'required|string|max:50',

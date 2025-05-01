@@ -511,10 +511,16 @@
                                                     'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400'">
                                                 <span class="text-sm font-medium" x-text="mes.nombre"></span>
                                                 
-                                                <!-- Mostrar "No aplica" solo para estados no_aplica y futuro -->
-                                                <span x-show="['no_aplica','futuro'].includes(mes.estado)"
+                                                <!-- Mostrar "No aplica" solo para estados no_aplica -->
+                                                <span x-show="['no_aplica'].includes(mes.estado)"
                                                     class="text-xs text-gray-400 ml-2">
                                                     No aplica
+                                                </span>
+
+                                                <!-- Mostrar "Próximo" para meses futuros pero con el mismo color gris -->
+                                                <span x-show="mes.estado === 'futuro'"
+                                                    class="text-xs text-gray-400 ml-2">
+                                                    Próximo
                                                 </span>
                                                 
                                                 <!-- Mostrar precio para mes pagado -->
@@ -820,11 +826,61 @@
                         depósito/transferencia</label>
                 </div>
 
-                <!-- Subir comprobante -->
+                <!-- Subir comprobante con previsualización -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Subir comprobante</label>
-                    <div class="flex items-center">
-                        <label
+                    <div class="flex flex-col items-center" x-data="{ 
+                        fileName: '', 
+                        fileSize: '', 
+                        fileType: '',
+                        previewUrl: null,
+                        fileSelected: false,
+                        
+                        handleFileChange(event) {
+                            const file = event.target.files[0];
+                            if (!file) {
+                                this.resetFileData();
+                                return;
+                            }
+                            
+                            this.fileName = file.name;
+                            this.fileType = file.type;
+                            this.fileSize = this.formatBytes(file.size);
+                            this.fileSelected = true;
+                            
+                            // Crear URL para previsualización
+                            if (file.type.startsWith('image/')) {
+                                this.previewUrl = URL.createObjectURL(file);
+                            } else if (file.type === 'application/pdf') {
+                                this.previewUrl = '{{ asset('images/pdf-icon.png') }}';
+                            } else {
+                                this.previewUrl = '{{ asset('images/file-icon.png') }}';
+                            }
+                        },
+                        
+                        formatBytes(bytes, decimals = 2) {
+                            if (bytes === 0) return '0 Bytes';
+                            
+                            const k = 1024;
+                            const dm = decimals < 0 ? 0 : decimals;
+                            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                            
+                            const i = Math.floor(Math.log(bytes) / Math.log(k));
+                            
+                            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                        },
+                        
+                        resetFileData() {
+                            this.fileName = '';
+                            this.fileSize = '';
+                            this.fileType = '';
+                            this.previewUrl = null;
+                            this.fileSelected = false;
+                            document.getElementById('dropzone-file').value = '';
+                        }
+                    }">
+                        <!-- Área de arrastrar y soltar cuando no hay archivo -->
+                        <label x-show="!fileSelected"
                             class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                 <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true"
@@ -837,16 +893,61 @@
                                     o arrastrar</p>
                                 <p class="text-xs text-gray-500">PNG, JPG o PDF (MAX. 5MB)</p>
                             </div>
-                            <input id="dropzone-file" type="file" class="hidden" />
+                            <input @change="handleFileChange($event)" id="dropzone-file" type="file" class="hidden" accept=".jpg,.jpeg,.png,.pdf" />
                         </label>
+                        
+                        <!-- Previsualización del archivo -->
+                        <div x-show="fileSelected" class="w-full">
+                            <div class="relative w-full p-4 mb-4 bg-white border rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <img :src="previewUrl" class="h-16 w-16 object-cover rounded bg-gray-100" 
+                                             :class="{'object-contain p-2': !fileType.startsWith('image/')}" />
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate" x-text="fileName"></p>
+                                        <p class="text-sm text-gray-500" x-text="fileSize"></p>
+                                        <p class="text-xs text-gray-400" x-text="fileType"></p>
+                                    </div>
+                                    <div class="flex-shrink-0 ml-4">
+                                        <button type="button" @click="resetFileData"
+                                            class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none">
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Previsualización de imagen grande (solo para imágenes) -->
+                                <div x-show="fileType.startsWith('image/')" class="mt-3">
+                                    <img :src="previewUrl" class="w-full h-auto max-h-64 object-contain rounded border border-gray-200" />
+                                </div>
+                                
+                                <!-- Mensaje para archivos PDF -->
+                                <div x-show="fileType === 'application/pdf'" class="mt-3 text-center text-gray-500 text-sm">
+                                    Vista previa de PDF no disponible
+                                </div>
+                            </div>
+                            
+                            <!-- Botón para cambiar archivo -->
+                            <button type="button" @click="document.getElementById('dropzone-file').click()"
+                                class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                                <svg class="-ml-1 mr-2 h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Cambiar archivo
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botón Enviar Pago -->
+            <!-- Botón Enviar Pago con AJAX -->
             <div class="flex justify-end">
-                <button
-                    class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 md:w-1/4 w-full px-6 justify-center rounded-md flex items-center">
+                <button id="enviarPago" type="button"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white py-2 md:w-1/4 w-full px-6 justify-center rounded-md flex items-center"
+                    onclick="enviarPago()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -912,55 +1013,24 @@
             var precioMatch = servicioTextoCompleto.match(/\(S\/\s*([0-9.]+)\)/);
             var precioServicio = precioMatch ? precioMatch[1].trim() : '0.00';
 
-            // 3. Verificar meses seleccionados
+            // 3. Verificar que al menos un mes esté seleccionado
             var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            var mesesDuplicados = [];
+            var algunMesSeleccionado = false;
             
             for (var i = 0; i < checkboxes.length; i++) {
-                var checkbox = checkboxes[i];
-                if (checkbox.checked && !checkbox.disabled && checkbox.id.startsWith('month-')) {
-                    var labelId = checkbox.id;
-                    var label = document.querySelector('label[for="' + labelId + '"]');
-                    
-                    if (label) {
-                        // Encontrar el año del mes (buscando en los ancestros hasta encontrar el año)
-                        var anioElement = label.closest('[x-show="openAnio === anio.anio"]');
-                        var anio = anioElement ? 
-                            parseInt(anioElement.previousElementSibling.textContent.match(/\d+/)[0]) : 
-                            new Date().getFullYear();
-                        
-                        var nombreSpan = label.querySelector('span:first-child');
-                        if (nombreSpan) {
-                            var nombreMes = nombreSpan.textContent.trim();
-                            var numeroMes = obtenerNumeroMes(nombreMes);
-                            
-                            // Buscar el precio
-                            var precio = 0;
-                            var precioSpan = label.querySelector('span.text-red-600') || 
-                                           label.querySelector('span.text-yellow-600');
-                            
-                            if (precioSpan) {
-                                precio = parseFloat(precioSpan.textContent.replace('S/', '').trim());
-                            }
-                            
-                            // Verificar si el mes ya está en la tabla
-                            if (verificarMesExistente(contratoTexto, servicioNombre, nombreMes)) {
-                                mesesDuplicados.push(nombreMes);
-                                checkbox.checked = false;
-                            }
-                        }
-                    }
+                if (checkboxes[i].checked && !checkboxes[i].disabled && checkboxes[i].id.startsWith('month-')) {
+                    algunMesSeleccionado = true;
+                    break;
                 }
             }
             
-            // Si hay meses duplicados, mostrar notificación y detener
-            if (mesesDuplicados.length > 0) {
-                mostrarNotificacion(
-                    'Los siguientes meses ya están agregados: ' + mesesDuplicados.join(', '), 
-                    'warning'
-                );
+            if (!algunMesSeleccionado) {
+                mostrarNotificacion('Por favor, seleccione al menos un mes a pagar', 'error');
                 return;
             }
+            
+            // Verificar meses duplicados
+            var mesesDuplicados = [];
             
             // 4. Obtener los meses seleccionados con ordenamiento cronológico
             var mesesSeleccionados = [];
@@ -993,15 +1063,37 @@
                                 precio = parseFloat(precioSpan.textContent.replace('S/', '').trim());
                             }
                             
-                            mesesSeleccionados.push({
-                                nombre: nombreMes,
-                                precio: precio,
-                                anio: anio,
-                                numeroMes: numeroMes
-                            });
+                            // Verificar si el mes ya está en la tabla
+                            if (verificarMesExistente(contratoTexto, servicioNombre, nombreMes)) {
+                                mesesDuplicados.push(nombreMes);
+                                checkbox.checked = false;
+                            } else {
+                                // Si no está duplicado, agregarlo a mesesSeleccionados
+                                mesesSeleccionados.push({
+                                    nombre: nombreMes,
+                                    precio: precio,
+                                    anio: anio,
+                                    numeroMes: numeroMes
+                                });
+                            }
                         }
                     }
                 }
+            }
+            
+            // Si hay meses duplicados, mostrar notificación y detener
+            if (mesesDuplicados.length > 0) {
+                mostrarNotificacion(
+                    'Los siguientes meses ya están agregados: ' + mesesDuplicados.join(', '), 
+                    'warning'
+                );
+                return;
+            }
+            
+            // Verificar si quedaron meses seleccionados después de filtrar duplicados
+            if (mesesSeleccionados.length === 0) {
+                mostrarNotificacion('No hay meses válidos para agregar', 'error');
+                return;
             }
             
             // Ordenar meses cronológicamente
@@ -1177,6 +1269,106 @@
                 'Diciembre': 12
             };
             return meses[nombreMes] || 0;
+        }
+
+        // Función para enviar el pago mediante AJAX
+        function enviarPago() {
+            // Validaciones básicas
+            var medioPago = document.querySelector('select[x-model="selectedMethod"]').value;
+            if (!medioPago) {
+                mostrarNotificacion('Por favor, seleccione un método de pago', 'error');
+                return;
+            }
+
+            // Verificar que haya servicios agregados
+            if (serviciosAgregados.length === 0) {
+                mostrarNotificacion('Por favor, agregue al menos un servicio para pagar', 'error');
+                return;
+            }
+
+            // Verificar la confirmación de pago
+            if (!document.getElementById('confirm-payment').checked) {
+                mostrarNotificacion('Debe confirmar que ha realizado el pago', 'error');
+                return;
+            }
+
+            // Verificar que se haya subido un comprobante
+            var comprobante = document.getElementById('dropzone-file').files[0];
+            if (!comprobante) {
+                mostrarNotificacion('Por favor, suba un comprobante de pago', 'error');
+                return;
+            }
+
+            // Configurar el formulario para enviarlo con AJAX
+            var formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('medio_pago', medioPago);
+            formData.append('servicios', JSON.stringify(serviciosAgregados));
+            formData.append('total_pagar', totalPagar);
+            formData.append('comprobante', comprobante);
+
+            // Cambiar estado del botón a "Enviando..."
+            var botonEnviar = document.getElementById('enviarPago');
+            var textoOriginal = botonEnviar.innerHTML;
+            botonEnviar.disabled = true;
+            botonEnviar.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Enviando...';
+
+            // Enviar datos mediante AJAX
+            fetch('{{ route("panel.guardar-pago") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarNotificacion(data.message, 'success');
+                    
+                    // Limpiar formulario después de 2 segundos y redireccionar a la vista correcta
+                    setTimeout(function() {
+                        limpiarFormulario();
+                        window.location.href = '{{ route("panel.historial-pago") }}';
+                    }, 2000);
+                } else {
+                    mostrarNotificacion(data.error, 'error');
+                    botonEnviar.disabled = false;
+                    botonEnviar.innerHTML = textoOriginal;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarNotificacion('Ocurrió un error al procesar la solicitud. Inténtelo nuevamente.', 'error');
+                botonEnviar.disabled = false;
+                botonEnviar.innerHTML = textoOriginal;
+            });
+        }
+
+        // Función para limpiar el formulario completo
+        function limpiarFormulario() {
+            // Limpiar selecciones de contrato y servicio
+            document.querySelector('select[x-model="selectedContrato"]').value = '';
+            document.querySelector('select[x-model="selectedServicio"]').value = '';
+            
+            // Limpiar medio de pago
+            document.querySelector('select[x-model="selectedMethod"]').value = '';
+            
+            // Desmarcar checkbox de confirmación
+            document.getElementById('confirm-payment').checked = false;
+            
+            // Limpiar el input de archivo
+            document.getElementById('dropzone-file').value = '';
+            
+            // Limpiar tabla de servicios agregados
+            serviciosAgregados = [];
+            totalPagar = 0;
+            actualizarTablaDetalles();
+            
+            // Limpiar checkboxes
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (!checkboxes[i].disabled) {
+                    checkboxes[i].checked = false;
+                }
+            }
         }
     </script>
 

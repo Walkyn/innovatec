@@ -53,7 +53,7 @@ class PanelController extends Controller
 
     public function historialPagos()
     {
-        return view('panel.historial-pago');
+        return $this->historialPago();
     }
 
     public function comprobantes()
@@ -132,5 +132,127 @@ class PanelController extends Controller
     {
         session()->forget(['cliente_id', 'cliente_nombre']);
         return redirect()->route('login-cliente')->with('successDetails', 'Sesión cerrada correctamente');
+    }
+
+    /**
+     * Guarda un nuevo pago realizado por el cliente.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function guardarPago(Request $request)
+    {
+        // Validación de los datos
+        $validated = $request->validate([
+            'medio_pago' => 'required|string',
+            'servicios' => 'required|json',
+            'total_pagar' => 'required|numeric',
+            'comprobante' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120', // 5MB máximo
+        ]);
+
+        try {
+            // Procesar los servicios JSON
+            $servicios = json_decode($request->servicios, true);
+            if (empty($servicios)) {
+                return response()->json(['error' => 'No hay servicios seleccionados'], 422);
+            }
+
+            // Procesar y guardar el archivo de comprobante
+            $comprobantePath = null;
+            if ($request->hasFile('comprobante') && $request->file('comprobante')->isValid()) {
+                $file = $request->file('comprobante');
+                $filename = 'comprobante_' . time() . '.' . $file->getClientOriginalExtension();
+                $comprobantePath = $file->storeAs('comprobantes', $filename, 'public');
+            }
+
+            // Crear un array con todos los meses pagados
+            $mesesPagados = [];
+            $detallesServicio = [];
+
+            foreach ($servicios as $servicio) {
+                $detallesServicio[] = [
+                    'contrato' => $servicio['contratoNumero'],
+                    'servicio' => $servicio['servicioNombre'],
+                    'precio' => $servicio['precio'],
+                    'subtotal' => $servicio['subtotal']
+                ];
+                
+                // Agregar los meses a la lista total de meses pagados
+                if (!empty($servicio['mesesTexto'])) {
+                    $mesesPagados[] = $servicio['mesesTexto'];
+                }
+            }
+
+            // Crear el registro de pago
+            $pago = new \App\Models\Pago([
+                'cliente_id' => session('cliente_id'),
+                'medio_pago' => $validated['medio_pago'],
+                'detalles_servicio' => json_encode($detallesServicio),
+                'meses_pagados' => implode(', ', $mesesPagados),
+                'monto_total' => $validated['total_pagar'],
+                'comprobante_path' => $comprobantePath,
+                'estado' => 'en_revision'
+            ]);
+
+            $pago->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pago registrado correctamente. Está en revisión por nuestro equipo.',
+                'pago_id' => $pago->id
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error al guardar pago: ' . $e->getMessage());
+            return response()->json(['error' => 'Ocurrió un error al procesar el pago: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Muestra la lista de pagos del cliente.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function listarPagos()
+    {
+        $cliente_id = session('cliente_id');
+        $pagos = \App\Models\Pago::where('cliente_id', $cliente_id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+        
+        return view('panel.pagos', compact('pagos'));
+    }
+
+    /**
+     * Muestra el historial de pagos del cliente.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function historialPago()
+    {
+        $cliente_id = session('cliente_id');
+        
+        // Consultar todos los pagos para las estadísticas
+        $todosPagos = \App\Models\Pago::where('cliente_id', $cliente_id)->get();
+        
+        // Consultar los pagos paginados para la tabla
+        $pagos = \App\Models\Pago::where('cliente_id', $cliente_id)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10);
+        
+        // Calcular estadísticas por estado
+        $totales = [
+            'Aceptado' => ['count' => 0, 'sum' => 0],
+            'en_revision' => ['count' => 0, 'sum' => 0],
+            'Rechazado' => ['count' => 0, 'sum' => 0]
+        ];
+        
+        foreach($todosPagos as $pago) {
+            if (isset($totales[$pago->estado])) {
+                $totales[$pago->estado]['count']++;
+                $totales[$pago->estado]['sum'] += $pago->monto_total;
+            }
+        }
+        
+        return view('panel.historial-pago', compact('pagos', 'totales'));
     }
 }

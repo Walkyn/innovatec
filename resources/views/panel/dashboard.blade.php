@@ -90,7 +90,7 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-sm text-gray-500">Teléfono</p>
-                            <a href="tel:+{{ $configuracion->telefono ?? '51123456789' }}"
+                            <a href="tel:{{ $configuracion->telefono ?? '51123456789' }}"
                                 class="text-gray-700 hover:text-blue-600 truncate block">
                                 +{{ $configuracion->telefono ?? '51 123 456 789' }}
                             </a>

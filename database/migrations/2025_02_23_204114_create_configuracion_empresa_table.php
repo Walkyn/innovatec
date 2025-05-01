@@ -33,8 +33,8 @@ return new class extends Migration
         DB::table('configuracion_empresa')->insert([
             'nombre' => 'Business Manager',
             'ruc' => '20' . rand(10000000, 99999999) . '0' . rand(0, 9),
-            'correo' => 'info@businessmanager.com',
-            'telefono' => '9' . rand(1000000, 9999999),
+            'correo' => 'bussinesmanager.pe@gmail.com',
+            'telefono' => '+51 917 319 939',
             'direccion' => 'Av. Principal ' . rand(1, 1000) . ', Lima',
             'descripcion' => 'Sistema de gestión empresarial para pequeñas y medianas empresas',
             'facebook' => 'https://facebook.com/ztx.es',
