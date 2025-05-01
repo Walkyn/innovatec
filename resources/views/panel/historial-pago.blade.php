@@ -65,6 +65,16 @@
                     <div class="font-medium">Historial de Pagos</div>
                 </div>
                 <div class="overflow-x-auto">
+                    @php
+                        $nombresMediosPago = [
+                            'BCP' => 'Banco de Crédito del Perú',
+                            'BBVA' => 'Banco BBVA',
+                            'BN' => 'Banco de la Nación',
+                            'CAJA_PIURA' => 'Caja Piura',
+                            'YAPE' => 'Yape',
+                            'PLIN' => 'Plin'
+                        ];
+                    @endphp
                     <table class="w-full min-w-[460px] whitespace-no-wrap">
                         <thead>
                             <tr>
@@ -95,7 +105,9 @@
                                         <div class="flex items-center">
                                             <img src="{{ asset('images/paymethods/' . strtolower($pago->medio_pago) . '.png') }}" alt="{{ $pago->medio_pago }}"
                                                 class="w-8 h-8 rounded object-cover block">
-                                            <span class="text-gray-600 text-sm font-medium ml-2 truncate">{{ $pago->medio_pago }}</span>
+                                            <span class="text-gray-600 text-sm font-medium ml-2 truncate">
+                                                {{ $nombresMediosPago[$pago->medio_pago] ?? $pago->medio_pago }}
+                                            </span>
                                         </div>
                                     </td>
                                     <td class="py-2 px-4 border-b border-b-gray-50">
@@ -114,7 +126,7 @@
                                     <td class="py-2 px-4 border-b border-b-gray-50">
                                         <span class="text-[13px] font-medium text-gray-500">{{ $pago->meses_pagados }}</span>
                                     </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
+                                    <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap">
                                         <span class="text-[13px] font-medium text-emerald-500">S/ {{ number_format($pago->monto_total, 2) }}</span>
                                     </td>
                                     <td class="py-2 px-4 border-b border-b-gray-50">

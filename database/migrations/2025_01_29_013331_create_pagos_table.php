@@ -21,7 +21,7 @@ class CreatePagosTable extends Migration
             $table->text('meses_pagados');
             $table->decimal('monto_total', 10, 2);
             $table->string('comprobante_path')->nullable();
-            $table->enum('estado', ['en_revision', 'Aceptado', 'Rechazado'])->default('en_revision');
+            $table->enum('estado', ['en_revision', 'Aprobado', 'Rechazado'])->default('en_revision');
             $table->text('observaciones')->nullable();
             $table->timestamps();
 

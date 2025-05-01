@@ -24,8 +24,8 @@ class Pago extends Model
      * Estados posibles del pago
      */
     const ESTADO_EN_REVISION = 'en_revision';
-    const ESTADO_VERIFICADO = 'verificado';
-    const ESTADO_RECHAZADO = 'rechazado';
+    const ESTADO_APROBADO = 'Aprobado';
+    const ESTADO_RECHAZADO = 'Rechazado';
 
     /**
      * Obtiene el cliente asociado al pago.
@@ -43,8 +43,8 @@ class Pago extends Model
         switch($this->estado) {
             case self::ESTADO_EN_REVISION:
                 return 'En revisión';
-            case self::ESTADO_VERIFICADO:
-                return 'Verificado';
+            case self::ESTADO_APROBADO:
+                return 'Aprobado';
             case self::ESTADO_RECHAZADO:
                 return 'Rechazado';
             default:
