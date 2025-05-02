@@ -132,21 +132,28 @@ class PanelController extends Controller
         ]);
 
         try {
-            // Obtener el cliente actual usando el ID de la sesión
             $cliente = Cliente::find(session('cliente_id'));
             
             if (!$cliente) {
-                return redirect()->back()->with('error', 'No se pudo encontrar el cliente');
+                return redirect()->back()->with([
+                    'errorMessage' => 'Error',
+                    'errorDetails' => 'No se pudo encontrar el cliente'
+                ]);
             }
 
-            // Actualizar la clave_acceso
             $cliente->clave_acceso = Hash::make($request->password);
             $cliente->save();
 
-            return redirect()->back()->with('success', 'Contraseña actualizada correctamente');
+            return redirect()->back()->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Contraseña actualizada correctamente'
+            ]);
             
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al actualizar la contraseña');
+            return redirect()->back()->with([
+                'errorMessage' => 'Error',
+                'errorDetails' => 'Error al actualizar la contraseña'
+            ]);
         }
     }
 

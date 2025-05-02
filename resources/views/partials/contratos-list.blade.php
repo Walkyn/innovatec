@@ -1,5 +1,5 @@
 @forelse($contratos as $index => $contrato)
-    <div class="mb-6" x-data="{ 
+    <div class="mb-4" x-data="{ 
         open: {{ $index === 0 ? 'true' : 'false' }}, 
         openServiceId: null 
     }">
@@ -13,9 +13,27 @@
                 <span class="text-xs text-gray-500 dark:text-gray-400">
                     Fecha: {{ \Carbon\Carbon::parse($contrato->fecha_contrato)->format('d/m/Y') }}
                 </span>
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-full inline-flex items-center
-                    {{ $contrato->estado_contrato === 'activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
-                    <i class="fas fa-check-circle mr-1"></i>
+                @php
+                    switch($contrato->estado_contrato){
+                        case 'activo':
+                            $contratoStateClasses = 'bg-green-100 text-green-700';
+                            $contratoStateIcon = 'fa-check-circle';
+                            break;
+                        case 'suspendido':
+                            $contratoStateClasses = 'bg-red-100 text-red-700';
+                            $contratoStateIcon = 'fa-times-circle';
+                            break;
+                        case 'cancelado':
+                            $contratoStateClasses = 'bg-gray-100 text-gray-500';
+                            $contratoStateIcon = 'fa-times-circle';
+                            break;
+                        default:
+                            $contratoStateClasses = 'bg-gray-100 text-gray-500';
+                            $contratoStateIcon = 'fa-question-circle';
+                    }
+                @endphp
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full inline-flex items-center {{ $contratoStateClasses }}">
+                    <i class="fas {{ $contratoStateIcon }} mr-1"></i>
                     {{ ucfirst($contrato->estado_contrato) }}
                 </span>
             </div>
@@ -102,7 +120,7 @@
                                     $mesesYear = \App\Models\Mes::where('anio', $year)->orderBy('numero')->get();
                                     $todosPagados = true;
                                     $tieneMesesValidos = false;
-                                    $tieneMesEnCurso = false;
+                                    $tieneMesEnCursoNoPagado = false;
                                     $tieneMesesPendientes = false;
 
                                     foreach($mesesYear as $mesYear) {
@@ -110,18 +128,30 @@
                                             ($year < $fechaSuspension->year) || 
                                             ($year === $fechaSuspension->year && $mesYear->numero <= $mesSuspension)) {
                                             
+                                            // Si el mes no aplica (antes de la instalación), lo ignoramos
+                                            if ($year === $anioInicio && $mesYear->numero < $fechaInicio->format('n')) {
+                                                continue;
+                                            }
+                                            // Si el mes es futuro, lo ignoramos
+                                            if ($year > now()->year || ($year === now()->year && $mesYear->numero > now()->month)) {
+                                                continue;
+                                            }
+
                                             $tieneMesesValidos = true;
 
+                                            $pagado = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+                                                ->where('contrato_servicio_id', $cs->id)
+                                                ->where('mes_id', $mesYear->id)
+                                                ->where('estado_pago', 'pagado')
+                                                ->exists();
+
                                             if ($year === now()->year && $mesYear->numero === now()->month) {
-                                                $tieneMesEnCurso = true;
-                                                $todosPagados = false;
+                                                // Es el mes en curso
+                                                if (!$pagado) {
+                                                    $tieneMesEnCursoNoPagado = true;
+                                                    $todosPagados = false;
+                                                }
                                             } else {
-                                                $pagado = DB::table('cobranza_contratoservicio')
-                                                    ->where('contrato_servicio_id', $cs->id)
-                                                    ->where('mes_id', $mesYear->id)
-                                                    ->where('estado_pago', 'pagado')
-                                                    ->exists();
-                                                
                                                 if (!$pagado) {
                                                     $todosPagados = false;
                                                     $tieneMesesPendientes = true;
@@ -131,18 +161,18 @@
                                     }
 
                                     $bgColor = !$tieneMesesValidos ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 
-                                            ($todosPagados ? 'bg-green-50 hover:bg-green-100 text-green-700' : 
-                                            ($tieneMesEnCurso && !$tieneMesesPendientes ? 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700' : 
-                                            'bg-red-50 hover:bg-red-100 text-red-700'));
+                                                       ($todosPagados ? 'bg-green-50 hover:bg-green-100 text-green-700' : 
+                                                       ($tieneMesEnCursoNoPagado && !$tieneMesesPendientes ? 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700' : 
+                                                       'bg-red-50 hover:bg-red-100 text-red-700'));
                                     
                                     $iconColor = !$tieneMesesValidos ? 'text-gray-500' :
-                                            ($todosPagados ? 'text-green-500' : 
-                                            ($tieneMesEnCurso && !$tieneMesesPendientes ? 'text-yellow-500' : 
-                                            'text-red-500'));
+                                                ($todosPagados ? 'text-green-500' : 
+                                                ($tieneMesEnCursoNoPagado && !$tieneMesesPendientes ? 'text-yellow-500' : 
+                                                'text-red-500'));
 
                                     $icon = !$tieneMesesValidos ? '' :
                                             ($todosPagados ? 'fa-check-circle' : 
-                                            ($tieneMesEnCurso && !$tieneMesesPendientes ? 'fa-clock' : 
+                                            ($tieneMesEnCursoNoPagado && !$tieneMesesPendientes ? 'fa-clock' : 
                                             'fa-exclamation-circle'));
                                 @endphp
 
@@ -161,36 +191,28 @@
                                     </button>
 
                                     <div x-show="openYear === '{{ $cs->id }}-{{ $year }}'" x-transition class="mt-2">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                                             @foreach($mesesYear as $mesYear)
                                                 @php
-                                                    // Verificar si debemos omitir este mes (posterior a suspensión)
                                                     $omitirMes = false;
                                                     if ($fechaSuspension) {
-                                                        // Omitir meses posteriores al mes de suspensión en el mismo año
                                                         if ($year === $fechaSuspension->year && $mesYear->numero > $mesSuspension) {
                                                             $omitirMes = true;
                                                         }
-                                                        // Omitir todos los meses de años posteriores al año de suspensión
                                                         if ($year > $fechaSuspension->year) {
                                                             $omitirMes = true;
                                                         }
                                                     }
                                                     
-                                                    // Si debemos omitir este mes, continuamos con el siguiente
                                                     if ($omitirMes) continue;
                                                     
-                                                    // Parsear fechas del mes y hoy
                                                     $fechaInicioMes = \Carbon\Carbon::parse($mesYear->fecha_inicio);
                                                     $fechaFinMes = \Carbon\Carbon::parse($mesYear->fecha_fin);
                                                     $hoy = \Carbon\Carbon::now();
 
-                                                    // Variables del servicio
                                                     $mesActual = (int) \Carbon\Carbon::now()->format('n');
                                                     $mesInicio = (int) $fechaInicio->format('n');
 
-                                                    // 1) Determinar estado
-                                                    // Primero verificamos si existe un registro en cobranza con algún estado
                                                     if (\Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
                                                         ->where('contrato_servicio_id', $cs->id)
                                                         ->where('mes_id', $mesYear->id)

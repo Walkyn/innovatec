@@ -312,78 +312,91 @@
                     document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo || 'No especificado';
                     document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
                     
-                    // Actualizar información del plan
-                    if (cliente.plan_activo) {
-                        const servicioNombre = cliente.servicio_activo?.nombre;
-                        const planNombre = cliente.plan_activo.nombre;
-                        
-                        if (servicioNombre) {
-                            document.querySelector('#meses-modal [data-field="servicio"]').textContent = `${servicioNombre} ${planNombre}`;
-                        } else {
-                            document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
-                        }
-                        document.querySelector('#meses-modal [data-field="precio"]').textContent = `S/. ${cliente.plan_activo.precio}`;
-                    } else {
-                        document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
-                        document.querySelector('#meses-modal [data-field="precio"]').textContent = 'S/. 0.00';
-                    }
+                    // === NUEVO: Actualizar información del plan y estado usando los nuevos campos ===
+                    const servicioMostrar = cliente.servicio_mostrar;
+                    const planMostrar = cliente.plan_mostrar;
+                    const precioMostrar = cliente.precio_mostrar;
+                    const estadoMostrar = cliente.estado_mostrar;
 
-                    // Actualizar estado del cliente
+                    document.querySelector('#meses-modal [data-field="servicio"]').textContent =
+                        servicioMostrar ? (planMostrar ? `${servicioMostrar} ${planMostrar}` : servicioMostrar) : 'Sin servicio';
+
+                    document.querySelector('#meses-modal [data-field="precio"]').textContent =
+                        precioMostrar ? `S/. ${Number(precioMostrar).toFixed(2)}` : 'S/. 0.00';
+
+                    // Estado visual (badge, color, ícono)
                     const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
                     const estadoIconPlan = document.querySelector('#meses-modal [data-field="estado-icon"]');
                     const estadoIconContainer = estadoIconPlan.parentElement;
                     const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
-                    
-                    // Actualizar el texto del estado
-                    estadoElement.textContent = cliente.estado_cliente.charAt(0).toUpperCase() + cliente.estado_cliente.slice(1);
-                    estadoElement.className = `text-sm font-semibold ${
-                        cliente.estado_cliente === 'activo' ? 'text-green-600 dark:text-green-400' :
-                        cliente.estado_cliente === 'inactivo' ? 'text-gray-600 dark:text-gray-400' :
-                        'text-red-600 dark:text-red-400'
-                    }`;
 
-                    const getEstadoClasses = (estado) => {
-                        const classes = {
-                            activo: {
-                                container: 'bg-green-500',
-                                icon: 'fa-check-circle'
-                            },
-                            inactivo: {
-                                container: 'bg-gray-500',
-                                icon: 'fa-times-circle'
-                            },
-                            suspendido: {
-                                container: 'bg-red-500',
-                                icon: 'fa-exclamation-circle'
-                            }
-                        };
-                        return classes[estado] || classes.activo;
-                    };
+                    let estadoTexto = '';
+                    let estadoColor = '';
+                    let icono = '';
+                    let iconoColor = '';
+                    let bgIcono = '';
 
-                    // Actualizar el indicador de estado en el perfil
+                    switch (estadoMostrar) {
+                        case 'activo':
+                            estadoTexto = 'Activo';
+                            estadoColor = 'text-green-600 dark:text-green-400';
+                            icono = 'fa-check-circle';
+                            iconoColor = 'text-green-500 dark:text-green-300';
+                            bgIcono = 'bg-green-100 dark:bg-green-900';
+                            break;
+                        case 'suspendido':
+                            estadoTexto = 'Suspendido';
+                            estadoColor = 'text-red-600 dark:text-red-400';
+                            icono = 'fa-times-circle';
+                            iconoColor = 'text-red-500 dark:text-red-300';
+                            bgIcono = 'bg-red-100 dark:bg-red-900';
+                            break;
+                        case 'cancelado':
+                            estadoTexto = 'Cancelado';
+                            estadoColor = 'text-gray-600 dark:text-gray-400';
+                            icono = 'fa-times-circle';
+                            iconoColor = 'text-gray-500 dark:text-gray-300';
+                            bgIcono = 'bg-gray-100 dark:bg-gray-900';
+                            break;
+                        default:
+                            estadoTexto = 'Sin servicios';
+                            estadoColor = 'text-gray-400';
+                            icono = 'fa-question-circle';
+                            iconoColor = 'text-gray-400';
+                            bgIcono = 'bg-gray-100 dark:bg-gray-700';
+                    }
+
+                    if (estadoElement) {
+                        estadoElement.textContent = estadoTexto;
+                        estadoElement.className = `text-sm font-semibold ${estadoColor}`;
+                    }
+                    if (estadoIconPlan && estadoIconContainer) {
+                        estadoIconPlan.className = `fas ${icono} ${iconoColor}`;
+                        estadoIconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${bgIcono}`;
+                    }
                     if (estadoIndicator) {
-                        const estadoClasses = getEstadoClasses(cliente.estado_cliente);
-                        estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${estadoClasses.container} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
-                        estadoIndicator.querySelector('i').className = `fas ${estadoClasses.icon} text-white text-xs`;
-                    }
-
-                    // Actualizar el ícono y contenedor en la sección de Plan y detalles
-                    if (estadoIconContainer) {
-                        const estadoClasses = getEstadoClasses(cliente.estado_cliente);
-                        estadoIconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                            cliente.estado_cliente === 'activo' ? 'bg-green-100 dark:bg-green-900' :
-                            cliente.estado_cliente === 'inactivo' ? 'bg-gray-100 dark:bg-gray-900' :
-                            'bg-red-100 dark:bg-red-900'
-                        }`;
-                    }
-
-                    if (estadoIconPlan) {
-                        const estadoClasses = getEstadoClasses(cliente.estado_cliente);
-                        estadoIconPlan.className = `fas ${
-                            cliente.estado_cliente === 'activo' ? 'fa-check-circle text-green-500 dark:text-green-300' :
-                            cliente.estado_cliente === 'inactivo' ? 'fa-times-circle text-gray-500 dark:text-gray-300' :
-                            'fa-exclamation-circle text-red-500 dark:text-red-300'
-                        }`;
+                        // Indicador pequeño en el avatar
+                        let indicatorBg = '';
+                        let indicatorIcon = '';
+                        switch (estadoMostrar) {
+                            case 'activo':
+                                indicatorBg = 'bg-green-500';
+                                indicatorIcon = 'fa-check-circle';
+                                break;
+                            case 'suspendido':
+                                indicatorBg = 'bg-red-500';
+                                indicatorIcon = 'fa-times-circle';
+                                break;
+                            case 'cancelado':
+                                indicatorBg = 'bg-gray-500';
+                                indicatorIcon = 'fa-times-circle';
+                                break;
+                            default:
+                                indicatorBg = 'bg-gray-400';
+                                indicatorIcon = 'fa-question-circle';
+                        }
+                        estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${indicatorBg} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+                        estadoIndicator.querySelector('i').className = `fas ${indicatorIcon} text-white text-xs`;
                     }
 
                     // Actualizar fecha de inicio y fecha de instalación

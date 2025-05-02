@@ -35,11 +35,9 @@
                 </div>
 
                 <!-- Agregar mensaje de éxito -->
-                @if(session('success'))
-                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                        {{ session('success') }}
-                    </div>
-                @endif
+                <!-- ====== Alerts Start -->
+                @include('partials.alerts')
+                <!-- ====== Alerts End -->
 
                 <!-- Formulario de cambio de contraseña -->
                 <div class="bg-white p-6 rounded-lg border border-gray-100 shadow-xs">

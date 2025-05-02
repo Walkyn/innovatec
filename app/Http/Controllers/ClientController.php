@@ -22,7 +22,8 @@ class ClientController extends Controller
             $query->where(function($q) use ($searchTerm) {
                 $q->where('nombres', 'like', "%{$searchTerm}%")
                   ->orWhere('apellidos', 'like', "%{$searchTerm}%")
-                  ->orWhere('identificacion', 'like', "%{$searchTerm}%");
+                  ->orWhere('identificacion', 'like', "%{$searchTerm}%")
+                  ->orWhereRaw("CONCAT(nombres, ' ', apellidos) LIKE ?", ["%{$searchTerm}%"]);
             });
         }
 
