@@ -328,7 +328,7 @@ class ClientController extends Controller
                     'pueblo' => $cliente->pueblo ? $cliente->pueblo->nombre : null,
                     'direccion' => $cliente->direccion,
                     'estado_cliente' => $cliente->estado_cliente,
-                    'created_at' => $cliente->created_at ? date('d/m/Y', strtotime($cliente->created_at)) : null,
+                    'created_at' => $cliente->created_at ? $cliente->created_at->toIso8601String() : null,
                     'contrato_activo' => $contratoActivo ? [
                         'id' => $contratoActivo->id,
                         'numero' => $contratoActivo->numero,

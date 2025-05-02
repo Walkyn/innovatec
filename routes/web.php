@@ -491,6 +491,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
 
     Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
+
+    Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
 });
 
 // Rutas que devuelven datos

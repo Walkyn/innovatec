@@ -32,7 +32,7 @@ class Pago extends Model
      */
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class);
+        return $this->belongsTo(\App\Models\Cliente::class, 'cliente_id');
     }
     
     /**

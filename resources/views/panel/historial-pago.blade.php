@@ -106,6 +106,9 @@
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Estado</th>
                                 <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    Observaciones</th>
+                                <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
                                     Acciones</th>
                             </tr>
@@ -163,6 +166,13 @@
                                         @endif
                                     </td>
                                     <td class="py-2 px-4 border-b border-b-gray-50">
+                                        @if($pago->estado == 'Rechazado')
+                                            <span class="text-xs text-rose-600">{{ $pago->observaciones ?? '-' }}</span>
+                                        @else
+                                            <span class="text-xs text-gray-400">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-2 px-4 border-b border-b-gray-50">
                                         <button onclick="confirmarEliminacion({{ $pago->id }})" 
                                                 {{ $pago->estado != 'en_revision' ? 'disabled' : '' }}
                                                 class="text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1
@@ -176,7 +186,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-4 text-center text-gray-500">
+                                    <td colspan="8" class="py-4 text-center text-gray-500">
                                         No has realizado ningún pago todavía.
                                         <a href="{{ route('panel.realizar-pago') }}" class="text-blue-500 hover:underline">Realiza tu primer pago</a>
                                     </td>

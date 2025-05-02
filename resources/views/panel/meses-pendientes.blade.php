@@ -130,7 +130,7 @@
                                                     $mesesYear = \App\Models\Mes::where('anio', $year)->orderBy('numero')->get();
                                                     $todosPagados = true;
                                                     $tieneMesesValidos = false;
-                                                    $tieneMesEnCurso = false;
+                                                    $tieneMesEnCursoNoPagado = false;
                                                     $tieneMesesPendientes = false;
 
                                                     foreach($mesesYear as $mesYear) {
@@ -159,18 +159,18 @@
                                                             $tieneMesesValidos = true;
 
                                                             // Verificar estado del mes
+                                                            $pagado = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+                                                                ->where('contrato_servicio_id', $cs->id)
+                                                                ->where('mes_id', $mesYear->id)
+                                                                ->where('estado_pago', 'pagado')
+                                                                ->exists();
+
                                                             if ($year === now()->year && $mesYear->numero === now()->month) {
-                                                                // Es el mes en curso
-                                                                $tieneMesEnCurso = true;
-                                                                $todosPagados = false; // Si hay mes en curso, no está todo pagado
+                                                                if (!$pagado) {
+                                                                    $tieneMesEnCursoNoPagado = true;
+                                                                    $todosPagados = false;
+                                                                }
                                                             } else {
-                                                                // No es el mes en curso, verificar si está pagado
-                                                                $pagado = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
-                                                                    ->where('contrato_servicio_id', $cs->id)
-                                                                    ->where('mes_id', $mesYear->id)
-                                                                    ->where('estado_pago', 'pagado')
-                                                                    ->exists();
-                                                                
                                                                 if (!$pagado) {
                                                                     $todosPagados = false;
                                                                     $tieneMesesPendientes = true;
@@ -184,26 +184,27 @@
                                                     // Amarillo: si hay mes en curso y no hay pendientes
                                                     // Rojo: si hay meses pendientes
                                                     // Gris: si no hay meses válidos
-                                                    $bgColor = !$tieneMesesValidos ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 
-                                                               ($todosPagados ? 'bg-green-50 hover:bg-green-100 text-green-700' : 
-                                                               ($tieneMesEnCurso && !$tieneMesesPendientes ? 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700' : 
-                                                               'bg-red-50 hover:bg-red-100 text-red-700'));
+                                                    $bgColor = !$tieneMesesValidos ? 'bg-gray-50 text-gray-700' : 
+                                                               ($todosPagados ? 'bg-green-50 text-green-700' : 
+                                                               ($tieneMesEnCursoNoPagado && !$tieneMesesPendientes ? 'bg-yellow-50 text-yellow-700' : 
+                                                               'bg-red-50 text-red-700'));
                                                     
                                                     $iconColor = !$tieneMesesValidos ? 'text-gray-500' :
                                                                 ($todosPagados ? 'text-green-500' : 
-                                                                ($tieneMesEnCurso && !$tieneMesesPendientes ? 'text-yellow-500' : 
+                                                                ($tieneMesEnCursoNoPagado && !$tieneMesesPendientes ? 'text-yellow-500' : 
                                                                 'text-red-500'));
 
                                                     $icon = !$tieneMesesValidos ? '' :
                                                             ($todosPagados ? 'fa-check-circle' : 
-                                                            ($tieneMesEnCurso && !$tieneMesesPendientes ? 'fa-clock' : 
+                                                            ($tieneMesEnCursoNoPagado && !$tieneMesesPendientes ? 'fa-clock' : 
                                                             'fa-exclamation-circle'));
                                                 @endphp
 
                                                 <div class="mb-4">
                                                     <button
                                                         @click="openYear = openYear === '{{ $cs->id }}-{{ $year }}' ? null : '{{ $cs->id }}-{{ $year }}'"
-                                                        class="w-full flex items-center justify-between px-4 py-2 {{ $bgColor }} rounded transition text-left dark:bg-gray-700 dark:hover:bg-gray-600">
+                                                        class="w-full flex items-center justify-between px-4 py-2 {{ $bgColor }} rounded transition text-left dark:bg-gray-700 dark:hover:bg-gray-600"
+                                                    >
                                                         <span class="font-medium">
                                                             Año {{ $year }}
                                                             @if($tieneMesesValidos)

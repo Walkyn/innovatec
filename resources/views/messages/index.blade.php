@@ -32,163 +32,44 @@
             <div class="flex flex-col gap-10">
 
                 <div class="flex h-screen">
-                    <!-- Sidebar con conversaciones -->
-                    <div class="w-1/4 bg-white dark:bg-boxdark border-r border-gray-200 dark:border-strokedark">
-                        <!-- Header del sidebar sin borde inferior -->
+                    <!-- Sidebar con pagos recibidos -->
+                    <div class="w-1/3 bg-white dark:bg-boxdark border-r border-gray-200 dark:border-strokedark">
                         <div class="p-6">
-                            <h1 class="text-xl font-semibold text-black dark:text-white flex justify-between">Mensajes <span class="bg-gray-100 dark:bg-meta-4 text-sm px-2 py-1 rounded-md">7</span></h1>
+                            <h1 class="text-xl font-semibold text-black dark:text-white flex justify-between">
+                                Pagos Recibidos
+                                <span class="bg-gray-100 dark:bg-meta-4 text-sm px-2 py-1 rounded-md">{{ $pagos->count() }}</span>
+                            </h1>
                         </div>
-
-                        <!-- Buscador con borde superior alineado con el header del chat -->
-                        <div class="border-t border-gray-200 dark:border-strokedark">
-                            <div class="p-4">
-                                <div class="relative">
-                                    <input type="text" placeholder="Search..." class="w-full p-2 pl-8 rounded-lg border border-gray-200 dark:border-strokedark dark:bg-meta-4 dark:text-white focus:outline-none">
-                                    <svg class="w-4 h-4 absolute left-2.5 top-3.5 text-gray-400 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="overflow-y-auto p-4">
-                            <!-- Lista de conversaciones -->
-                            <div class="flex items-center mb-2 p-2 hover:bg-gray-50 dark:hover:bg-meta-4 cursor-pointer">
-                                <div class="relative">
-                                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                        HD
+                            @foreach($pagos as $pago)
+                                <div class="flex items-center text-sm mb-2 p-2 hover:bg-gray-50 dark:hover:bg-meta-4 cursor-pointer pago-item"
+                                    data-pago-id="{{ $pago['id'] }}">
+                                    <div class="relative">
+                                        @php
+                                            $cliente = $pago['cliente'];
+                                            $iniciales = $cliente ? strtoupper(substr($cliente['nombres'],0,1) . substr($cliente['apellidos'],0,1)) : '?';
+                                        @endphp
+                                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                            {{ $iniciales }}
+                                        </div>
                                     </div>
-                                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-boxdark"></div>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="font-semibold text-black dark:text-white">Henry Dholi</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 truncate">I came across your profile and...</p>
-                                </div>
-                            </div>
-                
-                            <div class="flex items-center mb-2 p-2 hover:bg-gray-50 dark:hover:bg-meta-4 cursor-pointer">
-                                <div class="relative">
-                                    <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-semibold">
-                                        MD
+                                    <div class="ml-3 flex-1">
+                                        <p class="font-semibold text-black dark:text-white">
+                                            {{ $cliente ? $cliente['nombres'] . ' ' . $cliente['apellidos'] : 'Cliente no encontrado' }}
+                                        </p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                            {{ $pago['detalles_servicio'] ? json_decode($pago['detalles_servicio'], true)[0]['servicio'] ?? 'Sin asunto' : 'Sin asunto' }}
+                                        </p>
                                     </div>
-                                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-boxdark"></div>
                                 </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="font-semibold text-black dark:text-white">Mariya Dasoja</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 truncate">I like your confidence 😊</p>
-                                </div>
-                            </div>
-                
-                            <div class="flex items-center mb-2 p-2 hover:bg-gray-50 dark:hover:bg-meta-4 cursor-pointer">
-                                <div class="relative">
-                                    <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-semibold">
-                                        RJ
-                                    </div>
-                                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-boxdark"></div>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="font-semibold text-black dark:text-white">Robert Jhon</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 truncate">Can you share your offer?</p>
-                                </div>
-                            </div>
-            
+                            @endforeach
                         </div>
                     </div>
                 
-                    <!-- Área de chat principal -->
-                    <div class="flex-1 flex flex-col bg-gray-50 dark:bg-boxdark-2">
-                        <!-- Encabezado del chat con borde inferior -->
-                        <div class="border-b border-gray-200 dark:border-strokedark">
-                            <div class="p-4 flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                        HD
-                                    </div>
-                                    <div class="ml-3">
-                                        <h2 class="text-lg font-semibold text-black dark:text-white">Henry Dholi</h2>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Reply to message</p>
-                                    </div>
-                                </div>
-                                <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                
-                        <!-- Mensajes del chat -->
-                        <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                            <!-- Mensaje recibido -->
-                            <div class="flex justify-start">
-                                <div class="bg-white dark:bg-boxdark p-3 rounded-lg max-w-xs">
-                                    <p class="text-black dark:text-white">I can across your profile and...</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">1:56pm</p>
-                                </div>
-                            </div>
-                
-                            <!-- Mensaje enviado -->
-                            <div class="flex justify-end">
-                                <div class="bg-blue-500 text-white p-3 rounded-lg max-w-xs">
-                                    <p>You are welcome!</p>
-                                    <p class="text-xs text-blue-100 text-right mt-1">1:56pm</p>
-                                </div>
-                            </div>
-                
-                            <!-- Nueva conversación con Andri Thomas -->
-                            <div class="mt-8">
-                                <div class="flex justify-start">
-                                    <div class="bg-white dark:bg-boxdark p-3 rounded-lg max-w-xs">
-                                        <p class="font-semibold text-black dark:text-white">Andri Thomas</p>
-                                        <p>I want to make an appointment tomorrow from 2:00 to 5:00pm?</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">1:56pm</p>
-                                    </div>
-                                </div>
-                
-                                <div class="flex justify-end mt-2">
-                                    <div class="bg-blue-500 text-white p-3 rounded-lg max-w-xs">
-                                        <p>Hello, Thomas! I will check the schedule and inform you</p>
-                                        <p class="text-xs text-blue-100 text-right mt-1">1:56pm</p>
-                                    </div>
-                                </div>
-                
-                                <div class="flex justify-start mt-2">
-                                    <div class="bg-white dark:bg-boxdark p-3 rounded-lg max-w-xs">
-                                        <p class="font-semibold text-black dark:text-white">Andri Thomas</p>
-                                        <p>Ok, Thanks for your reply.</p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">1:56pm</p>
-                                    </div>
-                                </div>
-                
-                                <div class="flex justify-end mt-2">
-                                    <div class="bg-blue-500 text-white p-3 rounded-lg max-w-xs">
-                                        <p>You are welcome!</p>
-                                        <p class="text-xs text-blue-100 text-right mt-1">1:56pm</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                
-                        <!-- Área de escritura -->
-                        <div class="p-4 bg-white dark:bg-boxdark border-t border-gray-200 dark:border-strokedark">
-                            <div class="flex items-center bg-gray-50 dark:bg-meta-4 rounded-lg p-2">
-                                <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mx-2">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                                    </svg>
-                                </button>
-                                <input type="text" placeholder="Type something here" class="flex-1 bg-transparent focus:outline-none text-black dark:text-white">
-                                <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 mx-2">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </button>
-                                <button class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                    </svg>
-                                </button>
-                            </div>
+                    <!-- Área de detalle del pago seleccionado -->
+                    <div class="flex-1 flex flex-col bg-gray-50 dark:bg-boxdark-2" id="detalle-pago">
+                        <div class="flex items-center justify-center h-full text-gray-400">
+                            Selecciona un pago para ver los detalles.
                         </div>
                     </div>
                 </div>
@@ -200,6 +81,143 @@
     <!-- ===== Main Content End ===== -->
 
 @endsection
+
+<!-- Modal de éxito minimalista -->
+<div id="modalExito" class="fixed inset-0 z-50 hidden bg-black bg-opacity-30 flex items-center justify-center">
+    <div class="bg-white p-5 rounded shadow max-w-xs w-full text-center">
+        <p class="text-green-600 font-semibold mb-2">¡Pago actualizado!</p>
+        <p class="text-gray-600 text-sm mb-4">Los cambios se guardaron correctamente.</p>
+        <button id="cerrarModalExito" class="px-4 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm font-medium">
+            Aceptar
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pagos = @json($pagos);
+        const detallePago = document.getElementById('detalle-pago');
+
+        document.querySelectorAll('.pago-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                const pagoId = this.getAttribute('data-pago-id');
+                const pago = pagos.find(p => String(p['id']) === String(pagoId));
+                if (!pago || !pago['cliente']) return;
+
+                let detalles = '';
+                try {
+                    const servicios = JSON.parse(pago['detalles_servicio']);
+                    detalles = servicios.map(s => s.servicio).join(', ');
+                } catch {
+                    detalles = pago['detalles_servicio'];
+                }
+
+                let comprobanteHtml = '';
+                if (pago['comprobante_path']) {
+                    comprobanteHtml = `
+                        <div class="mb-2">
+                            <a href="/storage/${pago['comprobante_path']}" target="_blank" class="text-blue-600 underline">Ver comprobante</a>
+                            <img src="/storage/${pago['comprobante_path']}" alt="Comprobante" class="mt-2 max-w-xs rounded shadow">
+                        </div>
+                    `;
+                }
+
+                // Opciones de estado
+                const estados = [
+                    {valor: 'en_revision', texto: 'En revisión'},
+                    {valor: 'Aprobado', texto: 'Aprobado'},
+                    {valor: 'Rechazado', texto: 'Rechazado'}
+                ];
+
+                detallePago.innerHTML = `
+                    <div class="flex flex-col h-full">
+                        <!-- Header del pago -->
+                        <div class="flex items-center border-b px-6 py-4 bg-white">
+                            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-lg font-bold">
+                                ${pago['cliente']['nombres'].charAt(0).toUpperCase()}${pago['cliente']['apellidos'].charAt(0).toUpperCase()}
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <div class="font-semibold text-black dark:text-white text-lg">
+                                    ${pago['cliente']['nombres']} ${pago['cliente']['apellidos']}
+                                </div>
+                                <div class="text-xs text-gray-400">${pago['cliente']['email'] ?? ''}</div>
+                            </div>
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                ${pago['estado'] === 'Aprobado' ? 'bg-emerald-100 text-emerald-600' :
+                                  pago['estado'] === 'en_revision' ? 'bg-yellow-100 text-yellow-600' :
+                                  'bg-rose-100 text-rose-600'}">
+                                ${estados.find(e => e.valor === pago['estado']).texto}
+                            </span>
+                        </div>
+                        <!-- Info de pago + comprobante + observaciones actuales -->
+                        <div class="px-6 py-4 bg-white border-b">
+                            <div>
+                                <span class="font-semibold">Servicio:</span> ${detalles} &nbsp; | &nbsp;
+                                <span class="font-semibold">Monto:</span> S/ ${parseFloat(pago['monto_total']).toFixed(2)} &nbsp; | &nbsp;
+                                <span class="font-semibold">Fecha:</span> ${new Date(pago['created_at']).toLocaleDateString()}
+                            </div>
+                            ${comprobanteHtml}
+                            <div class="max-w-lg w-full mt-4">
+                                <div class="bg-white rounded-lg shadow p-4 border">
+                                    <div class="font-semibold text-gray-700 mb-2">Observaciones actuales</div>
+                                    <div class="text-gray-600 text-sm">
+                                        ${pago['observaciones'] ? pago['observaciones'] : '<span class="italic text-gray-400">Sin observaciones registradas.</span>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Formulario para nueva observación -->
+                        <form id="form-actualizar-pago" class="bg-white border-t p-4 flex flex-col gap-2">
+                            <label class="text-xs font-semibold text-gray-500 mb-1">Nueva observación:</label>
+                            <textarea name="observaciones" rows="2" class="border rounded p-2 text-sm" placeholder="Escribe aquí la observación que deseas guardar..."></textarea>
+                            <div class="flex items-center gap-2 mt-2">
+                                <label class="text-xs font-semibold text-gray-500">Estado:</label>
+                                <select name="estado" class="border rounded p-1 text-sm">
+                                    ${estados.map(e => `<option value="${e.valor}" ${pago['estado'] === e.valor ? 'selected' : ''}>${e.texto}</option>`).join('')}
+                                </select>
+                                <button type="submit" class="ml-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-semibold">Guardar</button>
+                            </div>
+                            <input type="hidden" name="pago_id" value="${pago['id']}">
+                        </form>
+                    </div>
+                `;
+
+                // Manejar el submit del formulario
+                document.getElementById('form-actualizar-pago').onsubmit = async function(e) {
+                    e.preventDefault();
+                    const form = e.target;
+                    const data = {
+                        observaciones: form.observaciones.value,
+                        estado: form.estado.value,
+                        pago_id: form.pago_id.value,
+                        _token: '{{ csrf_token() }}'
+                    };
+                    const resp = await fetch("{{ route('panel.actualizar-pago') }}", {
+                        method: "POST",
+                        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                        body: JSON.stringify(data)
+                    });
+                    const res = await resp.json();
+                    if (res.success) {
+                        document.getElementById('modalExito').classList.remove('hidden');
+                        document.getElementById('cerrarModalExito').onclick = function() {
+                            document.getElementById('modalExito').classList.add('hidden');
+                            location.reload();
+                        };
+                        document.getElementById('modalExito').addEventListener('click', function(e) {
+                            if (e.target === this) {
+                                this.classList.add('hidden');
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        alert(res.message || 'Error al actualizar');
+                    }
+                };
+            });
+        });
+    });
+</script>
 
 
 

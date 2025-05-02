@@ -312,7 +312,46 @@
                     document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo || 'No especificado';
                     document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
                     
-                    // === NUEVO: Actualizar información del plan y estado usando los nuevos campos ===
+                    // === ESTADO DEL CLIENTE (perfil/avatar) ===
+                    const estadoCliente = cliente.estado_cliente;
+                    const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
+                    const estadoPerfil = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
+
+                    let indicatorBg = '';
+                    let indicatorIcon = '';
+                    let estadoPerfilTexto = '';
+                    switch (estadoCliente) {
+                        case 'activo':
+                            indicatorBg = 'bg-green-500';
+                            indicatorIcon = 'fa-check-circle';
+                            estadoPerfilTexto = 'Cliente activo';
+                            break;
+                        case 'suspendido':
+                            indicatorBg = 'bg-yellow-500';
+                            indicatorIcon = 'fa-exclamation-circle';
+                            estadoPerfilTexto = 'Cliente suspendido';
+                            break;
+                        case 'inactivo':
+                            indicatorBg = 'bg-gray-400';
+                            indicatorIcon = 'fa-times-circle';
+                            estadoPerfilTexto = 'Cliente inactivo';
+                            break;
+                        default:
+                            indicatorBg = 'bg-gray-400';
+                            indicatorIcon = 'fa-question-circle';
+                            estadoPerfilTexto = 'Estado desconocido';
+                    }
+                    if (estadoIndicator) {
+                        estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${indicatorBg} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+                        estadoIndicator.querySelector('i').className = `fas ${indicatorIcon} text-white text-xs`;
+                    }
+                    if (estadoPerfil) {
+                        // Puedes mostrar el texto de estado aquí si lo deseas, o dejar la fecha de alta
+                        // estadoPerfil.textContent = estadoPerfilTexto;
+                        // O dejar la fecha de alta como ya tienes
+                    }
+
+                    // === ESTADO DEL SERVICIO/PLAN (sección plan) ===
                     const servicioMostrar = cliente.servicio_mostrar;
                     const planMostrar = cliente.plan_mostrar;
                     const precioMostrar = cliente.precio_mostrar;
@@ -328,7 +367,7 @@
                     const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
                     const estadoIconPlan = document.querySelector('#meses-modal [data-field="estado-icon"]');
                     const estadoIconContainer = estadoIconPlan.parentElement;
-                    const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
+                    const estadoIndicatorPlan = document.querySelector('#meses-modal [data-field="estado-indicator-plan"]');
 
                     let estadoTexto = '';
                     let estadoColor = '';
@@ -339,14 +378,14 @@
                     switch (estadoMostrar) {
                         case 'activo':
                             estadoTexto = 'Activo';
-                            estadoColor = 'text-green-600 dark:text-green-400';
+                            estadoColor = 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100';
                             icono = 'fa-check-circle';
                             iconoColor = 'text-green-500 dark:text-green-300';
                             bgIcono = 'bg-green-100 dark:bg-green-900';
                             break;
                         case 'suspendido':
                             estadoTexto = 'Suspendido';
-                            estadoColor = 'text-red-600 dark:text-red-400';
+                            estadoColor = 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100';
                             icono = 'fa-times-circle';
                             iconoColor = 'text-red-500 dark:text-red-300';
                             bgIcono = 'bg-red-100 dark:bg-red-900';
@@ -374,29 +413,29 @@
                         estadoIconPlan.className = `fas ${icono} ${iconoColor}`;
                         estadoIconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${bgIcono}`;
                     }
-                    if (estadoIndicator) {
+                    if (estadoIndicatorPlan) {
                         // Indicador pequeño en el avatar
-                        let indicatorBg = '';
-                        let indicatorIcon = '';
+                        let indicatorBgPlan = '';
+                        let indicatorIconPlan = '';
                         switch (estadoMostrar) {
                             case 'activo':
-                                indicatorBg = 'bg-green-500';
-                                indicatorIcon = 'fa-check-circle';
+                                indicatorBgPlan = 'bg-green-500';
+                                indicatorIconPlan = 'fa-check-circle';
                                 break;
                             case 'suspendido':
-                                indicatorBg = 'bg-red-500';
-                                indicatorIcon = 'fa-times-circle';
+                                indicatorBgPlan = 'bg-red-500';
+                                indicatorIconPlan = 'fa-times-circle';
                                 break;
                             case 'cancelado':
-                                indicatorBg = 'bg-gray-500';
-                                indicatorIcon = 'fa-times-circle';
+                                indicatorBgPlan = 'bg-gray-500';
+                                indicatorIconPlan = 'fa-times-circle';
                                 break;
                             default:
-                                indicatorBg = 'bg-gray-400';
-                                indicatorIcon = 'fa-question-circle';
+                                indicatorBgPlan = 'bg-gray-400';
+                                indicatorIconPlan = 'fa-question-circle';
                         }
-                        estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${indicatorBg} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
-                        estadoIndicator.querySelector('i').className = `fas ${indicatorIcon} text-white text-xs`;
+                        estadoIndicatorPlan.className = `absolute bottom-0 right-0 w-5 h-5 ${indicatorBgPlan} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+                        estadoIndicatorPlan.querySelector('i').className = `fas ${indicatorIconPlan} text-white text-xs`;
                     }
 
                     // Actualizar fecha de inicio y fecha de instalación
@@ -404,26 +443,34 @@
                     const fechaInstalacionElement = document.querySelector('#meses-modal [data-field="fecha-instalacion"]');
 
                     if (fechaInicioElement) {
-                        // Formatear la fecha para que sea más legible
                         let fechaFormateada = 'No especificada';
                         if (cliente.created_at) {
-                            const fecha = new Date(cliente.created_at);
-                            if (!isNaN(fecha.getTime())) {
-                                const dia = fecha.getDate();
-                                const mes = fecha.toLocaleString('es-ES', { month: 'long' });
-                                const anio = fecha.getFullYear();
-                                fechaFormateada = `el ${dia} de ${mes} de ${anio}`;
-                            }
+                            // Si viene como "2022-07-06" o "2022-07-06T00:00:00.000000Z"
+                            let fechaStr = cliente.created_at.split('T')[0]; // "2022-07-06"
+                            const [anio, mes, dia] = fechaStr.split('-');
+                            // Mes en español
+                            const meses = [
+                                'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                                'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+                            ];
+                            const mesNombre = meses[parseInt(mes, 10) - 1];
+                            fechaFormateada = `Cliente registrado el ${parseInt(dia, 10)} de ${mesNombre} de ${anio}`;
                         }
-                        
                         fechaInicioElement.innerHTML = `
                             <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                            Cliente activo desde ${fechaFormateada}
+                            ${fechaFormateada}
                         `;
                     }
 
                     if (fechaInstalacionElement) {
-                        fechaInstalacionElement.textContent = cliente.created_at || 'No especificada';
+                        let fechaInstalacionFormateada = 'No especificada';
+                        if (cliente.created_at) {
+                            // Si viene como "2022-07-06" o "2022-07-06T03:55:51.000000Z"
+                            let fechaStr = cliente.created_at.split('T')[0]; // "2022-07-06"
+                            const [anio, mes, dia] = fechaStr.split('-');
+                            fechaInstalacionFormateada = `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${anio}`;
+                        }
+                        fechaInstalacionElement.textContent = fechaInstalacionFormateada;
                     }
 
                     // Cargar los contratos

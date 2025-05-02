@@ -283,13 +283,20 @@
     }
 
     function showToast(ip) {
-        // Guardar la IP para mostrar el toast cuando regrese
+        // Detectar si es un dispositivo móvil
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
         window.pendingToast = ip;
 
         // Abrir la IP en una nueva ventana
         window.open(`http://${ip}`, '_blank');
 
-        // Agregar evento focus a la ventana
+        // Si es móvil, no intentar hacer fetch ni mostrar toast
+        if (isMobile) {
+            return;
+        }
+
+        // Agregar evento focus a la ventana (solo en escritorio)
         window.addEventListener('focus', function showToastOnFocus() {
             if (window.pendingToast) {
                 const currentIp = window.pendingToast;
