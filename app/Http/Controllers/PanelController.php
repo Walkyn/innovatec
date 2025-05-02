@@ -234,9 +234,11 @@ class PanelController extends Controller
             foreach ($servicios as $servicio) {
                 $detallesServicio[] = [
                     'contrato' => $servicio['contratoNumero'],
+                    'codigo_contrato' => $servicio['codigo_contrato'] ?? null,
                     'servicio' => $servicio['servicioNombre'],
                     'precio' => $servicio['precio'],
-                    'subtotal' => $servicio['subtotal']
+                    'subtotal' => $servicio['subtotal'],
+                    'mesesTexto' => $servicio['mesesTexto']
                 ];
                 
                 // Agregar los meses a la lista total de meses pagados

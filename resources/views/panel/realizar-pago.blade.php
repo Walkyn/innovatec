@@ -1114,6 +1114,7 @@
             var nuevoServicio = {
                 id: Date.now(),
                 contratoNumero: contratoTexto,
+                codigo_contrato: selectContrato.value,
                 servicioNombre: servicioNombre,
                 precio: precioServicio,
                 mesesTexto: mesesTexto,
@@ -1233,7 +1234,6 @@
                 }
             }
             
-            // Intentar limpiar la selección del servicio (compatible con Alpine)
             var selectServicio = document.querySelector('select[x-model="selectedServicio"]');
             if (selectServicio) {
                 selectServicio.value = '';
@@ -1322,10 +1322,9 @@
                 if (data.success) {
                     mostrarNotificacion(data.message, 'success');
                     
-                    // Limpiar formulario después de 2 segundos y redireccionar a la vista correcta
                     setTimeout(function() {
                         limpiarFormulario();
-                        window.location.href = '{{ route("panel.historial-pago") }}';
+                        window.location.href = "{{ route('panel.historial-pagos') }}";
                     }, 2000);
                 } else {
                     mostrarNotificacion(data.error, 'error');

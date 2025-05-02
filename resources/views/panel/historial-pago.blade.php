@@ -92,6 +92,9 @@
                                     Medio de Pago</th>
                                 <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
+                                    Contrato</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Servicio</th>
                                 <th
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
@@ -115,78 +118,98 @@
                         </thead>
                         <tbody>
                             @forelse($pagos as $pago)
-                                <tr>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
-                                        <div class="flex items-center">
-                                            <img src="{{ asset('images/paymethods/' . strtolower($pago->medio_pago) . '.png') }}" alt="{{ $pago->medio_pago }}"
-                                                class="w-8 h-8 rounded object-cover block">
-                                            <span class="text-gray-600 text-sm font-medium ml-2 truncate">
-                                                {{ $nombresMediosPago[$pago->medio_pago] ?? $pago->medio_pago }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
-                                        @php
-                                            $detalles = json_decode($pago->detalles_servicio, true);
-                                            $servicios = array_map(function($detalle) {
-                                                return $detalle['servicio'];
-                                            }, $detalles);
-                                            $servicioTexto = implode(', ', array_slice($servicios, 0, 2));
-                                            if (count($servicios) > 2) {
-                                                $servicioTexto .= ' y ' . (count($servicios) - 2) . ' más';
-                                            }
-                                        @endphp
-                                        <span class="text-[13px] font-medium text-gray-500">{{ $servicioTexto }}</span>
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
-                                        <span class="text-[13px] font-medium text-gray-500">{{ $pago->meses_pagados }}</span>
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap">
-                                        <span class="text-[13px] font-medium text-emerald-500">S/ {{ number_format($pago->monto_total, 2) }}</span>
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
-                                        <span class="text-[13px] font-medium text-gray-500">{{ $pago->created_at->format('d/m/Y') }}</span>
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap">
-                                        @if($pago->estado == 'en_revision')
-                                            <span class="text-xs font-medium text-yellow-600 bg-yellow-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                                <i class="fas fa-clock"></i>
-                                                En revisión
-                                            </span>
-                                        @elseif($pago->estado == 'Aprobado')
-                                            <span class="text-xs font-medium text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                                <i class="fas fa-check-circle"></i>
-                                                Aprobado
-                                            </span>
-                                        @elseif($pago->estado == 'Rechazado')
-                                            <span class="text-xs font-medium text-rose-600 bg-rose-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                                <i class="fas fa-times-circle"></i>
-                                                Rechazado
-                                            </span>
+                                @php
+                                    $detalles = json_decode($pago->detalles_servicio, true);
+                                    $numDetalles = count($detalles);
+                                @endphp
+                                @for($i = 0; $i < $numDetalles; $i++)
+                                    <tr>
+                                        @if($i === 0)
+                                            <!-- Medio de pago solo en la primera fila -->
+                                            <td class="py-2 px-4 border-b border-b-gray-50" rowspan="{{ $numDetalles }}">
+                                                <div class="flex items-center">
+                                                    <img src="{{ asset('images/paymethods/' . strtolower($pago->medio_pago) . '.png') }}" alt="{{ $pago->medio_pago }}"
+                                                        class="w-8 h-8 rounded object-cover block">
+                                                    <span class="text-gray-600 text-sm font-medium ml-2 truncate">
+                                                        {{ $nombresMediosPago[$pago->medio_pago] ?? $pago->medio_pago }}
+                                                    </span>
+                                                </div>
+                                            </td>
                                         @endif
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
-                                        @if($pago->estado == 'Rechazado')
-                                            <span class="text-xs text-rose-600">{{ $pago->observaciones ?? '-' }}</span>
-                                        @else
-                                            <span class="text-xs text-gray-400">-</span>
+                                        <!-- Contrato -->
+                                        <td class="py-2 px-4 border-b border-b-gray-50">
+                                            <span class="text-[13px] font-medium text-gray-500 whitespace-nowrap">
+                                                {{ $detalles[$i]['contrato'] ?? '-' }}
+                                            </span>
+                                        </td>
+                                        <!-- Servicio -->
+                                        <td class="py-2 px-4 border-b border-b-gray-50">
+                                            <span class="text-[13px] font-medium text-gray-500 whitespace-nowrap">
+                                                {{ $detalles[$i]['servicio'] }}
+                                            </span>
+                                        </td>
+                                        <!-- Meses -->
+                                        <td class="py-2 px-4 border-b border-b-gray-50">
+                                            <span class="text-[13px] font-medium text-gray-500">
+                                                @if(isset($detalles[$i]['mesesTexto']))
+                                                    {{ $detalles[$i]['mesesTexto'] }}
+                                                @elseif(isset($detalles[$i]['meses']))
+                                                    {{ $detalles[$i]['meses'] }}
+                                                @else
+                                                    {{ $pago->meses_pagados }}
+                                                @endif
+                                            </span>
+                                        </td>
+                                        @if($i === 0)
+                                            <!-- Monto, fecha, estado, observaciones, acciones solo en la primera fila -->
+                                            <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap" rowspan="{{ $numDetalles }}">
+                                                <span class="text-[13px] font-medium text-emerald-500">S/ {{ number_format($pago->monto_total, 2) }}</span>
+                                            </td>
+                                            <td class="py-2 px-4 border-b border-b-gray-50" rowspan="{{ $numDetalles }}">
+                                                <span class="text-[13px] font-medium text-gray-500">{{ $pago->created_at->format('d/m/Y') }}</span>
+                                            </td>
+                                            <td class="py-2 px-4 border-b border-b-gray-50 whitespace-nowrap" rowspan="{{ $numDetalles }}">
+                                                @if($pago->estado == 'en_revision')
+                                                    <span class="text-xs font-medium text-yellow-600 bg-yellow-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                        <i class="fas fa-clock"></i>
+                                                        En revisión
+                                                    </span>
+                                                @elseif($pago->estado == 'Aprobado')
+                                                    <span class="text-xs font-medium text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                        <i class="fas fa-check-circle"></i>
+                                                        Aprobado
+                                                    </span>
+                                                @elseif($pago->estado == 'Rechazado')
+                                                    <span class="text-xs font-medium text-rose-600 bg-rose-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                                        <i class="fas fa-times-circle"></i>
+                                                        Rechazado
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="py-2 px-4 border-b border-b-gray-50" rowspan="{{ $numDetalles }}">
+                                                @if($pago->estado == 'Rechazado')
+                                                    <span class="text-xs text-rose-600">{{ $pago->observaciones ?? '-' }}</span>
+                                                @else
+                                                    <span class="text-xs text-gray-400">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="py-2 px-4 border-b border-b-gray-50" rowspan="{{ $numDetalles }}">
+                                                <button onclick="confirmarEliminacion({{ $pago->id }})" 
+                                                        {{ $pago->estado != 'en_revision' ? 'disabled' : '' }}
+                                                        class="text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1
+                                                        {{ $pago->estado == 'en_revision' 
+                                                            ? 'text-rose-600 bg-rose-100/50 hover:bg-rose-200/50 cursor-pointer' 
+                                                            : 'text-gray-400 bg-gray-100/50 cursor-not-allowed opacity-50' }}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                    Eliminar
+                                                </button>
+                                            </td>
                                         @endif
-                                    </td>
-                                    <td class="py-2 px-4 border-b border-b-gray-50">
-                                        <button onclick="confirmarEliminacion({{ $pago->id }})" 
-                                                {{ $pago->estado != 'en_revision' ? 'disabled' : '' }}
-                                                class="text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1
-                                                {{ $pago->estado == 'en_revision' 
-                                                    ? 'text-rose-600 bg-rose-100/50 hover:bg-rose-200/50 cursor-pointer' 
-                                                    : 'text-gray-400 bg-gray-100/50 cursor-not-allowed opacity-50' }}">
-                                            <i class="fas fa-trash-alt"></i>
-                                            Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
+                                    </tr>
+                                @endfor
                             @empty
                                 <tr>
-                                    <td colspan="8" class="py-4 text-center text-gray-500">
+                                    <td colspan="9" class="py-4 text-center text-gray-500">
                                         No has realizado ningún pago todavía.
                                         <a href="{{ route('panel.realizar-pago') }}" class="text-blue-500 hover:underline">Realiza tu primer pago</a>
                                     </td>

@@ -170,11 +170,17 @@
                 <!-- Chat Notification Area -->
                 <li class="relative">
                     <a class="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        href="{{ route('messages.index') }}">
+                        href="{{ route('messages.index') }}?v={{ time() }}">
+                        
+                        @php
+                            $pagosPendientes = DB::table('pagos')->where('estado', 'en_revision')->count();
+                        @endphp
+                        
+                        @if($pagosPendientes > 0)
                         <span class="absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-meta-1">
-                            <span
-                                class="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
+                            <span class="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
                         </span>
+                        @endif
 
                         <svg class="fill-current duration-300 ease-in-out" width="18" height="18"
                             viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
