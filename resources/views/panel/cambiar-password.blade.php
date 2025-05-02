@@ -19,20 +19,27 @@
                             <!-- Avatar -->
                             <div class="relative flex-shrink-0 hidden md:block">
                                 <div class="w-18 h-18 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                                    <span class="text-xl font-bold text-white">JL</span>
+                                    <span class="text-xl font-bold text-white">{{ $initials }}</span>
                                 </div>
                             </div>
 
                             <!-- Información básica -->
                             <div class="flex flex-col">
-                                <h2 class="text-xl font-light text-gray-900 mb-1">Juan López Martínez</h2>
+                                <h2 class="text-xl font-light text-gray-900 mb-1">{{ $user->nombres }} {{ $user->apellidos }}</h2>
                                 <div class="flex flex-wrap gap-2 mt-2">
-                                    <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full">75849632</span>
+                                    <span class="px-2.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full">{{ $user->identificacion }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Agregar mensaje de éxito -->
+                @if(session('success'))
+                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
                 <!-- Formulario de cambio de contraseña -->
                 <div class="bg-white p-6 rounded-lg border border-gray-100 shadow-xs">

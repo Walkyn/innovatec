@@ -1601,6 +1601,8 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
         });
     </script>
 
+    <!-- Scripts -->
+    @stack('scripts')
 </body>
 
 </html>

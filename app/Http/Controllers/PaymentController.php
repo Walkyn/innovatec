@@ -114,15 +114,7 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
+    
     public function show(string $id)
     {
         try {

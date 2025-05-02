@@ -12,7 +12,17 @@
                 <button id="optionsDropdownButton" data-dropdown-toggle="optionsDropdown"
                     class="w-full md:w-auto flex items-center justify-center py-2 px-8 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded shadow-sm border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                     type="button">
-                    Opciones
+                    @php
+                        $opcionSeleccionada = 'Opciones';
+                        if (request('fecha_inicio') === now()->format('Y-m-d') && !request('fecha_fin')) {
+                            $opcionSeleccionada = 'Hoy';
+                        } elseif (request('todos')) {
+                            $opcionSeleccionada = 'Todos';
+                        } elseif (request('fecha_inicio') && request('fecha_fin') && substr(request('fecha_inicio'), 0, 4) === substr(request('fecha_fin'), 0, 4)) {
+                            $opcionSeleccionada = 'Año ' . substr(request('fecha_inicio'), 0, 4);
+                        }
+                    @endphp
+                    {{ $opcionSeleccionada }}
                     <svg class="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewbox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path clip-rule="evenodd" fill-rule="evenodd"
@@ -24,14 +34,21 @@
                     <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="optionsDropdownButton">
                         <li>
                             <button type="button" id="btn-hoy"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ request('fecha_inicio') === now()->format('Y-m-d') && !request('fecha_fin') ? 'bg-gray-100 text-primary-700 dark:bg-gray-600 dark:text-white' : '' }}">
                                 Hoy
                             </button>
                         </li>
                         <li>
                             <button type="button" id="btn-todos"
-                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ request('todos') ? 'bg-gray-100 text-primary-700 dark:bg-gray-600 dark:text-white' : '' }}">
                                 Todos
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" id="btn-anio"
+                                class="w-full text-left block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ request('fecha_inicio') && request('fecha_fin') && substr(request('fecha_inicio'), 0, 4) === substr(request('fecha_fin'), 0, 4) ? 'bg-gray-100 text-primary-700 dark:bg-gray-600 dark:text-white' : '' }}"
+                                data-modal-target="anio-modal" data-modal-toggle="anio-modal">
+                                Por Año
                             </button>
                         </li>
                     </ul>
@@ -345,33 +362,91 @@
     </div>
 </main>
 
+<!-- Modal para selección de año -->
+<div id="anio-modal" tabindex="-1" aria-hidden="true" 
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Filtrar por Año
+                </h3>
+                <button type="button" 
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-hide="anio-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <form id="form-anio">
+                    <div class="mb-4">
+                        <label for="select-anio" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Seleccionar Año</label>
+                        <select id="select-anio" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <?php
+                            $currentYear = date('Y');
+                            for ($year = $currentYear; $year >= $currentYear - 10; $year--) {
+                                echo "<option value=\"$year\">$year</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <button type="submit" 
+                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Filtrar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Botones de filtro
         document.getElementById('btn-hoy').addEventListener('click', function() {
             const url = new URL(window.location.href);
+            // Limpiar todos los parámetros existentes
             url.searchParams.delete('todos');
+            url.searchParams.delete('fecha_inicio');
+            url.searchParams.delete('fecha_fin');
+            // Establecer el filtro de hoy
             url.searchParams.set('fecha_inicio', '{{ now()->format('Y-m-d') }}');
             window.location.href = url.toString();
         });
 
         document.getElementById('btn-todos').addEventListener('click', function() {
             const url = new URL(window.location.href);
-            // Limpiar todos los parámetros de fecha
+            // Limpiar todos los parámetros
             url.searchParams.delete('fecha_inicio');
             url.searchParams.delete('fecha_fin');
+            url.searchParams.delete('todos');
+            // Establecer el filtro de todos
             url.searchParams.set('todos', '1');
             window.location.href = url.toString();
         });
 
-        // Si no hay ningún parámetro en la URL, mostrar los cobros de hoy por defecto
-        const urlParams = new URLSearchParams(window.location.search);
-        if (!urlParams.has('fecha_inicio') && !urlParams.has('fecha_fin') && !urlParams.has('search') && !
-            urlParams.has('todos')) {
+        // Manejar el formulario de año
+        document.getElementById('form-anio').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const year = document.getElementById('select-anio').value;
+            
+            // Construir la URL con los parámetros
             const url = new URL(window.location.href);
-            url.searchParams.set('fecha_inicio', '{{ now()->format('Y-m-d') }}');
+            // Limpiar todos los parámetros existentes
+            url.searchParams.delete('todos');
+            url.searchParams.delete('fecha_inicio');
+            url.searchParams.delete('fecha_fin');
+            // Establecer el filtro por año
+            url.searchParams.set('fecha_inicio', `${year}-01-01`);
+            url.searchParams.set('fecha_fin', `${year}-12-31`);
+            
+            // Redirigir a la nueva URL
             window.location.href = url.toString();
-        }
+        });
 
         // Función para mostrar el modal de confirmación de anulación
         const mostrarConfirmacionAnulacion = (cobranzaId) => {

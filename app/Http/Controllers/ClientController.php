@@ -353,4 +353,21 @@ class ClientController extends Controller
             ], 500);
         }
     }
+
+    public function getContracts(Cliente $client)
+    {
+        $contratos = $client->contratos()
+            ->orderByDesc('fecha_contrato')
+            ->get();
+
+        $view = view('partials.contratos-list', [
+            'contratos' => $contratos,
+            'cliente' => $client
+        ])->render();
+
+        return response()->json([
+            'success' => true,
+            'html' => $view
+        ]);
+    }
 }

@@ -46,7 +46,7 @@ class Cobranza extends Model
                 $siguienteNumero = 1;
             }
 
-            $cobranza->numero_boleta = $year . '-' . str_pad($siguienteNumero, 6, '0', STR_PAD_LEFT);
+            $cobranza->numero_boleta = $year . '-' . str_pad($siguienteNumero, 5, '0', STR_PAD_LEFT);
         });
     }
 

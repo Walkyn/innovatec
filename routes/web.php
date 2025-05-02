@@ -31,6 +31,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PanelController;
 use App\Models\Mes;
 use Carbon\Carbon;
+use App\Http\Controllers\PagoController;
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -82,6 +83,7 @@ Route::middleware('auth')->group(function () {
         Route::put('clients/{id}', 'update')->middleware('check.permissions:clients,actualizar')->name('clients.update');
         Route::delete('clients/{id}', 'destroy')->middleware('check.permissions:clients,eliminar')->name('clients.destroy');
         Route::get('clients/{id}/details', 'getDetails')->name('clients.details');
+        Route::get('/clients/{client}/contracts', 'getContracts')->name('clients.contracts');
     });
 
     // Import Routes
@@ -483,7 +485,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/panel/pagos', [App\Http\Controllers\PanelController::class, 'listarPagos'])->name('panel.pagos');
 
     // Ruta para ver historial de pagos
-    Route::get('/panel/historial-pago', [App\Http\Controllers\PanelController::class, 'historialPago'])->name('panel.historial-pago');
+    Route::get('/panel/historial-pago', [PagoController::class, 'historial'])->name('panel.historial-pago');
+
+    // Ruta para eliminar pago
+    Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
+
+    Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
 });
 
 // Rutas que devuelven datos
@@ -648,6 +655,8 @@ Route::middleware(['auth.cliente'])->group(function () {
     Route::get('/cambiar-password', [PanelController::class, 'cambiarPassword'])->name('panel.cambiar-password');
     Route::post('/panel/cerrar-sesion', [PanelController::class, 'logout'])->name('panel.cerrar-sesion');
     Route::get('/historial-servicios', [PanelController::class, 'historialServicios'])->name('panel.historial-servicios');
+    Route::get('/panel/comprobante/{id}/detalle', [PanelController::class, 'verDetalleComprobante'])
+        ->name('panel.comprobante.detalle');
 });
 
 Route::post('/set-cliente-id/{id}', function($id) {

@@ -7,14 +7,23 @@
     <div class="relative p-4 w-full max-h-full mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md lg:col-span-2">
-                <div class="flex justify-between mb-4 items-start">
+                <div class="flex justify-between mb-4 items-center">
                     <div class="font-medium">Estado de Pagos</div>
+                    <div class="relative">
+                        <select id="yearSelector" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-32 p-2">
+                            @foreach($años_disponibles as $año)
+                                <option value="{{ $año }}" {{ $año == $año_seleccionado ? 'selected' : '' }}>
+                                    {{ $año }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                     @php
                         // Calcular estadísticas por estado
                         $totales = [
-                            'Aceptado' => ['count' => 0, 'sum' => 0],
+                            'Aprobado' => ['count' => 0, 'sum' => 0],
                             'en_revision' => ['count' => 0, 'sum' => 0],
                             'Rechazado' => ['count' => 0, 'sum' => 0]
                         ];
@@ -30,12 +39,12 @@
                     <!-- Pagos Aceptados -->
                     <div class="rounded-md border border-dashed border-gray-200 p-4">
                         <div class="flex items-center mb-0.5">
-                            <div class="text-xl font-semibold">{{ $totales['Aceptado']['count'] }}</div>
+                            <div class="text-xl font-semibold">{{ $totales['Aprobado']['count'] }}</div>
                             <span class="p-1 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500 leading-none ml-1">
-                                S/ {{ number_format($totales['Aceptado']['sum'], 2) }}
+                                S/ {{ number_format($totales['Aprobado']['sum'], 2) }}
                             </span>
                         </div>
-                        <span class="text-gray-400 text-sm">Completado</span>
+                        <span class="text-gray-400 text-sm">Aprobado</span>
                     </div>
                     
                     <!-- Pagos en Revisión -->
@@ -94,8 +103,11 @@
                                     class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Fecha</th>
                                 <th
-                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md whitespace-nowrap">
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left">
                                     Estado</th>
+                                <th
+                                    class="text-[12px] uppercase tracking-wide font-medium text-gray-400 py-2 px-4 bg-gray-50 text-left rounded-tr-md rounded-br-md">
+                                    Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -138,10 +150,10 @@
                                                 <i class="fas fa-clock"></i>
                                                 En revisión
                                             </span>
-                                        @elseif($pago->estado == 'Aceptado')
+                                        @elseif($pago->estado == 'Aprobado')
                                             <span class="text-xs font-medium text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
                                                 <i class="fas fa-check-circle"></i>
-                                                Completado
+                                                Aprobado
                                             </span>
                                         @elseif($pago->estado == 'Rechazado')
                                             <span class="text-xs font-medium text-rose-600 bg-rose-100/50 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -150,10 +162,21 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="py-2 px-4 border-b border-b-gray-50">
+                                        <button onclick="confirmarEliminacion({{ $pago->id }})" 
+                                                {{ $pago->estado != 'en_revision' ? 'disabled' : '' }}
+                                                class="text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1
+                                                {{ $pago->estado == 'en_revision' 
+                                                    ? 'text-rose-600 bg-rose-100/50 hover:bg-rose-200/50 cursor-pointer' 
+                                                    : 'text-gray-400 bg-gray-100/50 cursor-not-allowed opacity-50' }}">
+                                            <i class="fas fa-trash-alt"></i>
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-4 text-center text-gray-500">
+                                    <td colspan="7" class="py-4 text-center text-gray-500">
                                         No has realizado ningún pago todavía.
                                         <a href="{{ route('panel.realizar-pago') }}" class="text-blue-500 hover:underline">Realiza tu primer pago</a>
                                     </td>
@@ -165,41 +188,7 @@
                 
                 <!-- Paginación -->
                 <div class="mt-4 flex justify-center">
-                    @if ($pagos->hasPages())
-                    <nav role="navigation" aria-label="Pagination Navigation" class="flex justify-between">
-                        {{-- Botón Anterior --}}
-                        @if ($pagos->onFirstPage())
-                            <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-md">
-                                Anterior
-                            </span>
-                        @else
-                            <a href="{{ $pagos->previousPageUrl() }}" rel="prev" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700">
-                                Anterior
-                            </a>
-                        @endif
-
-                        {{-- Números de Páginas --}}
-                        <div class="hidden md:flex">
-                            @foreach ($pagos->getUrlRange(1, $pagos->lastPage()) as $page => $url)
-                                <a href="{{ $url }}" class="relative inline-flex items-center px-4 py-2 mx-1 text-sm font-medium border rounded-md 
-                                    {{ $page == $pagos->currentPage() ? 'bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50' }}">
-                                    {{ $page }}
-                                </a>
-                            @endforeach
-                        </div>
-
-                        {{-- Botón Siguiente --}}
-                        @if ($pagos->hasMorePages())
-                            <a href="{{ $pagos->nextPageUrl() }}" rel="next" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700">
-                                Siguiente
-                            </a>
-                        @else
-                            <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-md">
-                                Siguiente
-                            </span>
-                        @endif
-                    </nav>
-                    @endif
+                    {{ $pagos->links() }}
                 </div>
             </div>
         </div>
@@ -304,4 +293,188 @@
             text-decoration: none;
         }
     </style>
+
+    <!-- Modal de Confirmación -->
+    <div id="modalConfirmacion" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Fondo oscuro -->
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" aria-hidden="true"></div>
+
+            <!-- Centrar modal -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <!-- Contenido del Modal -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Confirmar eliminación
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    ¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede deshacer.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmarEliminacion"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Eliminar
+                    </button>
+                    <button type="button" id="cancelarEliminacion"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito -->
+    <div id="modalExito" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Fondo oscuro -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- Centrar modal -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <!-- Contenido del Modal -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-check text-green-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Pago eliminado
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    El pago ha sido eliminado correctamente.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="cerrarExito"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearSelector = document.getElementById('yearSelector');
+            const modalConfirmacion = document.getElementById('modalConfirmacion');
+            const modalExito = document.getElementById('modalExito');
+            let pagoIdToDelete = null;
+
+            // Funciones para mostrar/ocultar modales
+            function mostrarModalConfirmacion() {
+                modalConfirmacion.classList.remove('hidden');
+            }
+
+            function ocultarModalConfirmacion() {
+                modalConfirmacion.classList.add('hidden');
+            }
+
+            function mostrarModalExito() {
+                modalExito.classList.remove('hidden');
+            }
+
+            function ocultarModalExito() {
+                modalExito.classList.add('hidden');
+                window.location.reload(); // Recargar solo después de cerrar el modal de éxito
+            }
+
+            // Manejador del selector de año
+            if (yearSelector) {
+                yearSelector.addEventListener('change', function() {
+                    const selectedYear = this.value;
+                    window.location.href = "{{ route('panel.historial-pago') }}?año=" + selectedYear;
+                });
+            }
+
+            // Función para confirmar eliminación
+            window.confirmarEliminacion = function(pagoId) {
+                pagoIdToDelete = pagoId;
+                mostrarModalConfirmacion();
+            }
+
+            // Botón de cancelar eliminación
+            document.getElementById('cancelarEliminacion').addEventListener('click', ocultarModalConfirmacion);
+
+            // Botón de confirmar eliminación
+            document.getElementById('confirmarEliminacion').addEventListener('click', async function() {
+                if (pagoIdToDelete) {
+                    try {
+                        const response = await fetch(`{{ route('panel.eliminar-pago', '') }}/${pagoIdToDelete}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            ocultarModalConfirmacion();
+                            mostrarModalExito();
+                        } else {
+                            alert(data.message || 'Error al eliminar el pago');
+                        }
+                    } catch (error) {
+                        alert('Error al procesar la solicitud');
+                    }
+                }
+            });
+
+            // Botón de cerrar modal de éxito
+            document.getElementById('cerrarExito').addEventListener('click', ocultarModalExito);
+
+            // Cerrar modales al hacer clic fuera
+            window.addEventListener('click', function(event) {
+                if (event.target === modalConfirmacion) {
+                    ocultarModalConfirmacion();
+                }
+                if (event.target === modalExito) {
+                    ocultarModalExito();
+                }
+            });
+
+            // Cerrar modales con la tecla ESC
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    ocultarModalConfirmacion();
+                    ocultarModalExito();
+                }
+            });
+        });
+    </script>
+    @endpush
+
+    @php
+        // Agregar temporalmente para debug
+        // dd([
+        //     'año_seleccionado' => $año_seleccionado,
+        //     'años_disponibles' => $años_disponibles,
+        //     'total_pagos' => $pagos->count(),
+        //     'cliente_id' => Auth::id()
+        // ]);
+    @endphp
 @endsection

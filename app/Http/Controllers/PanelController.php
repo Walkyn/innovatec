@@ -7,6 +7,7 @@ use App\Models\ConfiguracionEmpresa;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Hash;
 use App\Models\MedioPago;
+use App\Models\Cobranza;
 
 class PanelController extends Controller
 {
@@ -51,14 +52,31 @@ class PanelController extends Controller
         return view('panel.realizar-pago', compact('mediosPago'));
     }
 
-    public function historialPagos()
+    public function historialPagos(Request $request)
     {
-        return $this->historialPago();
+        return $this->historialPago($request);
     }
 
-    public function comprobantes()
+    public function comprobantes(Request $request)
     {
-        return view('panel.comprobantes');
+        $query = Cobranza::where('cliente_id', session('cliente_id'))
+            ->orderByDesc('numero_boleta')
+            ->orderByDesc('fecha_cobro');
+
+        // Si hay término de búsqueda
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            
+            // Si el término empieza con 'B', lo removemos
+            $search = ltrim($search, 'B');
+            
+            // Buscar por el número de boleta
+            $query->where('numero_boleta', 'like', '%' . $search . '%');
+        }
+
+        $cobranzas = $query->paginate(12);
+
+        return view('panel.comprobantes', compact('cobranzas'));
     }
 
     public function mesesPendientes()
@@ -72,7 +90,13 @@ class PanelController extends Controller
 
     public function cambiarPassword()
     {
-        return view('panel.cambiar-password');
+        $cliente = \App\Models\Cliente::find(session('cliente_id'));
+        $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
+        
+        return view('panel.cambiar-password', [
+            'user' => $cliente,
+            'initials' => $initials
+        ]);
     }
 
     public function mensajes()
@@ -90,9 +114,40 @@ class PanelController extends Controller
         return view('panel.mis-pagos');
     }
 
+    public function showChangePassword()
+    {
+        $user = auth()->user();
+        $initials = strtoupper(substr($user->nombres, 0, 1) . substr($user->apellidos, 0, 1));
+        
+        return view('panel.cambiar-password', [
+            'user' => $user,
+            'initials' => $initials
+        ]);
+    }
+
     public function updatePassword(Request $request)
     {
-        return view('panel.cambiar-password');
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        try {
+            // Obtener el cliente actual usando el ID de la sesión
+            $cliente = Cliente::find(session('cliente_id'));
+            
+            if (!$cliente) {
+                return redirect()->back()->with('error', 'No se pudo encontrar el cliente');
+            }
+
+            // Actualizar la clave_acceso
+            $cliente->clave_acceso = Hash::make($request->password);
+            $cliente->save();
+
+            return redirect()->back()->with('success', 'Contraseña actualizada correctamente');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al actualizar la contraseña');
+        }
     }
 
     public function login(Request $request)
@@ -227,32 +282,95 @@ class PanelController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function historialPago()
+    public function historialPago(Request $request)
     {
         $cliente_id = session('cliente_id');
-        
-        // Consultar todos los pagos para las estadísticas
-        $todosPagos = \App\Models\Pago::where('cliente_id', $cliente_id)->get();
-        
-        // Consultar los pagos paginados para la tabla
+
+        // Obtener el año seleccionado o el actual
+        $año_seleccionado = $request->input('año', date('Y'));
+
+        // Obtener los pagos del usuario filtrados por año
         $pagos = \App\Models\Pago::where('cliente_id', $cliente_id)
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(10);
-        
-        // Calcular estadísticas por estado
+            ->whereYear('created_at', $año_seleccionado)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $años_disponibles = \App\Models\Pago::where('cliente_id', $cliente_id)
+            ->selectRaw('YEAR(created_at) as año')
+            ->distinct()
+            ->pluck('año')
+            ->toArray();
+
+        // Si no hay años disponibles, agrega el año actual para evitar error en el select
+        if (empty($años_disponibles)) {
+            $años_disponibles = [date('Y')];
+        }
+
         $totales = [
-            'Aceptado' => ['count' => 0, 'sum' => 0],
+            'Aprobado' => ['count' => 0, 'sum' => 0],
             'en_revision' => ['count' => 0, 'sum' => 0],
             'Rechazado' => ['count' => 0, 'sum' => 0]
         ];
-        
+        $todosPagos = \App\Models\Pago::where('cliente_id', $cliente_id)->get();
         foreach($todosPagos as $pago) {
             if (isset($totales[$pago->estado])) {
                 $totales[$pago->estado]['count']++;
                 $totales[$pago->estado]['sum'] += $pago->monto_total;
             }
         }
-        
-        return view('panel.historial-pago', compact('pagos', 'totales'));
+
+        return view('panel.historial-pago', compact('pagos', 'años_disponibles', 'año_seleccionado', 'totales'));
+    }
+
+    public function verDetalleComprobante($id)
+    {
+        try {
+            $cobranza = Cobranza::with([
+                'cliente', 
+                'cobranzaContratoServicios.mes', 
+                'cobranzaContratoServicios.contratoServicio.servicio',
+                'cobranzaContratoServicios.contratoServicio.plan'
+            ])
+                ->where('cliente_id', session('cliente_id'))
+                ->findOrFail($id);
+
+            $detallesFormateados = $cobranza->cobranzaContratoServicios->map(function($detalle) {
+                $servicio = $detalle->contratoServicio->servicio->nombre;
+                $plan = $detalle->contratoServicio->plan ? " - {$detalle->contratoServicio->plan->nombre}" : '';
+                
+                return [
+                    'servicio' => $servicio . $plan,
+                    'mes' => $detalle->mes->nombre . ' ' . $detalle->mes->anio,
+                    'estado_pago' => $detalle->estado_pago,
+                    'monto_pagado' => number_format($detalle->monto_pagado, 2)
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'cobranza' => [
+                        'numero_boleta' => $cobranza->numero_boleta,
+                        'fecha_cobro' => $cobranza->fecha_cobro->format('d/m/Y'),
+                        'monto_total' => number_format($cobranza->monto_total, 2),
+                        'tipo_pago' => ucfirst($cobranza->tipo_pago),
+                        'estado_cobro' => $cobranza->estado_cobro,
+                        'glosa' => $cobranza->glosa ?? 'Sin notas adicionales'
+                    ],
+                    'cliente' => [
+                        'nombres' => $cobranza->cliente->nombres . ' ' . $cobranza->cliente->apellidos,
+                        'identificacion' => $cobranza->cliente->identificacion,
+                        'telefono' => $cobranza->cliente->telefono ?? 'No registrado'
+                    ],
+                    'detalles' => $detallesFormateados
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error en verDetalleComprobante: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar los detalles del comprobante'
+            ], 500);
+        }
     }
 }
