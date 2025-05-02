@@ -67,7 +67,7 @@
                                         <i class="fa fa-user text-gray-500 dark:text-gray-400"></i>
                                     </div>
                                     <input type="text" id="selected-client" value=""
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                        class="bg-gray-50 border border-gray-100 text-gray-900 text-sm rounded focus:ring-0 focus:border-gray-300 block w-full ps-10 p-3 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                         readonly required />
                                     <input type="hidden" id="selected-client-id" name="cliente_id" value="">
                                 </div>
@@ -81,7 +81,7 @@
                                     Buscar Cliente
                                 </label>
                                 <button id="toggleDropdown" type="button"
-                                    class="inline-flex items-center p-3 text-sm font-outfit text-gray-700 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-2 focus:outline-none focus:ring-slate-500 dark:focus:ring-slate-500 rounded w-full">
+                                    class="inline-flex items-center p-3 text-sm font-outfit text-gray-700 dark:text-white bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-2 focus:outline-none focus:ring-slate-500 dark:focus:ring-slate-500 rounded w-full">
                                     <span class="flex-1 text-left">Seleccionar</span>
                                     <i class="fas fa-chevron-down text-xs ml-2.5"></i>
                                 </button>
@@ -305,7 +305,7 @@
                                         class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Categoría</label>
                                     <div class="relative">
                                         <select x-model="categoriaId" @change="fetchServicios()"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                            class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccionar</option>
                                             <template x-for="categoria in categorias" :key="categoria.id">
                                                 <option :value="categoria.id" x-text="categoria.nombre"></option>
@@ -320,7 +320,7 @@
                                         class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Servicio</label>
                                     <div class="relative">
                                         <select x-model="servicioId" @change="fetchPlanes(); verificarServicio()"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                            class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccionar</option>
                                             <template x-for="servicio in serviciosDisponibles" :key="servicio.id">
                                                 <option :value="servicio.id" x-text="servicio.nombre"></option>
@@ -352,7 +352,7 @@
                                                 </div>
                                                 <input type="text" id="ipInput" x-model="ip"
                                                     placeholder="192.168.1.1" pattern="[0-9.]*"
-                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                     @input="validarIP($event)" />
                                             </div>
                                         </div>
@@ -374,7 +374,7 @@
                                         class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Plan</label>
                                     <div class="relative">
                                         <select x-model="planId" @change="actualizarPrecio()"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                                            class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                                             <option value="">Seleccionar</option>
                                             <template x-for="plan in planesDisponibles" :key="plan.id">
                                                 <option :value="plan.id" x-text="plan.nombre"></option>
@@ -395,7 +395,7 @@
                                             <span class="text-gray-500 dark:text-gray-400">S/</span>
                                         </div>
                                         <input x-model="precioPlan"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 pl-8 pr-2 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
+                                            class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 pl-8 pr-2 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                             placeholder="0.00" disabled>
                                     </div>
                                 </div>
@@ -405,8 +405,8 @@
                                     <label
                                         class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Fecha</label>
                                     <input type="date" name="fecha" x-model="fecha"
-                                        class="appearance-none block w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
-                                        border border-gray-200 dark:border-gray-600 rounded py-3 px-4 leading-tight 
+                                        class="appearance-none block w-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 
+                                        border border-gray-100 dark:border-gray-600 rounded py-3 px-4 leading-tight 
                                         focus:outline-none focus:bg-white dark:focus:bg-gray-800"
                                         required>
                                 </div>
@@ -419,7 +419,7 @@
                                     </label>
                                     <div class="relative">
                                         <select name="estado" x-model="estadoContrato"
-                                            class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 cursor-not-allowed"
+                                            class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 text-gray-800 dark:text-gray-300 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800 cursor-not-allowed"
                                             disabled>
                                             <option value="activo">Activo</option>
                                         </select>
@@ -442,7 +442,7 @@
                                         </div>
                                         <input type="text" name="observaciones" x-model="observaciones"
                                             placeholder="Ingrese observaciones"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            class="bg-gray-50 border border-gray-100 text-gray-900 text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                             required />
                                     </div>
                                 </div>

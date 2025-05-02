@@ -272,154 +272,169 @@
     }
 
     function verDetallesCliente(clienteId) {
-        // Realizar la petición
-        fetch(`/clients/${clienteId}/details`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const cliente = data.cliente;
-                    
-                    // Actualizar las iniciales en el avatar
-                    document.querySelector('#meses-modal .text-2xl').textContent = 
-                        `${cliente.nombres.charAt(0)}${cliente.apellidos.charAt(0)}`;
-                    
-                    // Actualizar el nombre completo
-                    document.querySelector('#meses-modal [data-field="nombre"]').textContent = 
-                        `${cliente.nombres} ${cliente.apellidos}`;
-                    
-                    // Actualizar información de contacto
-                    document.querySelector('#meses-modal [data-field="identificacion"]').textContent = cliente.identificacion;
-                    document.querySelector('#meses-modal [data-field="telefono"]').textContent = cliente.telefono;
-                    document.querySelector('#meses-modal [data-field="gps"]').textContent = cliente.gps || 'No especificado';
-                    
-                    // Actualizar información de ubicación
-                    document.querySelector('#meses-modal [data-field="region"]').textContent = cliente.region || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="provincia"]').textContent = cliente.provincia || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="distrito"]').textContent = cliente.distrito || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
-                    
-                    // Actualizar información del plan
-                    if (cliente.plan_activo) {
-                        const servicioNombre = cliente.servicio_activo?.nombre;
-                        const planNombre = cliente.plan_activo.nombre;
+        // Primero guardamos el ID del cliente en la sesión
+        fetch(`/set-cliente-id/${clienteId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            }
+        }).then(() => {
+            // Luego hacemos la petición de los detalles
+            fetch(`/clients/${clienteId}/details`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const cliente = data.cliente;
                         
-                        if (servicioNombre) {
-                            document.querySelector('#meses-modal [data-field="servicio"]').textContent = `${servicioNombre} ${planNombre}`;
+                        // Actualizar las iniciales en el avatar
+                        document.querySelector('#meses-modal .text-2xl').textContent = 
+                            `${cliente.nombres.charAt(0)}${cliente.apellidos.charAt(0)}`;
+                        
+                        // Actualizar el nombre completo
+                        document.querySelector('#meses-modal [data-field="nombre"]').textContent = 
+                            `${cliente.nombres} ${cliente.apellidos}`;
+                        
+                        // Actualizar información de contacto
+                        document.querySelector('#meses-modal [data-field="identificacion"]').textContent = cliente.identificacion;
+                        document.querySelector('#meses-modal [data-field="telefono"]').textContent = cliente.telefono;
+                        document.querySelector('#meses-modal [data-field="gps"]').textContent = cliente.gps || 'No especificado';
+                        
+                        // Actualizar información de ubicación
+                        document.querySelector('#meses-modal [data-field="region"]').textContent = cliente.region || 'No especificado';
+                        document.querySelector('#meses-modal [data-field="provincia"]').textContent = cliente.provincia || 'No especificado';
+                        document.querySelector('#meses-modal [data-field="distrito"]').textContent = cliente.distrito || 'No especificado';
+                        document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo || 'No especificado';
+                        document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
+                        
+                        // Actualizar información del plan
+                        if (cliente.plan_activo) {
+                            const servicioNombre = cliente.servicio_activo?.nombre;
+                            const planNombre = cliente.plan_activo.nombre;
+                            
+                            if (servicioNombre) {
+                                document.querySelector('#meses-modal [data-field="servicio"]').textContent = `${servicioNombre} ${planNombre}`;
+                            } else {
+                                document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
+                            }
+                            document.querySelector('#meses-modal [data-field="precio"]').textContent = `S/. ${cliente.plan_activo.precio}`;
                         } else {
                             document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
+                            document.querySelector('#meses-modal [data-field="precio"]').textContent = 'S/. 0.00';
                         }
-                        document.querySelector('#meses-modal [data-field="precio"]').textContent = `S/. ${cliente.plan_activo.precio}`;
-                    } else {
-                        document.querySelector('#meses-modal [data-field="servicio"]').textContent = 'Sin servicios';
-                        document.querySelector('#meses-modal [data-field="precio"]').textContent = 'S/. 0.00';
-                    }
 
-                    // Actualizar estado del cliente
-                    const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
-                    const estadoIconPlan = document.querySelector('#meses-modal [data-field="estado-icon"]');
-                    const estadoIconContainer = estadoIconPlan.parentElement;
-                    const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
-                    
-                    // Actualizar el texto del estado
-                    estadoElement.textContent = cliente.estado_cliente.charAt(0).toUpperCase() + cliente.estado_cliente.slice(1);
-                    estadoElement.className = `text-sm font-semibold ${
-                        cliente.estado_cliente === 'activo' ? 'text-green-600 dark:text-green-400' :
-                        cliente.estado_cliente === 'inactivo' ? 'text-gray-600 dark:text-gray-400' :
-                        'text-red-600 dark:text-red-400'
-                    }`;
-
-                    const getEstadoClasses = (estado) => {
-                        const classes = {
-                            activo: {
-                                container: 'bg-green-500',
-                                icon: 'fa-check-circle'
-                            },
-                            inactivo: {
-                                container: 'bg-gray-500',
-                                icon: 'fa-times-circle'
-                            },
-                            suspendido: {
-                                container: 'bg-red-500',
-                                icon: 'fa-exclamation-circle'
-                            }
-                        };
-                        return classes[estado] || classes.activo;
-                    };
-
-                    // Actualizar el indicador de estado en el perfil
-                    if (estadoIndicator) {
-                        const estadoClasses = getEstadoClasses(cliente.estado_cliente);
-                        estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${estadoClasses.container} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
-                        estadoIndicator.querySelector('i').className = `fas ${estadoClasses.icon} text-white text-xs`;
-                    }
-
-                    // Actualizar el ícono y contenedor en la sección de Plan y detalles
-                    if (estadoIconContainer) {
-                        const estadoClasses = getEstadoClasses(cliente.estado_cliente);
-                        estadoIconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                            cliente.estado_cliente === 'activo' ? 'bg-green-100 dark:bg-green-900' :
-                            cliente.estado_cliente === 'inactivo' ? 'bg-gray-100 dark:bg-gray-900' :
-                            'bg-red-100 dark:bg-red-900'
-                        }`;
-                    }
-
-                    if (estadoIconPlan) {
-                        const estadoClasses = getEstadoClasses(cliente.estado_cliente);
-                        estadoIconPlan.className = `fas ${
-                            cliente.estado_cliente === 'activo' ? 'fa-check-circle text-green-500 dark:text-green-300' :
-                            cliente.estado_cliente === 'inactivo' ? 'fa-times-circle text-gray-500 dark:text-gray-300' :
-                            'fa-exclamation-circle text-red-500 dark:text-red-300'
-                        }`;
-                    }
-
-                    // Actualizar fecha de inicio y fecha de instalación
-                    const fechaInicioElement = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
-                    const fechaInstalacionElement = document.querySelector('#meses-modal [data-field="fecha-instalacion"]');
-
-                    if (fechaInicioElement) {
-                        // Formatear la fecha para que sea más legible
-                        let fechaFormateada = 'No especificada';
-                        if (cliente.created_at) {
-                            const fecha = new Date(cliente.created_at);
-                            if (!isNaN(fecha.getTime())) {
-                                const dia = fecha.getDate();
-                                const mes = fecha.toLocaleString('es-ES', { month: 'long' });
-                                const anio = fecha.getFullYear();
-                                fechaFormateada = `el ${dia} de ${mes} de ${anio}`;
-                            }
-                        }
+                        // Actualizar estado del cliente
+                        const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
+                        const estadoIconPlan = document.querySelector('#meses-modal [data-field="estado-icon"]');
+                        const estadoIconContainer = estadoIconPlan.parentElement;
+                        const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
                         
-                        fechaInicioElement.innerHTML = `
-                            <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                            Cliente activo desde ${fechaFormateada}
-                        `;
-                    }
+                        // Actualizar el texto del estado
+                        estadoElement.textContent = cliente.estado_cliente.charAt(0).toUpperCase() + cliente.estado_cliente.slice(1);
+                        estadoElement.className = `text-sm font-semibold ${
+                            cliente.estado_cliente === 'activo' ? 'text-green-600 dark:text-green-400' :
+                            cliente.estado_cliente === 'inactivo' ? 'text-gray-600 dark:text-gray-400' :
+                            'text-red-600 dark:text-red-400'
+                        }`;
 
-                    if (fechaInstalacionElement) {
-                        fechaInstalacionElement.textContent = cliente.created_at || 'No especificada';
-                    }
+                        const getEstadoClasses = (estado) => {
+                            const classes = {
+                                activo: {
+                                    container: 'bg-green-500',
+                                    icon: 'fa-check-circle'
+                                },
+                                inactivo: {
+                                    container: 'bg-gray-500',
+                                    icon: 'fa-times-circle'
+                                },
+                                suspendido: {
+                                    container: 'bg-red-500',
+                                    icon: 'fa-exclamation-circle'
+                                }
+                            };
+                            return classes[estado] || classes.activo;
+                        };
 
-                    // Mostrar el modal usando el evento de Alpine.js
-                    window.dispatchEvent(new CustomEvent('open-meses-modal'));
-                } else {
-                    // Mostrar error si la petición falla
+                        // Actualizar el indicador de estado en el perfil
+                        if (estadoIndicator) {
+                            const estadoClasses = getEstadoClasses(cliente.estado_cliente);
+                            estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${estadoClasses.container} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+                            estadoIndicator.querySelector('i').className = `fas ${estadoClasses.icon} text-white text-xs`;
+                        }
+
+                        // Actualizar el ícono y contenedor en la sección de Plan y detalles
+                        if (estadoIconContainer) {
+                            const estadoClasses = getEstadoClasses(cliente.estado_cliente);
+                            estadoIconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                                cliente.estado_cliente === 'activo' ? 'bg-green-100 dark:bg-green-900' :
+                                cliente.estado_cliente === 'inactivo' ? 'bg-gray-100 dark:bg-gray-900' :
+                                'bg-red-100 dark:bg-red-900'
+                            }`;
+                        }
+
+                        if (estadoIconPlan) {
+                            const estadoClasses = getEstadoClasses(cliente.estado_cliente);
+                            estadoIconPlan.className = `fas ${
+                                cliente.estado_cliente === 'activo' ? 'fa-check-circle text-green-500 dark:text-green-300' :
+                                cliente.estado_cliente === 'inactivo' ? 'fa-times-circle text-gray-500 dark:text-gray-300' :
+                                'fa-exclamation-circle text-red-500 dark:text-red-300'
+                            }`;
+                        }
+
+                        // Actualizar fecha de inicio y fecha de instalación
+                        const fechaInicioElement = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
+                        const fechaInstalacionElement = document.querySelector('#meses-modal [data-field="fecha-instalacion"]');
+
+                        if (fechaInicioElement) {
+                            // Formatear la fecha para que sea más legible
+                            let fechaFormateada = 'No especificada';
+                            if (cliente.created_at) {
+                                const fecha = new Date(cliente.created_at);
+                                if (!isNaN(fecha.getTime())) {
+                                    const dia = fecha.getDate();
+                                    const mes = fecha.toLocaleString('es-ES', { month: 'long' });
+                                    const anio = fecha.getFullYear();
+                                    fechaFormateada = `el ${dia} de ${mes} de ${anio}`;
+                                }
+                            }
+                            
+                            fechaInicioElement.innerHTML = `
+                                <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                                Cliente activo desde ${fechaFormateada}
+                            `;
+                        }
+
+                        if (fechaInstalacionElement) {
+                            fechaInstalacionElement.textContent = cliente.created_at || 'No especificada';
+                        }
+
+                        // Disparar el evento para abrir el modal
+                        const modal = document.getElementById('meses-modal');
+                        if (modal) {
+                            const modalInstance = new Modal(modal, {
+                                backdrop: 'static',
+                                keyboard: false
+                            });
+                            modalInstance.show();
+                        }
+                    } else {
+                        // Mostrar error si la petición falla
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.errorDetails,
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
                         title: 'Error',
-                        text: data.errorDetails,
+                        text: 'No se pudo cargar la información del cliente',
                         icon: 'error',
                         confirmButtonText: 'Aceptar'
                     });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'No se pudo cargar la información del cliente',
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar'
                 });
-            });
+        });
     }
 </script>

@@ -125,14 +125,93 @@
                                         @endphp
                                         <div x-data="{ openYear: null }">
                                             @foreach($years as $year)
+                                                @php
+                                                    // Verificar el estado de todos los meses del año
+                                                    $mesesYear = \App\Models\Mes::where('anio', $year)->orderBy('numero')->get();
+                                                    $todosPagados = true;
+                                                    $tieneMesesValidos = false;
+                                                    $tieneMesEnCurso = false;
+                                                    $tieneMesesPendientes = false;
+
+                                                    foreach($mesesYear as $mesYear) {
+                                                        // Verificar si el mes aplica (no está después de suspensión)
+                                                        $omitirMes = false;
+                                                        if ($fechaSuspension) {
+                                                            if ($year === $fechaSuspension->year && $mesYear->numero > $mesSuspension) {
+                                                                $omitirMes = true;
+                                                            }
+                                                            if ($year > $fechaSuspension->year) {
+                                                                $omitirMes = true;
+                                                            }
+                                                        }
+                                                        
+                                                        if (!$omitirMes) {
+                                                            // Si el mes no aplica (antes de la instalación), lo ignoramos
+                                                            if ($year === $anioInicio && $mesYear->numero < $mesInicio) {
+                                                                continue;
+                                                            }
+                                                            
+                                                            // Si el mes es futuro, lo ignoramos
+                                                            if ($year > now()->year || ($year === now()->year && $mesYear->numero > now()->month)) {
+                                                                continue;
+                                                            }
+                                                            
+                                                            $tieneMesesValidos = true;
+
+                                                            // Verificar estado del mes
+                                                            if ($year === now()->year && $mesYear->numero === now()->month) {
+                                                                // Es el mes en curso
+                                                                $tieneMesEnCurso = true;
+                                                                $todosPagados = false; // Si hay mes en curso, no está todo pagado
+                                                            } else {
+                                                                // No es el mes en curso, verificar si está pagado
+                                                                $pagado = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
+                                                                    ->where('contrato_servicio_id', $cs->id)
+                                                                    ->where('mes_id', $mesYear->id)
+                                                                    ->where('estado_pago', 'pagado')
+                                                                    ->exists();
+                                                                
+                                                                if (!$pagado) {
+                                                                    $todosPagados = false;
+                                                                    $tieneMesesPendientes = true;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // Determinar el color basado en el estado
+                                                    // Verde: solo si todos los meses están pagados y no hay mes en curso
+                                                    // Amarillo: si hay mes en curso y no hay pendientes
+                                                    // Rojo: si hay meses pendientes
+                                                    // Gris: si no hay meses válidos
+                                                    $bgColor = !$tieneMesesValidos ? 'bg-gray-50 hover:bg-gray-100 text-gray-700' : 
+                                                               ($todosPagados ? 'bg-green-50 hover:bg-green-100 text-green-700' : 
+                                                               ($tieneMesEnCurso && !$tieneMesesPendientes ? 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700' : 
+                                                               'bg-red-50 hover:bg-red-100 text-red-700'));
+                                                    
+                                                    $iconColor = !$tieneMesesValidos ? 'text-gray-500' :
+                                                                ($todosPagados ? 'text-green-500' : 
+                                                                ($tieneMesEnCurso && !$tieneMesesPendientes ? 'text-yellow-500' : 
+                                                                'text-red-500'));
+
+                                                    $icon = !$tieneMesesValidos ? '' :
+                                                            ($todosPagados ? 'fa-check-circle' : 
+                                                            ($tieneMesEnCurso && !$tieneMesesPendientes ? 'fa-clock' : 
+                                                            'fa-exclamation-circle'));
+                                                @endphp
+
                                                 <div class="mb-4">
                                                     <button
                                                         @click="openYear = openYear === '{{ $cs->id }}-{{ $year }}' ? null : '{{ $cs->id }}-{{ $year }}'"
-                                                        class="w-full flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded transition text-left">
-                                                        <span class="font-medium">Año {{ $year }}</span>
-                                                        <i :class="openYear === '{{ $cs->id }}-{{ $year }}' 
-                                                                  ? 'fas fa-chevron-up' 
-                                                                  : 'fas fa-chevron-down'"></i>
+                                                        class="w-full flex items-center justify-between px-4 py-2 {{ $bgColor }} rounded transition text-left dark:bg-gray-700 dark:hover:bg-gray-600">
+                                                        <span class="font-medium">
+                                                            Año {{ $year }}
+                                                            @if($tieneMesesValidos)
+                                                                <i class="fas {{ $icon }} ml-2 {{ $iconColor }}"></i>
+                                                            @endif
+                                                        </span>
+                                                        <i :class="openYear === '{{ $cs->id }}-{{ $year }}' ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                                           class="{{ $iconColor }} dark:text-gray-400"></i>
                                                     </button>
 
                                                     <div x-show="openYear === '{{ $cs->id }}-{{ $year }}'" x-transition class="mt-2">

@@ -649,3 +649,8 @@ Route::middleware(['auth.cliente'])->group(function () {
     Route::post('/panel/cerrar-sesion', [PanelController::class, 'logout'])->name('panel.cerrar-sesion');
     Route::get('/historial-servicios', [PanelController::class, 'historialServicios'])->name('panel.historial-servicios');
 });
+
+Route::post('/set-cliente-id/{id}', function($id) {
+    session(['cliente_id' => $id]);
+    return response()->json(['success' => true]);
+})->name('set.cliente.id');

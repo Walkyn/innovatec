@@ -46,7 +46,7 @@
                         <input type="hidden" name="search" value="{{ request('search') }}">
                     @endif
                     <select name="estado" onchange="this.form.submit()"
-                        class="block appearance-none w-full bg-gray-200 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-4 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
+                        class="block appearance-none w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-4 px-4 pr-8 rounded-md leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-800">
                         <option value="todos" {{ !$estado ? 'selected' : '' }}>Todos los estados</option>
                         <option value="activo" {{ $estado === 'activo' ? 'selected' : '' }}>Activo</option>
                         <option value="suspendido" {{ $estado === 'suspendido' ? 'selected' : '' }}>Suspendido</option>

@@ -306,24 +306,24 @@
                 handleMonthSelection: function(event, mesActual, mesesAnio) {
                     var checkbox = event.target;
                     
-                    // Filtrar y ordenar meses pendientes
-                    var mesesPendientes = mesesAnio
-                        .filter(function(m) { return m.estado === 'pendiente'; })
+                    // Filtrar y ordenar meses pendientes y en curso
+                    var mesesSeleccionables = mesesAnio
+                        .filter(function(m) { return m.estado === 'pendiente' || m.estado === 'en_curso'; })
                         .sort(function(a, b) { return a.numero - b.numero; });
                     
                     // Si está desmarcando, verificar que no haya meses posteriores marcados
                     if (!checkbox.checked) {
                         var mesIndex = -1;
-                        for (var i = 0; i < mesesPendientes.length; i++) {
-                            if (mesesPendientes[i].id === mesActual.id) {
+                        for (var i = 0; i < mesesSeleccionables.length; i++) {
+                            if (mesesSeleccionables[i].id === mesActual.id) {
                                 mesIndex = i;
                                 break;
                             }
                         }
                         
                         // Verificar si hay meses posteriores marcados
-                        for (var i = mesIndex + 1; i < mesesPendientes.length; i++) {
-                            var nextCheckbox = document.getElementById('month-' + mesesPendientes[i].id);
+                        for (var i = mesIndex + 1; i < mesesSeleccionables.length; i++) {
+                            var nextCheckbox = document.getElementById('month-' + mesesSeleccionables[i].id);
                             if (nextCheckbox && nextCheckbox.checked) {
                                 // Si un mes posterior está marcado, impedir desmarcar este
                                 checkbox.checked = true;
@@ -344,8 +344,8 @@
                     
                     // Si está marcando, encontrar el índice del mes actual
                     var mesIndex = -1;
-                    for (var i = 0; i < mesesPendientes.length; i++) {
-                        if (mesesPendientes[i].id === mesActual.id) {
+                    for (var i = 0; i < mesesSeleccionables.length; i++) {
+                        if (mesesSeleccionables[i].id === mesActual.id) {
                             mesIndex = i;
                             break;
                         }
@@ -353,7 +353,7 @@
                     
                     // Marcar automáticamente todos los meses anteriores
                     for (var i = 0; i < mesIndex; i++) {
-                        document.getElementById('month-' + mesesPendientes[i].id).checked = true;
+                        document.getElementById('month-' + mesesSeleccionables[i].id).checked = true;
                     }
                 },
                 
@@ -498,17 +498,16 @@
                                     <template x-for="mes in anio.meses" :key="mes.id">
                                         <div class="relative">
                                             <input type="checkbox" :id="'month-' + mes.id" class="hidden peer"
-                                                :disabled="mes.estado !== 'pendiente'"
+                                                :disabled="mes.estado !== 'pendiente' && mes.estado !== 'en_curso'"
                                                 @click="handleMonthSelection($event, mes, anio.meses)">
                                             <label :for="'month-' + mes.id"
                                                 class="flex items-center justify-between p-2 border-2 rounded-lg"
-                                                :class="mes.estado === 'pagado' ?
-                                                    'border-green-200 bg-green-50 cursor-not-allowed text-gray-700' :
-                                                    mes.estado === 'pendiente' ?
-                                                    'border-red-200 hover:bg-red-50 peer-checked:border-red-500 peer-checked:bg-red-100 text-gray-700' :
-                                                    mes.estado === 'en_curso' ?
-                                                    'border-yellow-200 bg-yellow-50 cursor-not-allowed text-gray-700' :
-                                                    'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400'">
+                                                :class="{
+                                                    'border-green-200 bg-green-50 cursor-not-allowed text-gray-700': mes.estado === 'pagado',
+                                                    'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 peer-checked:border-yellow-500 peer-checked:bg-yellow-100 text-gray-700': mes.estado === 'en_curso',
+                                                    'border-red-200 hover:bg-red-50 peer-checked:border-red-500 peer-checked:bg-red-100 text-gray-700': mes.estado === 'pendiente',
+                                                    'border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400': mes.estado === 'no_aplica' || mes.estado === 'futuro'
+                                                }">
                                                 <span class="text-sm font-medium" x-text="mes.nombre"></span>
                                                 
                                                 <!-- Mostrar "No aplica" solo para estados no_aplica -->
@@ -705,7 +704,7 @@
                                 <td colspan="5"
                                     class="py-2 px-4 border-b border-b-gray-50 text-right font-medium text-gray-600">
                                     Total a pagar:</td>
-                                <td class="py-2 px-4 border-b border-b-gray-50 font-bold text-emerald-500 text-right">S/ 0.00</td>
+                                <td class="py-2 px-4 border-b border-b-gray-50 font-bold text-emerald-500 text-right whitespace-nowrap">S/ 0.00</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -919,7 +918,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Previsualización de imagen grande (solo para imágenes) -->
+                                <!-- Previsualización de imagen grande -->
                                 <div x-show="fileType.startsWith('image/')" class="mt-3">
                                     <img :src="previewUrl" class="w-full h-auto max-h-64 object-contain rounded border border-gray-200" />
                                 </div>
@@ -1191,7 +1190,7 @@
                         '<td class="py-2 px-2 border-b border-b-gray-50">' +
                         '<span class="text-gray-600 text-sm font-medium ml-2">' + servicio.contratoNumero + '</span>' +
                         '</td>' +
-                        '<td class="py-2 px-2 border-b border-b-gray-50">' +
+                        '<td class="py-2 px-2 border-b border-b-gray-50 whitespace-nowrap">' +
                         '<span class="text-gray-600 text-sm font-medium ml-2 break-words" style="word-wrap: break-word; max-width: 200px; display: block;">' + 
                         servicio.servicioNombre + 
                         '</span>' +
