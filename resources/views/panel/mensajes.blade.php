@@ -16,15 +16,18 @@
             <!-- Lista de Notificaciones -->
             <div class="space-y-4">
                 @php
-                    $cliente_id = Auth::id();
+                    // Obtener el ID del cliente conectado actualmente
+                    $cliente_id = session('cliente_id');
+                    
+                    // Consultar los pagos usando el cliente_id correcto
                     $pagos = DB::table('pagos')
                         ->where('cliente_id', $cliente_id)
                         ->whereIn('estado', ['Aprobado', 'Rechazado'])
                         ->orderBy('updated_at', 'desc')
                         ->get();
-
+                    
                     $hayPagos = $pagos->count() > 0;
-
+                    
                     // Configurar Carbon para usar español
                     \Carbon\Carbon::setLocale('es');
                 @endphp
@@ -132,8 +135,8 @@
                             </div>
                             <div class="flex-1 w-full">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1 gap-1">
-                                    <div class="hidden sm:flex items-center gap-2">
-                                        <span class="whitespace-nowrap text-xs font-medium {{ $clase['badge-text'] }} {{ $clase['badge-bg'] }} px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="hidden sm:flex whitespace-nowrap text-xs font-medium {{ $clase['badge-text'] }} {{ $clase['badge-bg'] }} px-2 py-0.5 rounded-md items-center gap-1">
                                             <i class="{{ $clase['icon'] }}"></i>
                                             {{ $estado === 'Aprobado' ? 'Aprobado' : $estado }}
                                         </span>
@@ -232,10 +235,11 @@
     // Al cargar la página de mensajes, marcar todas las notificaciones como vistas
     document.addEventListener('DOMContentLoaded', function() {
         @php
-        $cliente_id = Auth::id();
+        // Obtener solo los pagos del cliente autenticado
+        $cliente_id = session('cliente_id');
         $pagos = DB::table('pagos')
-            ->where('cliente_id', $cliente_id)
-            ->whereIn('estado', ['Aprobado', 'Rechazado']) // Solo los estados relevantes
+            ->where('cliente_id', $cliente_id)  // Filtrar por el ID del cliente autenticado
+            ->whereIn('estado', ['Aprobado', 'Rechazado']) 
             ->orderBy('updated_at', 'desc')
             ->get();
             
