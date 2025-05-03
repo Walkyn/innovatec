@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $cliente_id = Auth::id();
         $pagos = DB::table('pagos')
             ->where('cliente_id', $cliente_id)
+            ->whereIn('estado', ['Aprobado', 'Rechazado']) // Solo contamos Aprobados y Rechazados
             ->orderBy('updated_at', 'desc')
             ->get();
             
@@ -296,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $cliente_id = Auth::id();
         $pagos = DB::table('pagos')
             ->where('cliente_id', $cliente_id)
+            ->whereIn('estado', ['Aprobado', 'Rechazado']) // Solo estados relevantes
             ->orderBy('updated_at', 'desc')
             ->get();
             

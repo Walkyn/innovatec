@@ -412,19 +412,62 @@
                     let detallesHtml = '';
                     try {
                         const servicios = JSON.parse(pago.detalles_servicio);
-                        detallesHtml = servicios.map(s => {
-                            const meses = s.mesesTexto || 'Meses no especificados';
-                            return `
-                                <div class="mb-2 p-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
-                                    <div><span class="font-semibold text-black dark:text-white">Servicio:</span> <span class="text-gray-700 dark:text-gray-300">${s.servicio}</span></div>
-                                    <div><span class="font-semibold text-black dark:text-white">Contrato:</span> <span class="text-gray-700 dark:text-gray-300">${s.contrato}</span></div>
-                                    <div><span class="font-semibold text-black dark:text-white">Meses:</span> <span class="text-gray-700 dark:text-gray-300">${meses}</span></div>
-                                    <div><span class="font-semibold text-black dark:text-white">Subtotal:</span> <span class="text-emerald-600 dark:text-emerald-400 whitespace-nowrap">S/ ${s.subtotal}</span></div>
+                        detallesHtml = `
+                            <div class="bg-white p-3 rounded-lg mb-3 border-l-4 border-blue-400">
+                                <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Detalles del pago:</div>
+                                
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <div>
+                                        <span class="text-xs font-medium text-gray-500">Monto Total</span>
+                                        <p class="font-medium text-gray-800">S/ ${parseFloat(pago.monto_total).toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-medium text-gray-500">Método</span>
+                                        <p class="font-medium text-gray-800">${pago.medio_pago || 'No especificado'}</p>
+                                    </div>
                                 </div>
-                            `;
-                        }).join('');
-                    } catch {
-                        detallesHtml = `<div class="text-gray-500 dark:text-gray-400">Detalles no disponibles</div>`;
+                                
+                                <div class="mt-3 border-t border-gray-100 pt-2">
+                                    <div class="space-y-2">
+                                        ${servicios.map((s, index) => `
+                                            <div class="${index > 0 ? 'pt-2 border-t border-gray-50' : ''}">
+                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                                                    <div>
+                                                        <span class="text-xs font-medium text-gray-500">Contrato</span>
+                                                        <p class="font-medium text-gray-800">${s.contrato || 'No especificado'}</p>
+                                                    </div>
+                                                    <div class="mt-1 sm:mt-0">
+                                                        <span class="text-xs font-medium text-gray-500">Servicio</span>
+                                                        <p class="font-medium text-gray-800">${s.servicio}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-1 mt-1">
+                                                    <div>
+                                                        <span class="text-xs font-medium text-gray-500">Periodo</span>
+                                                        <p class="font-medium text-gray-800">${s.mesesTexto || 'No especificado'}</p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="text-xs font-medium text-gray-500">Subtotal</span>
+                                                        <p class="font-medium text-emerald-600">S/ ${s.subtotal || '0.00'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } catch (e) {
+                        detallesHtml = `
+                            <div class="bg-white p-3 rounded-lg mb-3 border-l-4 border-blue-400">
+                                <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Detalles del pago:</div>
+                                <div class="text-gray-500 dark:text-gray-400">Detalles no disponibles</div>
+                                <div class="mt-2">
+                                    <span class="text-xs font-medium text-gray-500">Monto Total</span>
+                                    <p class="font-medium text-gray-800">S/ ${parseFloat(pago.monto_total).toFixed(2)}</p>
+                                </div>
+                            </div>
+                        `;
                     }
 
                     // Generar HTML para el comprobante
@@ -474,19 +517,7 @@
                             <!-- Cuerpo del pago -->
                             <div class="p-4">
                                 <!-- Detalles de servicios -->
-                                <div class="bg-gray-50 dark:bg-meta-4 p-3 rounded-lg mb-3">
-                                    ${detallesHtml}
-                                </div>
-                                
-                                <!-- Monto total -->
-                                <div class="flex justify-between items-center">
-                                    <div class="font-semibold text-black dark:text-white whitespace-nowrap">
-                                        Monto Total:
-                                    </div>
-                                    <div class="text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
-                                        S/ ${parseFloat(pago.monto_total).toFixed(2)}
-                                    </div>
-                                </div>
+                                ${detallesHtml}
                                 
                                 <!-- Comprobante si existe -->
                                 ${comprobanteHtml}

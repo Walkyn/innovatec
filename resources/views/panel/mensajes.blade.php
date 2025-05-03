@@ -16,10 +16,10 @@
             <!-- Lista de Notificaciones -->
             <div class="space-y-4">
                 @php
-
                     $cliente_id = Auth::id();
                     $pagos = DB::table('pagos')
                         ->where('cliente_id', $cliente_id)
+                        ->whereIn('estado', ['Aprobado', 'Rechazado'])
                         ->orderBy('updated_at', 'desc')
                         ->get();
 
@@ -33,34 +33,24 @@
                     @foreach($pagos as $pago)
                         @php
                             $clases = [
-                                'en_revision' => [
-                                    'bg' => 'bg-yellow-50',
-                                    'border' => 'border-yellow-100',
-                                    'badge-bg' => 'bg-yellow-100/60',
-                                    'badge-text' => 'text-yellow-600',
-                                    'icon-border' => 'border-yellow-200',
-                                    'icon' => 'fas fa-clock'
-                                ],
                                 'Aprobado' => [
-                                    'bg' => 'bg-green-50',
-                                    'border' => 'border-green-100',
-                                    'badge-bg' => 'bg-emerald-100/60',
+                                    'bg' => 'bg-white',
+                                    'border' => 'border-l-4 border-emerald-400',
+                                    'badge-bg' => 'bg-emerald-100',
                                     'badge-text' => 'text-emerald-600',
-                                    'icon-border' => 'border-green-200',
                                     'icon' => 'fas fa-check-circle'
                                 ],
                                 'Rechazado' => [
-                                    'bg' => 'bg-red-50',
-                                    'border' => 'border-red-100',
-                                    'badge-bg' => 'bg-rose-100/60',
+                                    'bg' => 'bg-white',
+                                    'border' => 'border-l-4 border-rose-400',
+                                    'badge-bg' => 'bg-rose-100',
                                     'badge-text' => 'text-rose-600',
-                                    'icon-border' => 'border-red-200',
                                     'icon' => 'fas fa-times-circle'
                                 ]
                             ];
                             
                             $estado = $pago->estado;
-                            $clase = $clases[$estado] ?? $clases['en_revision'];
+                            $clase = $clases[$estado] ?? $clases['Aprobado'];
                             
                             // Obtener el tiempo transcurrido en formato legible en español
                             $tiempoTranscurrido = \Carbon\Carbon::parse($pago->updated_at)->diffForHumans();
@@ -128,62 +118,92 @@
                             }
                         @endphp
                         
-                        <div class="flex items-start gap-4 p-4 {{ $clase['bg'] }} border {{ $clase['border'] }} rounded-lg hover:shadow-md transition-all duration-200">
-                            <div class="flex-shrink-0">
-                                <div class="w-12 h-12 rounded-full {{ $colorFondo }} flex items-center justify-center overflow-hidden">
-                                    <img src="{{ asset($imagenRuta) }}" alt="{{ $nombreMedioPago }}" class="w-full h-full object-cover p-1">
+                        <div class="flex flex-col sm:flex-row items-start gap-3 p-3 {{ $clase['bg'] }} {{ $clase['border'] }} border-t border-r border-b border-gray-100 rounded-md hover:shadow-sm transition-all duration-200">
+                            <div class="flex-shrink-0 mb-2 sm:mb-0 flex items-center">
+                                <div class="w-10 h-10 rounded-lg {{ $colorFondo }} flex items-center justify-center overflow-hidden">
+                                    <img src="{{ asset($imagenRuta) }}" alt="{{ $nombreMedioPago }}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="ml-2 sm:hidden">
+                                    <span class="whitespace-nowrap text-xs font-medium {{ $clase['badge-text'] }} {{ $clase['badge-bg'] }} px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="{{ $clase['icon'] }}"></i>
+                                        {{ $estado === 'Aprobado' ? 'Aprobado' : $estado }}
+                                    </span>
                                 </div>
                             </div>
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <span class="whitespace-nowrap text-xs font-medium {{ $clase['badge-text'] }} {{ $clase['badge-bg'] }} px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <div class="flex-1 w-full">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-1 gap-1">
+                                    <div class="hidden sm:flex items-center gap-2">
+                                        <span class="whitespace-nowrap text-xs font-medium {{ $clase['badge-text'] }} {{ $clase['badge-bg'] }} px-2 py-0.5 rounded-md flex items-center gap-1">
                                             <i class="{{ $clase['icon'] }}"></i>
-                                            {{ $estado === 'en_revision' ? 'En Revisión' : $estado }}
+                                            {{ $estado === 'Aprobado' ? 'Aprobado' : $estado }}
                                         </span>
                                     </div>
-                                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <div class="flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded-md self-end sm:self-auto">
                                         <i class="far fa-clock"></i>
                                         <span>{{ $tiempoTranscurrido }}</span>
                                     </div>
                                 </div>
-                                <div class="mt-3 text-sm text-gray-600">
-                                    <div class="grid grid-cols-2 gap-3 ml-6">
-                                        <div class="flex items-center gap-2">
-                                            <div>
-                                                <span class="text-xs text-gray-500">Servicio</span>
-                                                <p class="font-medium">{{ $servicio ?: 'No especificado' }}</p>
-                                            </div>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <!-- Información general de pago -->
+                                    <div class="grid grid-cols-2 gap-2 mb-2">
+                                        <div>
+                                            <span class="text-xs font-medium text-gray-500">Monto Total</span>
+                                            <p class="font-medium text-gray-800">S/ {{ number_format((float)$monto, 2, '.', ',') }}</p>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <div>
-                                                <span class="text-xs text-gray-500">Período</span>
-                                                <p class="font-medium">{{ $periodo }}</p>
-                                            </div>
+                                        <div>
+                                            <span class="text-xs font-medium text-gray-500">Método de pago</span>
+                                            <p class="font-medium text-gray-800">{{ $nombreMedioPago }}</p>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <div>
-                                                <span class="text-xs text-gray-500">Monto</span>
-                                                <p class="font-medium">S/ {{ number_format((float)$monto, 2, '.', ',') }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <div>
-                                                <span class="text-xs text-gray-500">Método de pago</span>
-                                                <p class="font-medium">{{ $nombreMedioPago }}</p>
-                                            </div>
+                                    </div>
+                                    
+                                    @php
+                                        $serviciosDetallados = [];
+                                        $detallesArray = json_decode($pago->detalles_servicio, true);
+                                        
+                                        if (is_array($detallesArray) && !empty($detallesArray)) {
+                                            foreach ($detallesArray as $detalle) {
+                                                $serviciosDetallados[] = [
+                                                    'servicio' => $detalle['servicio'] ?? 'No especificado',
+                                                    'periodo' => $detalle['mesesTexto'] ?? ($detalle['meses'] ?? 'No especificado')
+                                                ];
+                                            }
+                                        } else {
+                                            $serviciosDetallados[] = [
+                                                'servicio' => $servicio ?: 'No especificado',
+                                                'periodo' => $periodo
+                                            ];
+                                        }
+                                    @endphp
+                                    
+                                    <!-- Lista de servicios -->
+                                    <div class="border-t border-gray-100 pt-2 mt-2">
+                                        <div class="space-y-2 pl-1">
+                                            @foreach($serviciosDetallados as $index => $item)
+                                                <div class="{{ $index > 0 ? 'pt-2 border-t border-gray-50' : '' }}">
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                                                        <div>
+                                                            <span class="text-xs font-medium text-gray-500">Servicio</span>
+                                                            <p class="font-medium text-gray-800">{{ $item['servicio'] }}</p>
+                                                        </div>
+                                                        <div class="mt-1 sm:mt-0">
+                                                            <span class="text-xs font-medium text-gray-500">Periodo</span>
+                                                            <p class="font-medium text-gray-800">{{ $item['periodo'] }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
                                     
                                     @if($estado === 'Rechazado' && !empty($pago->observaciones))
-                                    <div class="mt-3 flex items-center gap-2 text-rose-600 bg-rose-50 p-2 rounded-md">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        <span class="text-xs">Motivo del rechazo: {{ $pago->observaciones }}</span>
+                                    <div class="mt-2 flex items-start gap-1.5 text-rose-600 bg-rose-50 p-2 rounded-md text-xs">
+                                        <i class="fas fa-exclamation-circle mt-0.5"></i>
+                                        <span>Motivo del rechazo: {{ $pago->observaciones }}</span>
                                     </div>
                                     @elseif(!empty($pago->observaciones))
-                                    <div class="mt-3 flex items-center gap-2 text-gray-600 bg-gray-50 p-2 rounded-md">
-                                        <i class="fas fa-info-circle"></i>
-                                        <span class="text-xs">Observaciones: {{ $pago->observaciones }}</span>
+                                    <div class="mt-2 flex items-start gap-1.5 text-gray-600 bg-gray-50 p-2 rounded-md text-xs">
+                                        <i class="fas fa-info-circle mt-0.5"></i>
+                                        <span>Observaciones: {{ $pago->observaciones }}</span>
                                     </div>
                                     @endif
                                 </div>
@@ -191,11 +211,13 @@
                         </div>
                     @endforeach
                 @else
-                    <div class="flex items-center justify-center p-6 text-gray-500">
+                    <div class="flex items-center justify-center p-5 bg-white border border-gray-100 rounded-md">
                         <div class="text-center">
-                            <i class="far fa-bell-slash text-4xl mb-2 text-gray-300"></i>
-                            <p>No tienes notificaciones de pagos aún.</p>
-                            <p class="text-sm mt-2">Cuando realices un pago, podrás ver su estado aquí.</p>
+                            <div class="inline-flex p-2 mb-3 rounded-full bg-gray-50">
+                                <i class="far fa-bell-slash text-2xl text-gray-300"></i>
+                            </div>
+                            <p class="text-base font-medium text-gray-800">No tienes notificaciones aún</p>
+                            <p class="mt-1 text-xs text-gray-500">Cuando un pago sea aprobado o rechazado, podrás ver su estado aquí.</p>
                         </div>
                     </div>
                 @endif
@@ -213,6 +235,7 @@
         $cliente_id = Auth::id();
         $pagos = DB::table('pagos')
             ->where('cliente_id', $cliente_id)
+            ->whereIn('estado', ['Aprobado', 'Rechazado']) // Solo los estados relevantes
             ->orderBy('updated_at', 'desc')
             ->get();
             
@@ -268,10 +291,15 @@
                     });
                 });
                 
-                // Contar pagos nuevos o con estado cambiado
+                // Contar pagos nuevos o con estado cambiado (solo Aprobados o Rechazados)
                 let contadorNuevos = 0;
                 
                 pagosActuales.forEach(pago => {
+                    // Solo considerar pagos Aprobados o Rechazados
+                    if (pago.estado !== 'Aprobado' && pago.estado !== 'Rechazado') {
+                        return;
+                    }
+                    
                     const pagoVisto = mapaPagosVistos.get(pago.id);
                     
                     // Es nuevo o cambió su estado o se actualizó después
@@ -297,4 +325,5 @@
     }
 </script>
 @endsection
+
 
