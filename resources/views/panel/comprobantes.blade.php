@@ -97,7 +97,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="6" class="px-4 py-3 text-sm text-center text-gray-500">
-                                            No tienes comprobantes registrados
+                                            No tienes comprobantes emitidos
                                         </td>
                                     </tr>
                                 @endforelse

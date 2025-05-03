@@ -32,6 +32,8 @@ use App\Http\Controllers\PanelController;
 use App\Models\Mes;
 use Carbon\Carbon;
 use App\Http\Controllers\PagoController;
+use Illuminate\Support\Facades\Auth;
+
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -665,3 +667,13 @@ Route::post('/set-cliente-id/{id}', function($id) {
     session(['cliente_id' => $id]);
     return response()->json(['success' => true]);
 })->name('set.cliente.id');
+
+Route::get('/obtener-pagos', function () {
+    $cliente_id = Auth::id();
+    $pagos = DB::table('pagos')
+        ->where('cliente_id', $cliente_id)
+        ->orderBy('updated_at', 'desc')
+        ->get(['id', 'estado', 'updated_at']);
+    
+    return response()->json($pagos);
+})->middleware('auth');

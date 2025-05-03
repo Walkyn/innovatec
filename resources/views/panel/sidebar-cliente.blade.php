@@ -72,13 +72,14 @@
             </a>
         </li>
         <li class="mb-1 group {{ request()->routeIs('panel.mensajes') ? 'active' : '' }}">
-            <a href="{{ route('panel.mensajes') }}"
+            <a href="{{ route('panel.mensajes') }}" id="sidebar-mensajes-link"
                 class="flex font-semibold items-center py-2 px-4 text-gray-200 hover:bg-gray-600 hover:text-gray-100 rounded-md group-[.active]:bg-gray-600 group-[.active]:text-gray-100 group-[.selected]:bg-gray-600 group-[.selected]:text-gray-100">
                 <i class='bx bx-envelope mr-3 text-lg'></i>
                 <span class="text-sm">Mensajes</span>
-                <span
-                    class=" md:block px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-green-600 bg-green-200 rounded-full">2
-                    Nuevos</span>
+                <span id="nuevos-mensajes-badge"
+                    class="md:block px-2 py-0.5 ml-auto text-xs font-medium tracking-wide text-green-600 bg-green-200 rounded-full hidden">
+                    0 Nuevos
+                </span>
             </a>
         </li>
         <li class="mb-1 group">
@@ -206,6 +207,104 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
         closeLogoutModal();
     }
+});
+</script>
+
+<script>
+// Script completamente nuevo para gestionar el contador de notificaciones
+document.addEventListener('DOMContentLoaded', function() {
+    const badgeElement = document.getElementById('nuevos-mensajes-badge');
+    const mensajesLink = document.getElementById('sidebar-mensajes-link');
+    
+    // Función para actualizar el estado de las notificaciones
+    function actualizarNotificaciones() {
+        // Obtener los IDs de los pagos del cliente actual
+        @php
+        $cliente_id = Auth::id();
+        $pagos = DB::table('pagos')
+            ->where('cliente_id', $cliente_id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+        $pagoIds = $pagos->pluck('id')->toArray();
+        @endphp
+        
+        // Array de IDs de pagos como string para comparar
+        const pagoIdsString = "{{ implode(',', $pagoIds) }}";
+        
+        // Si no hay pagos, ocultar el badge y salir
+        if (pagoIdsString === "") {
+            badgeElement.classList.add('hidden');
+            return;
+        }
+        
+        // Estamos en la página de mensajes?
+        const enPaginaMensajes = window.location.pathname.includes('{{ route("panel.mensajes", [], false) }}');
+        
+        // Si estamos en la página de mensajes, marcar todas las notificaciones como vistas
+        if (enPaginaMensajes) {
+            localStorage.setItem('pagos_vistos', pagoIdsString);
+            badgeElement.classList.add('hidden');
+            return;
+        }
+        
+        // Obtener los pagos que ya hemos visto
+        const pagosVistos = localStorage.getItem('pagos_vistos') || "";
+        
+        // Si los pagos actuales son iguales a los que ya vimos, no hay notificaciones nuevas
+        if (pagosVistos === pagoIdsString) {
+            badgeElement.classList.add('hidden');
+            return;
+        }
+        
+        // Calcular cuántos pagos no hemos visto
+        const pagosVistosArray = pagosVistos ? pagosVistos.split(',') : [];
+        const pagosActualesArray = pagoIdsString ? pagoIdsString.split(',') : [];
+        
+        let pagosSinVer = 0;
+        
+        // Si no hay pagos vistos anteriormente, todos son nuevos
+        if (pagosVistosArray.length === 0) {
+            pagosSinVer = pagosActualesArray.length;
+        } else {
+            // Calcular pagos sin ver comparando los arrays
+            pagosSinVer = pagosActualesArray.filter(id => !pagosVistosArray.includes(id)).length;
+        }
+        
+        // Actualizar el badge según corresponda
+        if (pagosSinVer > 0) {
+            badgeElement.textContent = pagosSinVer + (pagosSinVer === 1 ? ' Nuevo' : ' Nuevos');
+            badgeElement.classList.remove('hidden');
+        } else {
+            badgeElement.classList.add('hidden');
+        }
+    }
+    
+    // Inicializar el contador al cargar la página
+    actualizarNotificaciones();
+    
+    // Escuchar eventos de cambio en localStorage para actualizaciones en otras pestañas
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'pagos_vistos') {
+            actualizarNotificaciones();
+        }
+    });
+    
+    // Agregar evento al enlace de mensajes para marcar notificaciones como vistas
+    mensajesLink.addEventListener('click', function() {
+        @php
+        $cliente_id = Auth::id();
+        $pagos = DB::table('pagos')
+            ->where('cliente_id', $cliente_id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+        $pagoIds = $pagos->pluck('id')->toArray();
+        @endphp
+        
+        localStorage.setItem('pagos_vistos', "{{ implode(',', $pagoIds) }}");
+        badgeElement.classList.add('hidden');
+    });
 });
 </script>
 <!-- end sidenav -->

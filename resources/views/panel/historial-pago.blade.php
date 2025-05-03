@@ -77,7 +77,7 @@
                     @php
                         $nombresMediosPago = [
                             'BCP' => 'Banco de Crédito del Perú',
-                            'BBVA' => 'Banco BBVA',
+                            'BBVA' => 'BBVA',
                             'BN' => 'Banco de la Nación',
                             'CAJA_PIURA' => 'Caja Piura',
                             'YAPE' => 'Yape',
