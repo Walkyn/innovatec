@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 
 class IpController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $ips = \App\Models\Ip::with('contratoServicio.contrato.cliente')->paginate(10);
+        $query = Ip::with('contratoServicio.contrato.cliente');
+        
+        // Filtrar por rango de IP específico si se proporciona
+        if ($request->filled('ip_range')) {
+            $ipRange = $request->ip_range;
+            $query->where('ip_address', 'like', $ipRange . '.%');
+        }
+        
+        // Obtener las IPs y ordenarlas
+        $ips = $query->get()->sortBy(function ($ip) {
+            return ip2long($ip->ip_address);
+        });
+        
         return view('ips.index', compact('ips'));
     }
 
@@ -102,5 +114,44 @@ class IpController extends Controller
         ]);
     }
 
-    // Aquí puedes agregar los métodos store, update, destroy, etc.
+    public function ping(Request $request)
+    {
+        try {
+            $request->validate([
+                'ip' => 'required|ip'
+            ]);
+
+            $ip = $request->ip;
+
+            // Detecta el sistema operativo para el comando correcto
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $cmd = "ping -n 2 " . escapeshellarg($ip);
+            } else {
+                $cmd = "ping -c 2 " . escapeshellarg($ip);
+            }
+
+            $output = shell_exec($cmd);
+
+            // Validar que $output sea una cadena no vacía y contenga caracteres imprimibles
+            if (!is_string($output) || trim($output) === '') {
+                return response()->json([
+                    'output' => 'No se pudo obtener respuesta del ping. (¿Está habilitado el comando ping en el servidor?)'
+                ]);
+            }
+
+            // Si ya está en UTF-8, no hace falta convertir
+            if (!mb_detect_encoding($output, 'UTF-8', true)) {
+                $output = mb_convert_encoding($output, 'UTF-8');
+            }
+
+            return response()->json([
+                'output' => $output
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'output' => 'Error interno al realizar el ping: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 } 

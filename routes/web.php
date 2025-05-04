@@ -182,6 +182,7 @@ Route::middleware('auth')->group(function () {
         Route::post('ips', 'store')->middleware('check.permissions:manage,guardar')->name('ips.store');
         Route::put('ips/{id}', 'update')->name('ips.update');
         Route::delete('ips/{id}', 'destroy')->name('ips.destroy');
+        Route::post('/ips/ping', 'ping')->name('ips.ping');
     });
 
     // Contrato PDF
