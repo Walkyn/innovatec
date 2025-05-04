@@ -73,6 +73,12 @@ Route::middleware('auth')->group(function () {
         Route::get('reset-password', 'passwordReset')->middleware('check.permissions:users,all')->name('password.reset');
         Route::post('verify-email', 'verifyEmail')->name('users.verifyEmail');
         Route::post('update-password', 'updatePassword')->middleware('check.permissions:users,actualizar')->name('users.updatePassword');
+
+        Route::get('reset-password-cliente', 'passwordResetCliente')->middleware('check.permissions:users,all')->name('password.reset-cliente');
+        Route::post('update-password-cliente', 'updatePasswordCliente')->name('users.updatePasswordCliente');
+
+        // Ruta para buscar cliente por identificación
+        Route::post('/find-cliente-by-identificacion', [UserController::class, 'findClienteByIdentificacion'])->name('users.findClienteByIdentificacion');
     });
 
     // Clients
@@ -692,3 +698,6 @@ Route::get('/obtener-pagos', function () {
 })->middleware('auth');
 
 Route::resource('ips', IpController::class);
+
+// Ruta alternativa usando GET
+Route::get('/search-cliente-workaround', [UserController::class, 'findClienteByIdentificacionWorkaround'])->name('users.findClienteByIdentificacionWorkaround');

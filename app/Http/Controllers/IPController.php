@@ -29,60 +29,77 @@ class IpController extends Controller
     {
         // IP individual
         if ($request->filled('ip_address')) {
-            $request->validate([
-                'ip_address' => 'required|ip|unique:ips,ip_address',
-            ]);
-    
-            \App\Models\Ip::create([
-                'ip_address' => $request->ip_address,
-            ]);
-    
-            return redirect()->route('ips.index')->with([
-                'successMessage' => 'Éxito',
-                'successDetails' => 'IP guardada correctamente.',
-            ]);
+            try {
+                $request->validate([
+                    'ip_address' => 'required|ip|unique:ips,ip_address',
+                ]);
+            
+                \App\Models\Ip::create([
+                    'ip_address' => $request->ip_address,
+                ]);
+            
+                return redirect()->route('ips.index')->with([
+                    'successMessage' => 'Éxito',
+                    'successDetails' => 'IP guardada correctamente.',
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                // Capturar específicamente errores de validación
+                return redirect()->route('ips.index')->with([
+                    'errorMessage' => 'Error',
+                    'errorDetails' => 'La IP ' . $request->ip_address . ' ya existe en la base de datos.',
+                ]);
+            }
         }
     
         // Rango de IPs
         if ($request->filled('ip_start') && $request->filled('ip_end')) {
-            $request->validate([
-                'ip_start' => 'required|ip',
-                'ip_end' => 'required|ip',
-            ]);
-    
-            $ips = $this->generateIpRange($request->ip_start, $request->ip_end);
-    
-            $nuevas = 0;
-            $existentes = 0;
-            foreach ($ips as $ip) {
-                if (!\App\Models\Ip::where('ip_address', $ip)->exists()) {
-                    \App\Models\Ip::create([
-                        'ip_address' => $ip,
-                    ]);
-                    $nuevas++;
-                } else {
-                    $existentes++;
-                }
-            }
-    
-            if ($nuevas > 0) {
-                $mensaje = "$nuevas IPs generadas correctamente.";
-                if ($existentes > 0) {
-                    $mensaje .= " $existentes ya existían y no se agregaron.";
-                }
-                return redirect()->route('ips.index')->with([
-                    'successMessage' => 'Éxito',
-                    'successDetails' => $mensaje,
+            try {
+                $request->validate([
+                    'ip_start' => 'required|ip',
+                    'ip_end' => 'required|ip',
                 ]);
-            } else {
+            
+                $ips = $this->generateIpRange($request->ip_start, $request->ip_end);
+            
+                $nuevas = 0;
+                $existentes = 0;
+                foreach ($ips as $ip) {
+                    if (!\App\Models\Ip::where('ip_address', $ip)->exists()) {
+                        \App\Models\Ip::create([
+                            'ip_address' => $ip,
+                        ]);
+                        $nuevas++;
+                    } else {
+                        $existentes++;
+                    }
+                }
+            
+                if ($nuevas > 0) {
+                    $mensaje = "$nuevas IPs generadas correctamente.";
+                    if ($existentes > 0) {
+                        $mensaje .= " $existentes ya existen y no se agregaron.";
+                    }
+                    return redirect()->route('ips.index')->with([
+                        'successMessage' => 'Éxito',
+                        'successDetails' => $mensaje,
+                    ]);
+                } else {
+                    return redirect()->route('ips.index')->with([
+                        'errorMessage' => 'Error',
+                        'errorDetails' => 'Todas las IPs del rango ya existen en la base de datos.',
+                    ]);
+                }
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                // Capturar errores de validación
                 return redirect()->route('ips.index')->with([
-                    'warningMessage' => 'Advertencia',
-                    'warningDetails' => 'Todas las IPs del rango ya existían en la base de datos.',
+                    'errorMessage' => 'Error',
+                    'errorDetails' => 'Error de validación: ' . implode(', ', $e->errors()['ip_start'] ?? $e->errors()['ip_end'] ?? ['Formato de IP incorrecto']),
                 ]);
             }
         }
 
         return redirect()->route('ips.index')->with([
+            'errorMessage' => 'Error',
             'errorDetails' => 'Debe proporcionar una dirección IP o un rango de IPs.',
         ]);
     }

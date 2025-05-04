@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // Temporalmente desactivar CSRF para esta ruta
+        'find-cliente-by-identificacion',
     ];
 }

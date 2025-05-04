@@ -109,7 +109,6 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        // Consulta para obtener usuario, rol, módulos y permisos
         $userData = DB::table('users as u')
             ->leftJoin('roles as r', 'u.id_rol', '=', 'r.id_rol')
             ->leftJoin('permisos as p', 'u.id', '=', 'p.id_usuario')
@@ -179,7 +178,6 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validación de los datos
         $rules = [
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
@@ -383,6 +381,121 @@ class UserController extends Controller
             return redirect()->route('users.create')->with([
                 'errorDetails' => 'Ocurrió un error al crear el usuario.',
             ]);
+        }
+    }
+
+    public function passwordResetCliente()
+    {
+        return view('users.reset-password-cliente');
+    }
+
+    /**
+     * Actualiza la contraseña del cliente
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePasswordCliente(Request $request)
+    {
+        $request->validate([
+            'cliente_id' => 'required|exists:clientes,id',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        try {
+            $cliente = \App\Models\Cliente::findOrFail($request->cliente_id);
+            
+            // Actualizar la contraseña
+            $cliente->clave_acceso = Hash::make($request->password);
+            $cliente->save();
+
+            return redirect()->route('password.reset-cliente')->with([
+                'successMessage' => 'Éxito',
+                'successDetails' => 'Contraseña restablecida correctamente'
+            ]);
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'errorMessage' => 'Error',
+                'errorDetails' => 'Error al restablecer la contraseña: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Busca un cliente por su identificación
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function findClienteByIdentificacion(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'required',
+        ]);
+
+        try {
+            $cliente = \App\Models\Cliente::where('identificacion', $request->identificacion)
+                             ->where('estado_cliente', 'activo')
+                             ->first();
+
+            if (!$cliente) {
+                return redirect()->route('password.reset-cliente')
+                    ->with([
+                        'errorMessage' => 'Error',
+                        'errorDetails' => 'No se encontró ningún cliente activo con esa identificación'
+                    ]);
+            }
+
+            $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
+            
+            return view('users.reset-password-cliente', [
+                'user' => $cliente,
+                'initials' => $initials
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('users.passwordResetCliente')
+                ->with([
+                    'errorMessage' => 'Error',
+                    'errorDetails' => 'Error al buscar el cliente: ' . $e->getMessage()
+                ]);
+        }
+    }
+
+    /**
+     * Versión alternativa para buscar cliente que usa GET
+     */
+    public function findClienteByIdentificacionWorkaround(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'required',
+        ]);
+
+        try {
+            $cliente = \App\Models\Cliente::where('identificacion', $request->identificacion)
+                             ->where('estado_cliente', 'activo')
+                             ->first();
+
+            if (!$cliente) {
+                return redirect()->route('password.reset-cliente')
+                    ->with([
+                        'errorMessage' => 'Error',
+                        'errorDetails' => 'No se encontró ningún cliente activo con esa identificación'
+                    ]);
+            }
+
+            $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
+            
+            return view('users.reset-password-cliente', [
+                'user' => $cliente,
+                'initials' => $initials
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('password.reset-cliente')
+                ->with([
+                    'errorMessage' => 'Error',
+                    'errorDetails' => 'Error al buscar el cliente: ' . $e->getMessage()
+                ]);
         }
     }
 }
