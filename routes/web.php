@@ -33,7 +33,7 @@ use App\Models\Mes;
 use Carbon\Carbon;
 use App\Http\Controllers\PagoController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\IPController;
+use App\Http\Controllers\IpController;
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -177,9 +177,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // IPS
-    Route::controller(IPController::class)->group(function () {
+    Route::controller(IpController::class)->group(function () {
         Route::get('ips', 'index')->middleware('check.permissions:manage,all')->name('ips.index');
         Route::post('ips', 'store')->middleware('check.permissions:manage,guardar')->name('ips.store');
+        Route::put('ips/{id}', 'update')->name('ips.update');
+        Route::delete('ips/{id}', 'destroy')->name('ips.destroy');
     });
 
     // Contrato PDF
@@ -687,3 +689,5 @@ Route::get('/obtener-pagos', function () {
     
     return response()->json($pagos);
 })->middleware('auth');
+
+Route::resource('ips', IpController::class);

@@ -10,7 +10,6 @@ class MessageController extends Controller
 {
     public function index()
     {
-        // Trae los pagos con la relación del cliente
         $pagos = Pago::with('cliente')->orderBy('created_at', 'desc')->get()->map(function($pago) {
             return $pago->toArray();
         });

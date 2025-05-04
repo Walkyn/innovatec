@@ -9,7 +9,7 @@
             <div class="flex justify-between mb-4 items-start">
                 <div class="font-medium text-lg flex items-center gap-2">
                     <i class="fas fa-bell text-gray-600"></i>
-                    Mensajes y Notificaciones
+                    Notificaciones
                 </div>
             </div>
 
@@ -18,11 +18,9 @@
                 @php
                     // Obtener el ID del cliente conectado actualmente
                     $cliente_id = session('cliente_id');
-                    
-                    // Volvemos al período de 30 días como se solicitó originalmente
+
                     $fechaLimite = \Carbon\Carbon::now()->subDays(30);
                     
-                    // Consultar los pagos usando el cliente_id correcto y filtrando por fecha
                     $pagos = DB::table('pagos')
                         ->where('cliente_id', $cliente_id)
                         ->whereIn('estado', ['Aprobado', 'Rechazado'])
@@ -240,16 +238,15 @@
         @php
         // Obtener solo los pagos del cliente autenticado
         $cliente_id = session('cliente_id');
-        // Volvemos al período de 30 días
+        
         $fechaLimite = \Carbon\Carbon::now()->subDays(30);
         $pagos = DB::table('pagos')
-            ->where('cliente_id', $cliente_id)  // Filtrar por el ID del cliente autenticado
+            ->where('cliente_id', $cliente_id)
             ->whereIn('estado', ['Aprobado', 'Rechazado']) 
-            ->where('updated_at', '>=', $fechaLimite)  // Solo mostrar notificaciones de los últimos 30 días
+            ->where('updated_at', '>=', $fechaLimite)
             ->orderBy('updated_at', 'desc')
             ->get();
-            
-        // Crear un array con información detallada de cada pago
+
         $pagosInfo = [];
         foreach ($pagos as $pago) {
             $pagosInfo[] = [

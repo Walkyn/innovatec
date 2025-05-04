@@ -209,7 +209,7 @@ class PanelController extends Controller
             'medio_pago' => 'required|string',
             'servicios' => 'required|json',
             'total_pagar' => 'required|numeric',
-            'comprobante' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120', // 5MB máximo
+            'comprobante' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
         try {
@@ -375,7 +375,6 @@ class PanelController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error en verDetalleComprobante: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error al cargar los detalles del comprobante'

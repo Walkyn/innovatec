@@ -170,7 +170,8 @@
                 <!-- Chat Notification Area -->
                 <li class="relative">
                     <a class="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        href="{{ route('messages.index') }}?v={{ time() }}">
+                        href="{{ route('messages.index') }}">
+                        
                         
                         @php
                             $pagosPendientes = DB::table('pagos')->where('estado', 'en_revision')->count();

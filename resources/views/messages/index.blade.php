@@ -568,15 +568,11 @@
             });
         });
         
-        // Si hay un cliente temporal guardado (después de una actualización), abrirlo
         if (clienteTemporal) {
-            // Eliminar el cliente temporal para que no se abra en futuras cargas
             localStorage.removeItem('temp_cliente_actualizado');
             
-            // Buscar y abrir el chat del cliente
             const elementoCliente = document.querySelector(`.cliente-item[data-cliente-id="${clienteTemporal}"]`);
             if (elementoCliente) {
-                // Pequeño retraso para asegurar que la página ha cargado completamente
                 setTimeout(() => {
                     elementoCliente.click();
                 }, 200);
@@ -584,14 +580,6 @@
         }
     });
 </script>
-
-@php
-    // Comentar o eliminar este bloque al final del archivo
-    // dd([
-    //     'pagos' => $pagos,
-    //     'cliente_id' => Auth::id()
-    // ]);
-@endphp
 
 
 
