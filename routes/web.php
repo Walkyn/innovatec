@@ -33,7 +33,7 @@ use App\Models\Mes;
 use Carbon\Carbon;
 use App\Http\Controllers\PagoController;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\IPController;
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -174,6 +174,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/categorias', 'getCategorias')->middleware('check.permissions:manage,all');
         Route::get('/servicios/{categoriaId}', 'getServicios')->middleware('check.permissions:manage,all');
         Route::get('/planes/{servicioId}', 'getPlanes')->middleware('check.permissions:manage,all');
+    });
+
+    // IPS
+    Route::controller(IPController::class)->group(function () {
+        Route::get('ips', 'index')->middleware('check.permissions:manage,all')->name('ips.index');
+        Route::post('ips', 'store')->middleware('check.permissions:manage,guardar')->name('ips.store');
     });
 
     // Contrato PDF
@@ -495,6 +501,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
 
     Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
+
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 });
 
 // Rutas que devuelven datos

@@ -106,6 +106,14 @@
                                             <i class="fas fa-calendar-alt"></i> Meses
                                         </a>
                                     </li>
+                                    <li>
+                                        <a
+                                            class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white {{ str_starts_with($currentRoute, 'ips.') ? 'text-white' : '' }}"
+                                            href="{{ route('ips.index') }}"
+                                        >
+                                        <i class="fas fa-ethernet"></i> Direcciones IP
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>

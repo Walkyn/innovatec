@@ -220,7 +220,7 @@
                 </div>
                 
                 <!-- Paginación -->
-                <div class="mt-4 flex justify-center">
+                <div>
                     {{ $pagos->links() }}
                 </div>
             </div>

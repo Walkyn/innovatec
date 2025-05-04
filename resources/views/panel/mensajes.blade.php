@@ -19,16 +19,19 @@
                     // Obtener el ID del cliente conectado actualmente
                     $cliente_id = session('cliente_id');
                     
-                    // Consultar los pagos usando el cliente_id correcto
+                    // Volvemos al período de 30 días como se solicitó originalmente
+                    $fechaLimite = \Carbon\Carbon::now()->subDays(30);
+                    
+                    // Consultar los pagos usando el cliente_id correcto y filtrando por fecha
                     $pagos = DB::table('pagos')
                         ->where('cliente_id', $cliente_id)
                         ->whereIn('estado', ['Aprobado', 'Rechazado'])
+                        ->where('updated_at', '>=', $fechaLimite)
                         ->orderBy('updated_at', 'desc')
                         ->get();
                     
                     $hayPagos = $pagos->count() > 0;
-                    
-                    // Configurar Carbon para usar español
+
                     \Carbon\Carbon::setLocale('es');
                 @endphp
                 
@@ -38,7 +41,7 @@
                             $clases = [
                                 'Aprobado' => [
                                     'bg' => 'bg-white',
-                                    'border' => 'border-l-4 border-emerald-400',
+                                    'border' => 'border-l-4 border-emerald-500',
                                     'badge-bg' => 'bg-emerald-100',
                                     'badge-text' => 'text-emerald-600',
                                     'icon' => 'fas fa-check-circle'
@@ -237,9 +240,12 @@
         @php
         // Obtener solo los pagos del cliente autenticado
         $cliente_id = session('cliente_id');
+        // Volvemos al período de 30 días
+        $fechaLimite = \Carbon\Carbon::now()->subDays(30);
         $pagos = DB::table('pagos')
             ->where('cliente_id', $cliente_id)  // Filtrar por el ID del cliente autenticado
             ->whereIn('estado', ['Aprobado', 'Rechazado']) 
+            ->where('updated_at', '>=', $fechaLimite)  // Solo mostrar notificaciones de los últimos 30 días
             ->orderBy('updated_at', 'desc')
             ->get();
             
@@ -285,6 +291,15 @@
                     pagosVistos = [];
                     console.error('Error al parsear pagos_vistos:', e);
                 }
+                
+                // Filtrar pagos actuales que tengan menos de 30 días
+                const fechaLimite = new Date();
+                fechaLimite.setDate(fechaLimite.getDate() - 30);
+                
+                pagosActuales = pagosActuales.filter(pago => {
+                    const fechaPago = new Date(pago.updated_at);
+                    return fechaPago >= fechaLimite;
+                });
                 
                 // Crear mapa para búsqueda rápida de pagos vistos
                 const mapaPagosVistos = new Map();
