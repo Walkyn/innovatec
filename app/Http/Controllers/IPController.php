@@ -9,6 +9,11 @@ class IpController extends Controller
 {
     public function index(Request $request)
     {
+        // Verificar autenticación
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+        
         $query = Ip::with('contratoServicio.contrato.cliente');
         
         // Filtrar por rango de IP específico si se proporciona

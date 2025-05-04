@@ -77,8 +77,8 @@ Route::middleware('auth')->group(function () {
         Route::get('reset-password-cliente', 'passwordResetCliente')->middleware('check.permissions:users,all')->name('password.reset-cliente');
         Route::post('update-password-cliente', 'updatePasswordCliente')->name('users.updatePasswordCliente');
 
-        // Ruta para buscar cliente por identificación
-        Route::post('/find-cliente-by-identificacion', [UserController::class, 'findClienteByIdentificacion'])->name('users.findClienteByIdentificacion');
+        // Ruta alternativa usando GET
+        Route::get('/search-cliente-workaround', 'findClienteByIdentificacionWorkaround')->name('users.findClienteByIdentificacionWorkaround');
     });
 
     // Clients
@@ -184,10 +184,9 @@ Route::middleware('auth')->group(function () {
 
     // IPS
     Route::controller(IpController::class)->group(function () {
-        Route::get('ips', 'index')->middleware('check.permissions:manage,all')->name('ips.index');
+        Route::get('ips', 'index')->middleware('check.permissions:manage,all', 'auth')->name('ips.index');
         Route::post('ips', 'store')->middleware('check.permissions:manage,guardar')->name('ips.store');
-        Route::put('ips/{id}', 'update')->name('ips.update');
-        Route::delete('ips/{id}', 'destroy')->name('ips.destroy');
+        Route::delete('ips/{id}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('ips.destroy');
         Route::post('/ips/ping', 'ping')->name('ips.ping');
     });
 
@@ -229,45 +228,45 @@ Route::middleware('auth')->group(function () {
         $fechaSuspension = $cs->estado_servicio_cliente === 'suspendido' && $cs->fecha_suspension_servicio
             ? Carbon::parse($cs->fecha_suspension_servicio)
             : null;
-        
+
         $diaInstalacion = (int) $fechaInicio->format('j');
         $ultimoDiaMesInstalacion = (int) $fechaInicio->copy()->endOfMonth()->format('j');
-        
+
         // Variables para el cálculo proporcional
         $mesInicioId = null;
         $montoProporcional = 0;
-        
+
         // 3) Traemos todos los Meses desde ese año/mes en adelante
         $anioInicio = $fechaInicio->year;
         $mesInicio = $fechaInicio->month;
-        
-        $meses = Mes::where(function($q) use ($anioInicio, $mesInicio) {
-                    $q->where('anio', '>', $anioInicio)
-                      ->orWhere(function($q2) use ($anioInicio, $mesInicio) {
-                          $q2->where('anio', $anioInicio)
-                             ->where('numero', '>=', $mesInicio);
-                      });
-                })
-                ->orderBy('anio')
-                ->orderBy('numero')
-                ->get();
-        
+
+        $meses = Mes::where(function ($q) use ($anioInicio, $mesInicio) {
+            $q->where('anio', '>', $anioInicio)
+                ->orWhere(function ($q2) use ($anioInicio, $mesInicio) {
+                    $q2->where('anio', $anioInicio)
+                        ->where('numero', '>=', $mesInicio);
+                });
+        })
+            ->orderBy('anio')
+            ->orderBy('numero')
+            ->get();
+
         // 4) Excluir meses cuyo estado sea 'pagado' o 'no_aplica'
         $excluidos = DB::table('cobranza_contratoservicio')
-                    ->where('contrato_servicio_id', $contratoServicioId)
-                    ->whereIn('estado_pago', ['pagado','no_aplica'])
-                    ->pluck('mes_id')
-                    ->toArray();
-        
+            ->where('contrato_servicio_id', $contratoServicioId)
+            ->whereIn('estado_pago', ['pagado', 'no_aplica'])
+            ->pluck('mes_id')
+            ->toArray();
+
         // 5) Calcular precio proporcional para el primer mes
         foreach ($meses as $index => $mes) {
             if ($mes->anio == $anioInicio && $mes->numero == $mesInicio) {
                 $mesInicioId = $mes->id;
-                
+
                 $fechaInicioMes = Carbon::parse($mes->fecha_inicio);
                 $fechaFinMes = Carbon::parse($mes->fecha_fin);
                 $restantes = $ultimoDiaMesInstalacion - $diaInstalacion;
-                
+
                 // Calcular el monto proporcional solo si no está en los excluidos
                 if (!in_array($mes->id, $excluidos)) {
                     if ($restantes < 5) {
@@ -289,47 +288,50 @@ Route::middleware('auth')->group(function () {
                 break;
             }
         }
-        
+
         // 6) Filtrar meses posteriores a suspensión y ajustar precio para meses incluidos
         $mesesConPrecio = [];
-        
+
         foreach ($meses as $mes) {
             // Omitir meses excluidos o posteriores a la suspensión
             if (in_array($mes->id, $excluidos)) {
                 continue;
             }
-            
+
             // Si hay suspensión, omitir meses posteriores
             if ($fechaSuspension) {
                 if (($mes->anio == $fechaSuspension->year && $mes->numero > $fechaSuspension->month) ||
-                    ($mes->anio > $fechaSuspension->year)) {
+                    ($mes->anio > $fechaSuspension->year)
+                ) {
                     continue;
                 }
             }
-            
+
             $precio = $cs->plan->precio;
-            
+
             // Si es mes de suspensión, calcular precio proporcional
-            if ($fechaSuspension && 
-                $mes->anio == $fechaSuspension->year && 
-                $mes->numero == $fechaSuspension->month) {
-                
+            if (
+                $fechaSuspension &&
+                $mes->anio == $fechaSuspension->year &&
+                $mes->numero == $fechaSuspension->month
+            ) {
+
                 $fechaInicioMes = Carbon::parse($mes->fecha_inicio);
                 $fechaFinMes = Carbon::parse($mes->fecha_fin);
-                
+
                 // Estos cálculos deben coincidir exactamente con los de meses-pendientes.blade.php
                 $diasTotales = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
                 $diaSuspension = (int) $fechaSuspension->format('j'); // Día del mes en que se suspendió
                 $diasHastaSusp = $diaSuspension; // Contamos hasta el día de suspensión inclusive
-                
+
                 $precio = ($cs->plan->precio / $diasTotales) * $diasHastaSusp;
                 $precio = round($precio, 2, PHP_ROUND_HALF_UP);
             }
-            
+
             $mes->precio_proporcional = $precio;
             $mesesConPrecio[] = $mes;
         }
-        
+
         // 7) Preparamos la respuesta JSON
         return response()->json([
             'success' => true,
@@ -347,58 +349,58 @@ Route::middleware('auth')->group(function () {
             ->where('estado_servicio_cliente', 'activo')
             ->with(['servicio', 'plan'])
             ->get();
-        
+
         // Recoger servicios suspendidos, pero solo los procesaremos si tienen meses pendientes
         $serviciosSuspendidos = ContratoServicio::where('contrato_id', $id)
             ->where('estado_servicio_cliente', 'suspendido')
             ->with(['servicio', 'plan'])
             ->get();
-        
+
         // Filtramos los servicios suspendidos que tienen meses pendientes
         $serviciosSuspendidosConPendientes = $serviciosSuspendidos->filter(function ($cs) {
             // Fecha de servicio y suspensión
             $fechaInicio = \Carbon\Carbon::parse($cs->fecha_servicio);
-            $fechaSuspension = $cs->fecha_suspension_servicio 
-                ? \Carbon\Carbon::parse($cs->fecha_suspension_servicio) 
+            $fechaSuspension = $cs->fecha_suspension_servicio
+                ? \Carbon\Carbon::parse($cs->fecha_suspension_servicio)
                 : null;
-            
+
             // Si no hay fecha de suspensión válida, excluimos
             if (!$fechaSuspension) {
                 return false;
             }
-            
+
             // Buscar todos los meses en el rango de fechas (desde inicio hasta suspensión)
-            $meses = \App\Models\Mes::where(function($q) use ($fechaInicio, $fechaSuspension) {
+            $meses = \App\Models\Mes::where(function ($q) use ($fechaInicio, $fechaSuspension) {
                 // Mismo año
                 if ($fechaInicio->year == $fechaSuspension->year) {
                     $q->where('anio', $fechaInicio->year)
-                      ->where('numero', '>=', $fechaInicio->month)
-                      ->where('numero', '<=', $fechaSuspension->month);
+                        ->where('numero', '>=', $fechaInicio->month)
+                        ->where('numero', '<=', $fechaSuspension->month);
                 } else {
                     // Años diferentes
-                    $q->where(function($q1) use ($fechaInicio) {
+                    $q->where(function ($q1) use ($fechaInicio) {
                         // Meses del primer año
                         $q1->where('anio', $fechaInicio->year)
-                           ->where('numero', '>=', $fechaInicio->month);
-                    })->orWhere(function($q2) use ($fechaSuspension) {
+                            ->where('numero', '>=', $fechaInicio->month);
+                    })->orWhere(function ($q2) use ($fechaSuspension) {
                         // Meses del último año
                         $q2->where('anio', $fechaSuspension->year)
-                           ->where('numero', '<=', $fechaSuspension->month);
-                    })->orWhere(function($q3) use ($fechaInicio, $fechaSuspension) {
+                            ->where('numero', '<=', $fechaSuspension->month);
+                    })->orWhere(function ($q3) use ($fechaInicio, $fechaSuspension) {
                         // Años intermedios
                         $q3->where('anio', '>', $fechaInicio->year)
-                           ->where('anio', '<', $fechaSuspension->year);
+                            ->where('anio', '<', $fechaSuspension->year);
                     });
                 }
             })->get();
-            
+
             // Meses ya pagados o marcados como no_aplica
             $mesesExcluidos = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
                 ->where('contrato_servicio_id', $cs->id)
                 ->whereIn('estado_pago', ['pagado', 'no_aplica'])
                 ->pluck('mes_id')
                 ->toArray();
-            
+
             // Verificar si el primer mes debe excluirse (menos de 5 días)
             foreach ($meses as $mes) {
                 if ($mes->anio == $fechaInicio->year && $mes->numero == $fechaInicio->month) {
@@ -406,14 +408,14 @@ Route::middleware('auth')->group(function () {
                     $diaInicio = (int) $fechaInicio->format('j');
                     $ultimoDia = (int) $fechaFinMes->format('j');
                     $diasRestantes = $ultimoDia - $diaInicio;
-                    
+
                     if ($diasRestantes < 5) {
                         $mesesExcluidos[] = $mes->id;
                     }
                     break;
                 }
             }
-            
+
             // Verificar si hay meses pendientes
             $tienePendientes = false;
             foreach ($meses as $mes) {
@@ -422,7 +424,7 @@ Route::middleware('auth')->group(function () {
                     break;
                 }
             }
-            
+
             // DEBUG - registra información para diagnóstico
             \Illuminate\Support\Facades\Log::info('Servicio suspendido ID: ' . $cs->id, [
                 'fecha_inicio' => $fechaInicio->toDateString(),
@@ -431,13 +433,13 @@ Route::middleware('auth')->group(function () {
                 'meses_excluidos' => count($mesesExcluidos),
                 'tiene_pendientes' => $tienePendientes
             ]);
-            
+
             return $tienePendientes;
         });
-        
+
         // Combinar servicios activos y suspendidos con pendientes
         $serviciosFiltrados = $serviciosActivos->concat($serviciosSuspendidosConPendientes);
-        
+
         // Formatear respuesta
         $resultados = $serviciosFiltrados->map(function ($cs) {
             return [
@@ -450,7 +452,7 @@ Route::middleware('auth')->group(function () {
                 'fecha_suspension' => $cs->fecha_suspension_servicio
             ];
         });
-        
+
         return response()->json($resultados);
     });
 
@@ -485,35 +487,6 @@ Route::middleware('auth')->group(function () {
         ->name('obtener.datos.periodo');
 
     Route::get('/obtener-datos-chart02', [ChartController::class, 'obtenerDatosChart02'])->name('obtener.datos.chart02');
-
-    Route::post('/panel/update-password', [PanelController::class, 'updatePassword'])
-        ->name('panel.update-password');
-
-    Route::post('/panel/login', [PanelController::class, 'login'])->name('panel.login');
-
-    Route::get('/panel/historial-servicios', function () {
-        return view('panel.historial-servicios');
-    })->name('panel.historial-servicios');
-
-    // Ruta para guardar el pago
-    Route::post('/panel/guardar-pago', [App\Http\Controllers\PanelController::class, 'guardarPago'])->name('panel.guardar-pago');
-
-    // Ruta para ver lista de pagos
-    Route::get('/panel/pagos', [App\Http\Controllers\PanelController::class, 'listarPagos'])->name('panel.pagos');
-
-    // Ruta para ver historial de pagos
-    Route::get('/panel/historial-pago', [PagoController::class, 'historial'])->name('panel.historial-pago');
-
-    // Ruta para eliminar pago
-    Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
-
-    Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
-
-    Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
-
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 });
 
 // Rutas que devuelven datos
@@ -536,58 +509,58 @@ Route::get('/contratos/{id}/servicios', function ($id) {
         ->where('estado_servicio_cliente', 'activo')
         ->with(['servicio', 'plan'])
         ->get();
-    
+
     // Recoger servicios suspendidos, pero solo los procesaremos si tienen meses pendientes
     $serviciosSuspendidos = ContratoServicio::where('contrato_id', $id)
         ->where('estado_servicio_cliente', 'suspendido')
         ->with(['servicio', 'plan'])
         ->get();
-    
+
     // Filtramos los servicios suspendidos que tienen meses pendientes
     $serviciosSuspendidosConPendientes = $serviciosSuspendidos->filter(function ($cs) {
         // Fecha de servicio y suspensión
         $fechaInicio = \Carbon\Carbon::parse($cs->fecha_servicio);
-        $fechaSuspension = $cs->fecha_suspension_servicio 
-            ? \Carbon\Carbon::parse($cs->fecha_suspension_servicio) 
+        $fechaSuspension = $cs->fecha_suspension_servicio
+            ? \Carbon\Carbon::parse($cs->fecha_suspension_servicio)
             : null;
-        
+
         // Si no hay fecha de suspensión válida, excluimos
         if (!$fechaSuspension) {
             return false;
         }
-        
+
         // Buscar todos los meses en el rango de fechas (desde inicio hasta suspensión)
-        $meses = \App\Models\Mes::where(function($q) use ($fechaInicio, $fechaSuspension) {
+        $meses = \App\Models\Mes::where(function ($q) use ($fechaInicio, $fechaSuspension) {
             // Mismo año
             if ($fechaInicio->year == $fechaSuspension->year) {
                 $q->where('anio', $fechaInicio->year)
-                  ->where('numero', '>=', $fechaInicio->month)
-                  ->where('numero', '<=', $fechaSuspension->month);
+                    ->where('numero', '>=', $fechaInicio->month)
+                    ->where('numero', '<=', $fechaSuspension->month);
             } else {
                 // Años diferentes
-                $q->where(function($q1) use ($fechaInicio) {
+                $q->where(function ($q1) use ($fechaInicio) {
                     // Meses del primer año
                     $q1->where('anio', $fechaInicio->year)
-                       ->where('numero', '>=', $fechaInicio->month);
-                })->orWhere(function($q2) use ($fechaSuspension) {
+                        ->where('numero', '>=', $fechaInicio->month);
+                })->orWhere(function ($q2) use ($fechaSuspension) {
                     // Meses del último año
                     $q2->where('anio', $fechaSuspension->year)
-                       ->where('numero', '<=', $fechaSuspension->month);
-                })->orWhere(function($q3) use ($fechaInicio, $fechaSuspension) {
+                        ->where('numero', '<=', $fechaSuspension->month);
+                })->orWhere(function ($q3) use ($fechaInicio, $fechaSuspension) {
                     // Años intermedios
                     $q3->where('anio', '>', $fechaInicio->year)
-                       ->where('anio', '<', $fechaSuspension->year);
+                        ->where('anio', '<', $fechaSuspension->year);
                 });
             }
         })->get();
-        
+
         // Meses ya pagados o marcados como no_aplica
         $mesesExcluidos = \Illuminate\Support\Facades\DB::table('cobranza_contratoservicio')
             ->where('contrato_servicio_id', $cs->id)
             ->whereIn('estado_pago', ['pagado', 'no_aplica'])
             ->pluck('mes_id')
             ->toArray();
-        
+
         // Verificar si el primer mes debe excluirse (menos de 5 días)
         foreach ($meses as $mes) {
             if ($mes->anio == $fechaInicio->year && $mes->numero == $fechaInicio->month) {
@@ -595,14 +568,14 @@ Route::get('/contratos/{id}/servicios', function ($id) {
                 $diaInicio = (int) $fechaInicio->format('j');
                 $ultimoDia = (int) $fechaFinMes->format('j');
                 $diasRestantes = $ultimoDia - $diaInicio;
-                
+
                 if ($diasRestantes < 5) {
                     $mesesExcluidos[] = $mes->id;
                 }
                 break;
             }
         }
-        
+
         // Verificar si hay meses pendientes
         $tienePendientes = false;
         foreach ($meses as $mes) {
@@ -611,13 +584,13 @@ Route::get('/contratos/{id}/servicios', function ($id) {
                 break;
             }
         }
-        
+
         return $tienePendientes;
     });
-    
+
     // Combinar servicios activos y suspendidos con pendientes
     $serviciosFiltrados = $serviciosActivos->concat($serviciosSuspendidosConPendientes);
-    
+
     // Formatear respuesta
     $resultados = $serviciosFiltrados->map(function ($cs) {
         return [
@@ -630,7 +603,7 @@ Route::get('/contratos/{id}/servicios', function ($id) {
             'fecha_suspension' => $cs->fecha_suspension_servicio
         ];
     });
-    
+
     return response()->json($resultados);
 });
 
@@ -682,7 +655,33 @@ Route::middleware(['auth.cliente'])->group(function () {
         ->name('panel.comprobante.detalle');
 });
 
-Route::post('/set-cliente-id/{id}', function($id) {
+Route::post('/panel/update-password', [PanelController::class, 'updatePassword'])
+    ->name('panel.update-password');
+
+Route::post('/panel/login', [PanelController::class, 'login'])->name('panel.login');
+
+Route::get('/panel/historial-servicios', function () {
+    return view('panel.historial-servicios');
+})->name('panel.historial-servicios');
+
+// Ruta para guardar el pago
+Route::post('/panel/guardar-pago', [App\Http\Controllers\PanelController::class, 'guardarPago'])->name('panel.guardar-pago');
+
+// Ruta para ver lista de pagos
+Route::get('/panel/pagos', [App\Http\Controllers\PanelController::class, 'listarPagos'])->name('panel.pagos');
+
+// Ruta para ver historial de pagos
+Route::get('/panel/historial-pago', [PagoController::class, 'historial'])->name('panel.historial-pago');
+
+// Ruta para eliminar pago
+Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
+
+Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
+
+Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
+
+
+Route::post('/set-cliente-id/{id}', function ($id) {
     session(['cliente_id' => $id]);
     return response()->json(['success' => true]);
 })->name('set.cliente.id');
@@ -693,11 +692,8 @@ Route::get('/obtener-pagos', function () {
         ->where('cliente_id', $cliente_id)
         ->orderBy('updated_at', 'desc')
         ->get(['id', 'estado', 'updated_at']);
-    
+
     return response()->json($pagos);
 })->middleware('auth');
 
 Route::resource('ips', IpController::class);
-
-// Ruta alternativa usando GET
-Route::get('/search-cliente-workaround', [UserController::class, 'findClienteByIdentificacionWorkaround'])->name('users.findClienteByIdentificacionWorkaround');

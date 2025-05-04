@@ -381,4 +381,49 @@ class PanelController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Elimina un pago registrado por el cliente.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function eliminarPago($id)
+    {
+        try {
+            // Obtener el ID del cliente desde la sesión
+            $cliente_id = session('cliente_id');
+            
+            if (!$cliente_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo eliminar el pago: Sesión no iniciada'
+                ], 401);
+            }
+
+            // Buscar el pago que pertenezca al cliente actual y tenga el ID especificado
+            $pago = \App\Models\Pago::where('id', $id)
+                                   ->where('cliente_id', $cliente_id)
+                                   ->where('estado', 'en_revision')  // Solo permitir eliminar pagos en revisión
+                                   ->firstOrFail();
+            
+            // Eliminar el pago
+            $pago->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pago eliminado correctamente'
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo eliminar el pago: Pago no encontrado o no autorizado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo eliminar el pago: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
