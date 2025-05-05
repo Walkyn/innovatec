@@ -57,28 +57,21 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y">
-                                @forelse($cobranzas as $cobranza)
+                                @forelse($cobranzas->where('estado_cobro', 'emitido') as $cobranza)
                                     <tr class="text-gray-700">
                                         <td class="px-4 py-3 text-sm whitespace-nowrap">B{{ $cobranza->numero_boleta }}</td>
                                         <td class="px-4 py-3 text-sm whitespace-nowrap">
-                                            @if ($cobranza->estado_cobro === 'anulado')
-                                                <span class="line-through text-gray-500">
-                                                    S/ {{ number_format($cobranza->monto_total, 2) }}
-                                                </span>
-                                            @else
-                                                <span class="whitespace-nowrap">
-                                                    S/ {{ number_format($cobranza->monto_total, 2) }}
-                                                </span>
-                                            @endif
+                                            <span class="whitespace-nowrap">
+                                                S/ {{ number_format($cobranza->monto_total, 2) }}
+                                            </span>
                                         </td>
                                         <td class="px-4 py-3 text-sm">{{ $cobranza->fecha_cobro->format('d/m/Y') }}</td>
                                         <td class="px-4 py-3 text-sm">{{ ucfirst($cobranza->tipo_pago) }}</td>
                                         <td class="px-4 py-3 text-xs">
                                             <span
-                                                class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center {{ $cobranza->estado_cobro === 'emitido' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100' }}">
-                                                <i
-                                                    class="fas {{ $cobranza->estado_cobro === 'emitido' ? 'fa-check-circle mr-2' : 'fa-times-circle mr-2' }}"></i>
-                                                {{ ucfirst($cobranza->estado_cobro) }}
+                                                class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center text-green-700 bg-green-100">
+                                                <i class="fas fa-check-circle mr-2"></i>
+                                                Emitido
                                             </span>
                                         </td>
                                         <td class="px-4 py-3">

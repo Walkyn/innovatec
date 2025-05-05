@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class IpController extends Controller
 {
@@ -27,7 +28,46 @@ class IpController extends Controller
             return ip2long($ip->ip_address);
         });
         
-        return view('ips.index', compact('ips'));
+        // Buscar IPs duplicadas en la tabla contrato_servicio
+        $ipDuplicadas = DB::table('contrato_servicio')
+            ->select('ip_servicio', DB::raw('COUNT(*) as total'))
+            ->whereNotNull('ip_servicio')
+            ->groupBy('ip_servicio')
+            ->having('total', '>', 1)
+            ->get()
+            ->pluck('total', 'ip_servicio')
+            ->toArray();
+        
+        // Mapear las IPs duplicadas por dirección a IDs de IP
+        $ipDuplicadasPorId = [];
+        
+        // Para cada IP, buscar los clientes que la tienen asignada
+        $clientesPorIp = [];
+        
+        foreach ($ips as $ip) {
+            if (isset($ipDuplicadas[$ip->ip_address])) {
+                $ipDuplicadasPorId[$ip->id] = $ipDuplicadas[$ip->ip_address];
+                
+                // Obtener los clientes que tienen esta IP
+                $clientes = DB::table('contrato_servicio')
+                    ->join('contratos', 'contrato_servicio.contrato_id', '=', 'contratos.id')
+                    ->join('clientes', 'contratos.cliente_id', '=', 'clientes.id')
+                    ->where('contrato_servicio.ip_servicio', $ip->ip_address)
+                    ->select('clientes.id', 'clientes.nombres', 'clientes.apellidos')
+                    ->get()
+                    ->map(function($cliente) {
+                        return [
+                            'id' => $cliente->id,
+                            'nombre_completo' => $cliente->nombres . ' ' . $cliente->apellidos
+                        ];
+                    })
+                    ->toArray();
+                
+                $clientesPorIp[$ip->id] = $clientes;
+            }
+        }
+        
+        return view('ips.index', compact('ips', 'ipDuplicadasPorId', 'clientesPorIp'));
     }
 
     public function store(Request $request)
@@ -172,6 +212,47 @@ class IpController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'output' => 'Error interno al realizar el ping: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getServices($id)
+    {
+        try {
+            $ip = Ip::findOrFail($id);
+            
+            // Obtener los servicios que usan esta IP
+            $services = DB::table('contrato_servicio')
+                ->join('contratos', 'contrato_servicio.contrato_id', '=', 'contratos.id')
+                ->join('clientes', 'contratos.cliente_id', '=', 'clientes.id')
+                ->leftJoin('servicios', 'contrato_servicio.servicio_id', '=', 'servicios.id')
+                ->leftJoin('planes', 'contrato_servicio.plan_id', '=', 'planes.id')
+                ->where('contrato_servicio.ip_servicio', $ip->ip_address)
+                ->select(
+                    'contrato_servicio.*',
+                    'clientes.nombres as cliente_nombres',
+                    'clientes.apellidos as cliente_apellidos',
+                    'servicios.nombre as servicio_nombre',
+                    'planes.nombre as plan_nombre'
+                )
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'cliente' => $item->cliente_nombres . ' ' . $item->cliente_apellidos,
+                        'servicio' => $item->servicio_nombre,
+                        'plan' => $item->plan_nombre,
+                        'estado' => $item->estado_servicio_cliente
+                    ];
+                });
+            
+            return response()->json([
+                'success' => true,
+                'services' => $services
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los servicios: ' . $e->getMessage()
             ], 500);
         }
     }

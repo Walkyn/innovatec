@@ -25,7 +25,7 @@
             <!-- ====== Alerts Start -->
             @include('partials.alerts')
             <!-- ====== Alerts End -->
-            
+
             <!-- ====== Controls Section Start -->
             <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <!-- Botones para acciones principales -->
@@ -43,31 +43,28 @@
                         Filtrar
                     </button>
                 </div>
-                
+
                 <div class="relative">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <select id="search-type" class="rounded-l-lg border border-stroke bg-white py-2 px-3 outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark dark:focus:border-primary">
+                            <select id="search-type"
+                                class="rounded-l-lg border border-stroke bg-white py-2 px-3 outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark dark:focus:border-primary">
                                 <option value="all">Todos</option>
                                 <option value="ip">IP</option>
                                 <option value="client">Cliente</option>
                             </select>
                         </div>
                         <div class="flex-grow relative">
-                            <input 
-                                type="text" 
-                                placeholder="Buscar IP o cliente" 
-                                class="w-full rounded-r-lg border border-stroke border-l-0 bg-white py-2 pl-10 pr-6 outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark dark:focus:border-primary"
-                                id="ip-search"
-                            >
-                            <span class="absolute left-3 top-2.5">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-body" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </span>
-                            <button id="clear-search" class="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" style="display: none;">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <input type="text" placeholder="Buscar IP o cliente"
+                                class="w-full rounded-r-lg border border-stroke border-l-0 bg-white py-2 pl-4 pr-6 outline-none focus:border-primary dark:border-strokedark dark:bg-boxdark dark:focus:border-primary"
+                                id="ip-search">
+                            <button id="clear-search"
+                                class="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                style="display: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
@@ -88,8 +85,10 @@
                         <div style="max-height: 720px; overflow-y: auto;">
                             <table class="w-full whitespace-no-wrap">
                                 <thead style="position: sticky; top: 0; z-index: 2; background: inherit;">
-                                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">Dirección IP</th>
+                                    <tr
+                                        class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                                        <th class="px-4 py-3 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">Dirección IP
+                                        </th>
                                         <th class="px-4 py-3 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">Cliente</th>
                                         <th class="px-4 py-3 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">Estado</th>
                                         <th class="px-4 py-3 sticky top-0 z-10 bg-gray-50 dark:bg-gray-800">Fecha</th>
@@ -102,34 +101,51 @@
                                             <td class="px-4 py-3">
                                                 <div class="flex items-center text-sm space-x-2">
                                                     <div>
-                                                        <button 
+                                                        <button
                                                             class="font-semibold text-primary hover:underline ping-ip-btn"
-                                                            data-ip="{{ $ip->ip_address }}"
-                                                            type="button"
-                                                            id="ip-{{ $ip->id }}"
-                                                        >
+                                                            data-ip="{{ $ip->ip_address }}" type="button"
+                                                            id="ip-{{ $ip->id }}">
                                                             {{ $ip->ip_address }}
                                                         </button>
                                                     </div>
-                                                    <button 
-                                                        type="button"
+                                                    <button type="button"
                                                         class="copy-ip-btn text-gray-400 hover:text-primary focus:outline-none"
-                                                        data-ip="{{ $ip->ip_address }}"
-                                                        title="Copiar IP"
-                                                    >
+                                                        data-ip="{{ $ip->ip_address }}" title="Copiar IP">
                                                         <i class="fas fa-copy"></i>
                                                     </button>
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3 text-sm">
-                                                @if($ip->contratoServicio && $ip->contratoServicio->contrato && $ip->contratoServicio->contrato->cliente)
+                                                @if ($ip->contratoServicio && $ip->contratoServicio->contrato && $ip->contratoServicio->contrato->cliente)
                                                     {{ $ip->contratoServicio->contrato->cliente->nombres . ' ' . $ip->contratoServicio->contrato->cliente->apellidos }}
                                                 @else
                                                     Sin asignar
                                                 @endif
                                             </td>
                                             <td class="px-4 py-3 text-xs">
-                                                @if($ip->contratoServicio)
+                                                @if (isset($ipDuplicadasPorId[$ip->id]) && $ipDuplicadasPorId[$ip->id] > 1)
+                                                    <div class="relative group">
+                                                        <span class="px-2 py-1 font-semibold leading-tight rounded-full text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100 flex items-center gap-1 whitespace-nowrap w-fit cursor-help">
+                                                            <i class="fas fa-exclamation-circle text-xs"></i>
+                                                            <span class="text-xs">Duplicada ({{ $ipDuplicadasPorId[$ip->id] }})</span>
+                                                        </span>
+                                                        <div class="absolute z-10 hidden group-hover:block bg-black text-white text-xs rounded p-3 mt-1 min-w-[250px] shadow-lg">
+                                                            <p class="mb-2">Esta IP está asignada a {{ $ipDuplicadasPorId[$ip->id] }} servicios diferentes, lo que puede causar conflictos de red.</p>
+                                                            
+                                                            <div class="mt-2 border-t border-gray-700 pt-2">
+                                                                <p class="font-bold mb-1">Clientes que usan esta IP:</p>
+                                                                <ul class="space-y-1">
+                                                                    @foreach($clientesPorIp[$ip->id] ?? [] as $index => $cliente)
+                                                                        <li class="flex items-center">
+                                                                            <span class="mr-2 text-{{ $index === 0 ? 'green' : 'red' }}-400">•</span>
+                                                                            {{ $cliente['nombre_completo'] }}
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @elseif ($ip->contratoServicio)
                                                     <span class="px-2 py-1 font-semibold leading-tight rounded-full text-yellow-700 bg-yellow-100 dark:bg-yellow-700 dark:text-yellow-100 flex items-center gap-1 whitespace-nowrap w-fit">
                                                         <i class="fas fa-check-circle text-xs"></i>
                                                         <span class="text-xs">En uso</span>
@@ -146,9 +162,15 @@
                                             </td>
                                             <td class="px-4 py-3">
                                                 <div class="flex items-center space-x-4 text-sm">
+                                                    @if (isset($ipDuplicadasPorId[$ip->id]) && $ipDuplicadasPorId[$ip->id] > 1)
+                                                        <button data-ip-id="{{ $ip->id }}" data-modal-target="view-services-modal" data-modal-toggle="view-services-modal" 
+                                                            class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-blue-600 rounded-lg dark:text-blue-400 focus:outline-none focus:shadow-outline-gray" 
+                                                            aria-label="View Services">
+                                                            <i class="fas fa-list-alt w-5 h-5"></i>
+                                                        </button>
+                                                    @endif
                                                     <!-- Botón Eliminar -->
-                                                    <button 
-                                                        data-ip-id="{{ $ip->id }}"
+                                                    <button data-ip-id="{{ $ip->id }}"
                                                         data-modal-target="delete-ip-modal"
                                                         data-modal-toggle="delete-ip-modal"
                                                         class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg dark:text-gray-400 focus:outline-none focus:shadow-outline-gray"
@@ -160,7 +182,8 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center py-4">No hay direcciones IP registradas.</td>
+                                            <td colspan="5" class="text-center py-4">No hay direcciones IP registradas.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -175,95 +198,170 @@
     <!-- ===== Main Content End ===== -->
 
     <!-- Modal Crear IP -->
-    <div id="create-ip-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative w-full max-w-md max-h-full">
-            <div class="relative bg-white rounded-lg shadow dark:bg-boxdark">
-                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="create-ip-modal">
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+    <div id="create-ip-modal" tabindex="-1" aria-hidden="true"
+        class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        @if (!auth()->user()->checkModuloAcceso('manage', 'guardar'))
+            <!-- Toast de error -->
+            <div id="service-modal"
+                class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800"
+                role="alert">
+                <div
+                    class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                        viewBox="0 0 20 20">
+                        <path
+                            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+                    </svg>
+                    <span class="sr-only">Error icon</span>
+                </div>
+                <div class="ms-3 text-sm font-normal">Sin permisos para esta acción.</div>
+                <!-- Botón de cierre del toast y modal -->
+                <button type="button"
+                    class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+                    data-modal-hide="create-ip-modal" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                     </svg>
                 </button>
-                <div class="px-6 py-6 lg:px-8">
-                    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Gestión de Direcciones IP</h3>
-                    
-                    <!-- Tabs para IP Individual y Rango -->
-                    <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-                        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="ipTabs" role="tablist">
-                            <li class="mr-2" role="presentation">
-                                <button class="inline-block p-4 border-b-2 rounded-t-lg" id="ip-individual-tab" data-tabs-target="#ip-individual" type="button" role="tab" aria-controls="ip-individual" aria-selected="true">IP Individual</button>
-                            </li>
-                            <li class="mr-2" role="presentation">
-                                <button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="ip-range-tab" data-tabs-target="#ip-range" type="button" role="tab" aria-controls="ip-range" aria-selected="false">Rango de IPs</button>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Contenido de los tabs -->
-                    <div id="ipTabContent">
-                        <!-- Tab IP Individual -->
-                        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="ip-individual" role="tabpanel" aria-labelledby="ip-individual-tab">
-                            <form class="space-y-6" action="#" method="POST">
-                                @csrf
-                                <div>
-                                    <label for="ip_address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dirección IP</label>
-                                    <input type="text" name="ip_address" id="ip_address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="192.168.1.1" required>
-                                    <div id="ip_address_error" class="text-red-600 text-xs mt-1" style="display:none"></div>
-                                </div>
-                                <div class="flex items-center">
-                                    <input checked id="status_libre" type="checkbox" name="status" value="0" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" disabled>
-                                    <label for="status_libre" class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Libre</label>
-                                    <input type="hidden" name="status" value="0">
-                                </div>
-                                <button type="submit" class="w-full text-white bg-primary hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg text-sm px-5 py-2.5 text-center">Guardar</button>
-                            </form>
+            </div>
+        @else
+            <div class="relative w-full max-w-md max-h-full">
+                <div class="relative bg-white rounded-lg shadow dark:bg-boxdark">
+                    <button type="button"
+                        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        data-modal-hide="create-ip-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                    </button>
+                    <div class="px-6 py-6 lg:px-8">
+                        <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Gestión de Direcciones IP</h3>
+
+                        <!-- Tabs para IP Individual y Rango -->
+                        <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+                            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="ipTabs"
+                                role="tablist">
+                                <li class="mr-2" role="presentation">
+                                    <button class="inline-block p-4 border-b-2 rounded-t-lg" id="ip-individual-tab"
+                                        data-tabs-target="#ip-individual" type="button" role="tab"
+                                        aria-controls="ip-individual" aria-selected="true">IP Individual</button>
+                                </li>
+                                <li class="mr-2" role="presentation">
+                                    <button
+                                        class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
+                                        id="ip-range-tab" data-tabs-target="#ip-range" type="button" role="tab"
+                                        aria-controls="ip-range" aria-selected="false">Rango de IPs</button>
+                                </li>
+                            </ul>
                         </div>
-                        
-                        <!-- Tab Rango de IPs -->
-                        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="ip-range" role="tabpanel" aria-labelledby="ip-range-tab">
-                            <form class="space-y-6" id="ip-range-form" method="POST" action="#">
-                                @csrf
-                                <div>
-                                    <label for="ip_start" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IP Inicial</label>
-                                    <input type="text" name="ip_start" id="ip_start" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="192.168.1.1" required>
-                                    <div id="ip_start_error" class="text-red-600 text-xs mt-1" style="display:none"></div>
-                                </div>
-                                <div>
-                                    <label for="ip_end" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IP Final</label>
-                                    <input type="text" name="ip_end" id="ip_end" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="192.168.1.254" required>
-                                    <div id="ip_end_error" class="text-red-600 text-xs mt-1" style="display:none"></div>
-                                </div>
-                                <div class="flex items-center">
-                                    <input checked id="range_status_libre" type="checkbox" name="range_status" value="0" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" disabled>
-                                    <label for="range_status_libre" class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Libre</label>
-                                    <input type="hidden" name="range_status" value="0">
-                                </div>
-                                <button type="submit" class="w-full text-white bg-primary hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg text-sm px-5 py-2.5 text-center">Generar IPs</button>
-                            </form>
+
+                        <!-- Contenido de los tabs -->
+                        <div id="ipTabContent">
+                            <!-- Tab IP Individual -->
+                            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="ip-individual"
+                                role="tabpanel" aria-labelledby="ip-individual-tab">
+                                <form class="space-y-6" action="#" method="POST">
+                                    @csrf
+                                    <div>
+                                        <label for="ip_address"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dirección
+                                            IP</label>
+                                        <input type="text" name="ip_address" id="ip_address"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="192.168.1.1" required>
+                                        <div id="ip_address_error" class="text-red-600 text-xs mt-1"
+                                            style="display:none"></div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input checked id="status_libre" type="checkbox" name="status" value="0"
+                                            class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                            disabled>
+                                        <label for="status_libre"
+                                            class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Libre</label>
+                                        <input type="hidden" name="status" value="0">
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full text-white bg-primary hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg text-sm px-5 py-2.5 text-center">Guardar</button>
+                                </form>
+                            </div>
+
+                            <!-- Tab Rango de IPs -->
+                            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="ip-range" role="tabpanel"
+                                aria-labelledby="ip-range-tab">
+                                <form class="space-y-6" id="ip-range-form" method="POST" action="#">
+                                    @csrf
+                                    <div>
+                                        <label for="ip_start"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IP
+                                            Inicial</label>
+                                        <input type="text" name="ip_start" id="ip_start"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="192.168.1.1" required>
+                                        <div id="ip_start_error" class="text-red-600 text-xs mt-1" style="display:none">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="ip_end"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IP
+                                            Final</label>
+                                        <input type="text" name="ip_end" id="ip_end"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="192.168.1.254" required>
+                                        <div id="ip_end_error" class="text-red-600 text-xs mt-1" style="display:none">
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input checked id="range_status_libre" type="checkbox" name="range_status"
+                                            value="0"
+                                            class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                            disabled>
+                                        <label for="range_status_libre"
+                                            class="ml-2 text-sm font-medium text-gray-900 dark:text-white">Libre</label>
+                                        <input type="hidden" name="range_status" value="0">
+                                    </div>
+                                    <button type="submit"
+                                        class="w-full text-white bg-primary hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg text-sm px-5 py-2.5 text-center">Generar
+                                        IPs</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 
     <!-- Modal Eliminar IP -->
-    <div id="delete-ip-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div id="delete-ip-modal" tabindex="-1" aria-hidden="true"
+        class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-md max-h-full">
             <div class="relative bg-white rounded-lg shadow dark:bg-boxdark">
-                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-ip-modal">
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                <button type="button"
+                    class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-hide="delete-ip-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                     </svg>
                 </button>
                 <div class="px-6 py-6 lg:px-8">
                     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Eliminar Dirección IP</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">¿Estás seguro de que deseas eliminar esta dirección IP? Esta acción no se puede deshacer.</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">¿Estás seguro de que deseas eliminar esta
+                        dirección IP? Esta acción no se puede deshacer.</p>
                     <form class="space-y-6" id="delete-ip-form" method="POST" action="#">
                         @csrf
                         @method('DELETE')
                         <div class="flex justify-end space-x-3">
-                            <button type="button" data-modal-hide="delete-ip-modal" class="text-gray-500 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm font-medium px-5 py-2.5">Cancelar</button>
-                            <button type="submit" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Eliminar</button>
+                            <button type="button" data-modal-hide="delete-ip-modal"
+                                class="text-gray-500 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm font-medium px-5 py-2.5">Cancelar</button>
+                            <button type="submit"
+                                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Eliminar</button>
                         </div>
                     </form>
                 </div>
@@ -272,12 +370,14 @@
     </div>
 
     <!-- Modal para mostrar el resultado del ping -->
-    <div id="ping-modal" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black bg-opacity-40">
+    <div id="ping-modal"
+        class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black bg-opacity-40">
         <div class="relative w-full max-w-lg max-h-full mx-auto mt-20">
             <div class="relative bg-white rounded-lg shadow dark:bg-boxdark p-6">
                 <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Resultado del Ping</h3>
                 <div id="ping-modal-status" class="mb-2 text-sm"></div>
-                <pre id="ping-modal-output" class="bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs overflow-x-auto" style="max-height: 300px;"></pre>
+                <pre id="ping-modal-output" class="bg-gray-100 dark:bg-gray-900 p-3 rounded text-xs overflow-x-auto"
+                    style="max-height: 300px;"></pre>
                 <div class="flex justify-end mt-4 space-x-2">
                     <button type="button" id="open-ip-btn"
                         class="flex items-center text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg text-sm font-medium px-5 py-2.5">
@@ -293,38 +393,76 @@
     </div>
 
     <!-- Modal para Filtrar por Rango de IPs -->
-    <div id="filter-range-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div id="filter-range-modal" tabindex="-1" aria-hidden="true"
+        class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-md max-h-full">
             <div class="relative bg-white rounded-lg shadow dark:bg-boxdark">
-                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="filter-range-modal">
-                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                <button type="button"
+                    class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-hide="filter-range-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                     </svg>
                 </button>
                 <div class="px-6 py-6 lg:px-8">
                     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Filtrar IPs</h3>
                     <div class="space-y-6">
                         <div>
-                            <label for="ip_range_select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rango de IP</label>
-                            <select id="ip_range_select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                            <label for="ip_range_select"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rango de IP</label>
+                            <select id="ip_range_select"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
                                 <option value="all">Todos los rangos</option>
                             </select>
                         </div>
-                        
+
                         <!-- Nuevo filtro por estado -->
                         <div>
-                            <label for="ip_status_select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado</label>
-                            <select id="ip_status_select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
+                            <label for="ip_status_select"
+                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estado</label>
+                            <select id="ip_status_select"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
                                 <option value="all">Todos los estados</option>
                                 <option value="free">Libre</option>
                                 <option value="used">En uso</option>
+                                <option value="duplicated">Duplicada</option>
                             </select>
                         </div>
-                        
+
                         <div class="flex space-x-3">
-                            <button type="button" id="apply-range-filter" data-modal-hide="filter-range-modal" class="flex-1 text-white bg-primary hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg text-sm px-5 py-2.5 text-center">Aplicar Filtro</button>
-                            <button type="button" id="clear-range-filter" data-modal-hide="filter-range-modal" class="flex-1 text-center text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Ver Todas</button>
+                            <button type="button" id="apply-range-filter" data-modal-hide="filter-range-modal"
+                                class="flex-1 text-white bg-primary hover:bg-primary focus:ring-4 focus:outline-none focus:ring-primary font-medium rounded-lg text-sm px-5 py-2.5 text-center">Aplicar
+                                Filtro</button>
+                            <button type="button" id="clear-range-filter" data-modal-hide="filter-range-modal"
+                                class="flex-1 text-center text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Ver
+                                Todas</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver servicios duplicados -->
+    <div id="view-services-modal" tabindex="-1" aria-hidden="true"
+        class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-boxdark">
+                <button type="button"
+                    class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-hide="view-services-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                </button>
+                <div class="px-6 py-6 lg:px-8">
+                    <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Servicios asociados a la IP</h3>
+                    <div id="services-list" class="space-y-6">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Cargando servicios...</p>
                     </div>
                 </div>
             </div>
@@ -358,9 +496,11 @@
             // Resalta líneas importantes
             if (!pingRaw) return '';
             let html = pingRaw
-                .replace(/(Tiempo de espera agotado para esta solicitud)/gi, '<span class="font-bold text-red-600">$1</span>')
+                .replace(/(Tiempo de espera agotado para esta solicitud)/gi,
+                    '<span class="font-bold text-red-600">$1</span>')
                 .replace(/(Host de destino inaccesible)/gi, '<span class="font-bold text-red-600">$1</span>')
-                .replace(/(Paquetes: enviados = \d+, recibidos = \d+, perdidos = \d+)/gi, '<span class="font-bold text-blue-700">$1</span>')
+                .replace(/(Paquetes: enviados = \d+, recibidos = \d+, perdidos = \d+)/gi,
+                    '<span class="font-bold text-blue-700">$1</span>')
                 .replace(/(\d+% perdidos)/gi, '<span class="font-bold text-red-600">$1</span>')
                 .replace(/(Respuesta desde [^\n]+)/gi, '<span class="text-green-700">$1</span>')
                 .replace(/(Tiempo.*milisegundos:)/gi, '<span class="font-bold text-blue-700">$1</span>')
@@ -372,37 +512,40 @@
 
         function hacerPing() {
             if (!currentIp) return;
-            
+
             // Cancelar cualquier solicitud anterior
             if (abortController) {
                 abortController.abort();
             }
-            
+
             // Crear un nuevo controlador para esta solicitud
             abortController = new AbortController();
-            
+
             document.getElementById('ping-modal-status').textContent = "Realizando ping a " + currentIp + "...";
-            
+
             fetch('{{ route('ips.ping') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ ip: currentIp }),
-                signal: abortController.signal
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('ping-modal-status').textContent = "Resultado del ping a " + currentIp;
-                document.getElementById('ping-modal-output').innerHTML = formatearPing(data.output || 'No se pudo obtener respuesta del ping.');
-            })
-            .catch(err => {
-                // Solo mostrar errores que no sean por cancelación
-                if (err.name !== 'AbortError') {
-                    document.getElementById('ping-modal-output').textContent = 'Error al realizar el ping.';
-                }
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        ip: currentIp
+                    }),
+                    signal: abortController.signal
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('ping-modal-status').textContent = "Resultado del ping a " + currentIp;
+                    document.getElementById('ping-modal-output').innerHTML = formatearPing(data.output ||
+                        'No se pudo obtener respuesta del ping.');
+                })
+                .catch(err => {
+                    // Solo mostrar errores que no sean por cancelación
+                    if (err.name !== 'AbortError') {
+                        document.getElementById('ping-modal-output').textContent = 'Error al realizar el ping.';
+                    }
+                });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -412,13 +555,14 @@
                         abortController.abort();
                         abortController = null;
                     }
-                    
+
                     // Configurar nueva IP
                     currentIp = this.getAttribute('data-ip');
                     document.getElementById('ping-modal').classList.remove('hidden');
-                    document.getElementById('ping-modal-status').textContent = "Iniciando ping a " + currentIp + "...";
+                    document.getElementById('ping-modal-status').textContent = "Iniciando ping a " +
+                        currentIp + "...";
                     document.getElementById('ping-modal-output').innerHTML = '';
-                    
+
                     // Hacer un único ping
                     hacerPing();
                 });
@@ -427,29 +571,29 @@
             // Código para inicializar las pestañas
             const tabs = document.querySelectorAll('[data-tabs-target]');
             const tabContents = document.querySelectorAll('[role="tabpanel"]');
-            
+
             // Por defecto, mostrar la primera pestaña
             document.getElementById('ip-individual').classList.remove('hidden');
             document.getElementById('ip-individual-tab').classList.add('text-primary', 'border-primary');
-            
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     const target = document.querySelector(this.getAttribute('data-tabs-target'));
-                    
+
                     // Ocultar todos los contenidos de pestañas
                     tabContents.forEach(content => {
                         content.classList.add('hidden');
                     });
-                    
+
                     // Quitar estilos activos de todas las pestañas
                     tabs.forEach(t => {
                         t.classList.remove('text-primary', 'border-primary');
                         t.classList.add('border-transparent');
                     });
-                    
+
                     // Mostrar el contenido de la pestaña seleccionada
                     target.classList.remove('hidden');
-                    
+
                     // Aplicar estilos activos a la pestaña seleccionada
                     this.classList.add('text-primary', 'border-primary');
                     this.classList.remove('border-transparent');
@@ -614,10 +758,11 @@
 
             // Asegurarse de que el botón de cerrar llama a cerrarPingModal
             document.querySelector('[onclick="cerrarPingModal()"]').addEventListener('click', cerrarPingModal);
-            
+
             // Opcional: Cerrar el modal con la tecla ESC
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && !document.getElementById('ping-modal').classList.contains('hidden')) {
+                if (e.key === 'Escape' && !document.getElementById('ping-modal').classList.contains(
+                        'hidden')) {
                     cerrarPingModal();
                 }
             });
@@ -626,23 +771,23 @@
             function obtenerRangoDeIP(ip) {
                 return ip.split('.').slice(0, 3).join('.');
             }
-            
+
             // Función para cargar dinámicamente los rangos disponibles
             function cargarRangosDisponibles() {
                 const ips = [];
                 document.querySelectorAll('.ping-ip-btn').forEach(function(btn) {
                     ips.push(btn.getAttribute('data-ip'));
                 });
-                
+
                 // Extraer rangos únicos
                 const rangosUnicos = [...new Set(ips.map(ip => obtenerRangoDeIP(ip)))];
                 rangosUnicos.sort(); // Ordenar alfabéticamente
-                
+
                 // Cargar los rangos en el selector
                 const rangeSelect = document.getElementById('ip_range_select');
                 // Mantener la opción "Todos los rangos"
                 rangeSelect.innerHTML = '<option value="all">Todos los rangos</option>';
-                
+
                 // Agregar cada rango como una opción
                 rangosUnicos.forEach(rango => {
                     const option = document.createElement('option');
@@ -651,57 +796,57 @@
                     rangeSelect.appendChild(option);
                 });
             }
-            
+
             // Método seguro para cerrar el modal
             function cerrarModalRango() {
                 const modal = document.getElementById('filter-range-modal');
                 modal.classList.add('hidden');
-                
+
                 // Remover cualquier overlay
                 document.querySelectorAll('[modal-backdrop]').forEach(el => {
                     el.remove();
                 });
-                
+
                 // Remover la clase que bloquea el scroll
                 document.body.classList.remove('overflow-hidden');
             }
-            
+
             // Cargar los rangos cuando se abre el modal
             const btnAbrirModalRango = document.querySelector('[data-modal-target="filter-range-modal"]');
             if (btnAbrirModalRango) {
                 btnAbrirModalRango.addEventListener('click', function() {
                     cargarRangosDisponibles();
-                    
+
                     // Restaurar las selecciones previas
                     const rangeSelect = document.getElementById('ip_range_select');
                     const statusSelect = document.getElementById('ip_status_select');
-                    
+
                     // Establecer valores seleccionados
                     if (rangeSelect.querySelector(`option[value="${currentRangeFilter}"]`)) {
                         rangeSelect.value = currentRangeFilter;
                     }
-                    
+
                     statusSelect.value = currentStatusFilter;
-                    
+
                     // Mostrar el modal
                     document.getElementById('filter-range-modal').classList.remove('hidden');
                 });
             }
-            
+
             // Filtrar las IPs cuando se aplica el filtro
             const btnAplicarFiltro = document.getElementById('apply-range-filter');
             if (btnAplicarFiltro) {
                 btnAplicarFiltro.addEventListener('click', function() {
                     const rangeSelect = document.getElementById('ip_range_select');
                     const statusSelect = document.getElementById('ip_status_select');
-                    
+
                     // Guardar las selecciones actuales
                     currentRangeFilter = rangeSelect.value;
                     currentStatusFilter = statusSelect.value;
-                    
+
                     // Cerrar el modal de forma segura
                     cerrarModalRango();
-                    
+
                     // Realizar la búsqueda integrada con los filtros
                     if (typeof performSearch === 'function') {
                         performSearch();
@@ -709,7 +854,7 @@
                         document.querySelectorAll('tbody tr').forEach(tr => {
                             const ipBtn = tr.querySelector('.ping-ip-btn');
                             if (!ipBtn) return;
-                            
+
                             // Verificar el rango
                             let mostrarPorRango = true;
                             if (currentRangeFilter !== 'all') {
@@ -717,7 +862,7 @@
                                 const ipRange = obtenerRangoDeIP(ip);
                                 mostrarPorRango = (ipRange === currentRangeFilter);
                             }
-                            
+
                             // Verificar el estado
                             let mostrarPorEstado = true;
                             if (currentStatusFilter !== 'all') {
@@ -728,10 +873,12 @@
                                         mostrarPorEstado = false;
                                     } else if (currentStatusFilter === 'used' && !estadoTexto.includes('En uso')) {
                                         mostrarPorEstado = false;
+                                    } else if (currentStatusFilter === 'duplicated' && !estadoTexto.includes('Duplicada')) {
+                                        mostrarPorEstado = false;
                                     }
                                 }
                             }
-                            
+
                             // Mostrar u ocultar la fila según ambos filtros
                             if (mostrarPorRango && mostrarPorEstado) {
                                 tr.style.display = '';
@@ -742,22 +889,23 @@
                     }
                 });
             }
-            
+
             const btnVerTodas = document.getElementById('clear-range-filter');
             if (btnVerTodas) {
                 btnVerTodas.addEventListener('click', function() {
                     currentRangeFilter = 'all';
                     currentStatusFilter = 'all';
-                    
+
                     document.querySelectorAll('tbody tr').forEach(tr => {
                         tr.style.display = '';
                     });
-                    
+
                     cerrarModalRango();
                 });
             }
-            
-            const btnCerrarModal = document.querySelector('#filter-range-modal [data-modal-hide="filter-range-modal"]');
+
+            const btnCerrarModal = document.querySelector(
+                '#filter-range-modal [data-modal-hide="filter-range-modal"]');
             if (btnCerrarModal) {
                 btnCerrarModal.addEventListener('click', cerrarModalRango);
             }
@@ -774,25 +922,26 @@
                 function performSearch() {
                     const searchText = ipSearchInput.value.toLowerCase().trim();
                     const searchType = searchTypeSelect.value;
-                    
+
                     // Guardar valores actuales para restaurar en el futuro
                     currentSearchText = searchText;
                     currentSearchType = searchType;
-                    
+
                     // Mostrar/ocultar botón de limpiar
                     clearSearchBtn.style.display = searchText ? 'block' : 'none';
-                    
+
                     let count = 0;
-                    
+
                     document.querySelectorAll('tbody tr').forEach(tr => {
                         // No filtrar si ya está oculto por otros filtros
                         if (tr.style.display === 'none' && !searchText) return;
-                        
+
                         const ipText = tr.querySelector('.ping-ip-btn')?.textContent.toLowerCase() || '';
-                        const clientText = tr.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
-                        
+                        const clientText = tr.querySelector('td:nth-child(2)')?.textContent.toLowerCase() ||
+                            '';
+
                         let matches = false;
-                        
+
                         if (searchText === '') {
                             // Si no hay texto de búsqueda, mostrar todo
                             matches = true;
@@ -806,10 +955,10 @@
                             // Buscar solo en cliente
                             matches = clientText.includes(searchText);
                         }
-                        
+
                         // Verificar también los filtros actuales de rango y estado
                         let pasaFiltros = true;
-                        
+
                         // Verificar filtro de rango
                         if (currentRangeFilter !== 'all') {
                             const ipBtn = tr.querySelector('.ping-ip-btn');
@@ -821,7 +970,7 @@
                                 }
                             }
                         }
-                        
+
                         // Verificar filtro de estado
                         if (currentStatusFilter !== 'all' && pasaFiltros) {
                             const estadoElement = tr.querySelector('td:nth-child(3) span');
@@ -831,10 +980,12 @@
                                     pasaFiltros = false;
                                 } else if (currentStatusFilter === 'used' && !estadoTexto.includes('En uso')) {
                                     pasaFiltros = false;
+                                } else if (currentStatusFilter === 'duplicated' && !estadoTexto.includes('Duplicada')) {
+                                    pasaFiltros = false;
                                 }
                             }
                         }
-                        
+
                         // Aplicar resultados
                         if (matches && pasaFiltros) {
                             tr.style.display = '';
@@ -843,15 +994,13 @@
                             tr.style.display = 'none';
                         }
                     });
-                    
+
                     // Actualizar contador de resultados
                     countResultsSpan.textContent = count;
                     searchCountDiv.classList.toggle('hidden', !searchText);
-                    
-                    // Agregar clase de "sin resultados" a la tabla si no hay coincidencias
+
                     const tbody = document.querySelector('tbody');
                     if (count === 0 && searchText) {
-                        // Si no existe una fila de "no hay resultados", crearla
                         if (!document.getElementById('no-results-row')) {
                             const noResultsRow = document.createElement('tr');
                             noResultsRow.id = 'no-results-row';
@@ -874,39 +1023,80 @@
                         document.getElementById('no-results-row').style.display = 'none';
                     }
                 }
-                
+
                 // Eventos para los controles de búsqueda
                 ipSearchInput.addEventListener('input', performSearch);
-                
+
                 searchTypeSelect.addEventListener('change', function() {
                     actualizarPlaceholder();
                     performSearch();
                 });
-                
+
                 actualizarPlaceholder();
-                
+
                 clearSearchBtn.addEventListener('click', function() {
                     ipSearchInput.value = '';
                     currentSearchText = '';
                     performSearch();
                     ipSearchInput.focus();
                 });
-                
+
                 btnAplicarFiltro.addEventListener('click', function() {
                     setTimeout(performSearch, 100);
                 });
-                
+
                 btnVerTodas.addEventListener('click', function() {
                     setTimeout(performSearch, 100);
                 });
             }
+
+            document.querySelectorAll('[data-modal-target="view-services-modal"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const ipId = this.getAttribute('data-ip-id');
+                    const ipAddress = document.querySelector(`#ip-${ipId}`).textContent.trim();
+                    
+                    // Actualizar el contenido del modal
+                    document.getElementById('services-list').innerHTML = `
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Cargando servicios para la IP ${ipAddress}...</p>
+                    `;
+                    
+                    // Cargar los servicios asociados a esta IP
+                    fetch(`/ips/${ipId}/services`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let html = '';
+                            if (data.services && data.services.length > 0) {
+                                html = '<div class="space-y-4">';
+                                data.services.forEach(service => {
+                                    html += `
+                                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                                            <p class="text-sm font-semibold">${service.cliente || 'Cliente no disponible'}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Servicio: ${service.servicio || 'No especificado'}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Plan: ${service.plan || 'No especificado'}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Estado: ${service.estado || 'No especificado'}</p>
+                                        </div>
+                                    `;
+                                });
+                                html += '</div>';
+                            } else {
+                                html = '<p class="text-sm text-gray-500 dark:text-gray-400">No se encontraron servicios asociados.</p>';
+                            }
+                            document.getElementById('services-list').innerHTML = html;
+                        })
+                        .catch(error => {
+                            document.getElementById('services-list').innerHTML = `
+                                <p class="text-sm text-red-500">Error al cargar los servicios: ${error.message}</p>
+                            `;
+                        });
+                });
+            });
         });
 
         function actualizarPlaceholder() {
             const searchType = document.getElementById('search-type').value;
             const searchInput = document.getElementById('ip-search');
-            
-            switch(searchType) {
+
+            switch (searchType) {
                 case 'ip':
                     searchInput.placeholder = "Buscar por dirección IP";
                     break;
@@ -920,17 +1110,22 @@
         }
     </script>
 
-    <div id="toast-copiado" style="display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:9999;"
+    <div id="toast-copiado"
+        style="display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:9999;"
         class="bg-green-600 text-white px-4 py-2 rounded shadow-lg text-sm">
         ¡IP copiada al portapapeles!
     </div>
 
-    <div id="toast-success" style="display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:9999;"
+    <div id="toast-success"
+        style="display:none; position:fixed; bottom:30px; left:50%; transform:translateX(-50%); z-index:9999;"
         class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 dark:bg-white bg-gray-800 text-white rounded-lg shadow-sm dark:text-gray-800 dark:bg-gray-800"
         role="alert">
-        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
-            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+        <div
+            class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                viewBox="0 0 20 20">
+                <path
+                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
             </svg>
             <span class="sr-only">Check icon</span>
         </div>
@@ -939,8 +1134,10 @@
             class="ms-auto -mx-1.5 -my-1.5 dark:bg-white bg-gray-800 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-700 inline-flex items-center hover:text-gray-200 justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-gray-500 dark:bg-gray-800 dark:hover:bg-gray-200"
             aria-label="Close">
             <span class="sr-only">Close</span>
-            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
             </svg>
         </button>
     </div>

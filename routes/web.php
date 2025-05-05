@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::post('update-password', 'updatePassword')->middleware('check.permissions:users,actualizar')->name('users.updatePassword');
 
         Route::get('reset-password-cliente', 'passwordResetCliente')->middleware('check.permissions:users,all')->name('password.reset-cliente');
-        Route::post('update-password-cliente', 'updatePasswordCliente')->name('users.updatePasswordCliente');
+        Route::post('update-password-cliente', 'updatePasswordCliente')->middleware('check.permissions:users,actualizar')->name('users.updatePasswordCliente');
 
         // Ruta alternativa usando GET
         Route::get('/search-cliente-workaround', 'findClienteByIdentificacionWorkaround')->name('users.findClienteByIdentificacionWorkaround');
@@ -184,10 +184,11 @@ Route::middleware('auth')->group(function () {
 
     // IPS
     Route::controller(IpController::class)->group(function () {
-        Route::get('ips', 'index')->middleware('check.permissions:manage,all', 'auth')->name('ips.index');
+        Route::get('ips', 'index')->middleware('check.permissions:manage,all')->name('ips.index');
         Route::post('ips', 'store')->middleware('check.permissions:manage,guardar')->name('ips.store');
         Route::delete('ips/{id}', 'destroy')->middleware('check.permissions:manage,eliminar')->name('ips.destroy');
         Route::post('/ips/ping', 'ping')->name('ips.ping');
+        Route::get('/ips/{id}/services', 'getServices')->name('ips.services');
     });
 
     // Contrato PDF
@@ -653,6 +654,22 @@ Route::middleware(['auth.cliente'])->group(function () {
     Route::get('/historial-servicios', [PanelController::class, 'historialServicios'])->name('panel.historial-servicios');
     Route::get('/panel/comprobante/{id}/detalle', [PanelController::class, 'verDetalleComprobante'])
         ->name('panel.comprobante.detalle');
+
+    // Ruta para guardar el pago
+    Route::post('/panel/guardar-pago', [PanelController::class, 'guardarPago'])->name('panel.guardar-pago');
+
+    // Ruta para ver lista de pagos
+    Route::get('/panel/pagos', [PanelController::class, 'listarPagos'])->name('panel.pagos');
+
+    // Ruta para ver historial de pagos
+    Route::get('/panel/historial-pago', [PagoController::class, 'historial'])->name('panel.historial-pago');
+
+    // Ruta para eliminar pago
+    Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
+
+    Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
+
+    Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
 });
 
 Route::post('/panel/update-password', [PanelController::class, 'updatePassword'])
@@ -663,22 +680,6 @@ Route::post('/panel/login', [PanelController::class, 'login'])->name('panel.logi
 Route::get('/panel/historial-servicios', function () {
     return view('panel.historial-servicios');
 })->name('panel.historial-servicios');
-
-// Ruta para guardar el pago
-Route::post('/panel/guardar-pago', [App\Http\Controllers\PanelController::class, 'guardarPago'])->name('panel.guardar-pago');
-
-// Ruta para ver lista de pagos
-Route::get('/panel/pagos', [App\Http\Controllers\PanelController::class, 'listarPagos'])->name('panel.pagos');
-
-// Ruta para ver historial de pagos
-Route::get('/panel/historial-pago', [PagoController::class, 'historial'])->name('panel.historial-pago');
-
-// Ruta para eliminar pago
-Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
-
-Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
-
-Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
 
 
 Route::post('/set-cliente-id/{id}', function ($id) {

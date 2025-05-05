@@ -1,7 +1,8 @@
 <!-- Main modal -->
 <div id="service-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 py-20 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    @if (!auth()->user()->checkModuloAcceso('manage', 'guardar'))
+    
+    @if (!auth()->user()->checkModuloAcceso('manage', 'guardar')) 
         <!-- Toast de error -->
         <div id="service-modal"
             class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800"

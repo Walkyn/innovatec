@@ -39,7 +39,7 @@
                             $clases = [
                                 'Aprobado' => [
                                     'bg' => 'bg-white',
-                                    'border' => 'border-l-4 border-emerald-500',
+                                    'border' => 'border-l-4 border-emerald-600',
                                     'badge-bg' => 'bg-emerald-100',
                                     'badge-text' => 'text-emerald-600',
                                     'icon' => 'fas fa-check-circle'
