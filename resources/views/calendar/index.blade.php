@@ -314,4 +314,51 @@
     });
 </script>
     <!-- ===== Main Content End ===== -->
+
+    <!-- Agregar estos estilos en la sección de head o en un archivo CSS separado -->
+    <style>
+      /* Estilos para los eventos en el calendario */
+      .fc-event {
+        cursor: pointer;
+        border-radius: 4px;
+        padding: 2px 4px;
+        margin: 1px 0;
+        border-left-width: 3px !important;
+      }
+      
+      /* Colores específicos para cada tipo de evento */
+      .fc-bg-danger {
+        border-left-color: #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+      }
+      
+      .fc-bg-warning {
+        border-left-color: #f97316 !important;
+        background-color: rgba(249, 115, 22, 0.15);
+        color: #f97316;
+      }
+      
+      .fc-bg-success {
+        border-left-color: #22c55e !important;
+        background-color: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+      }
+      
+      .fc-bg-primary {
+        border-left-color: #3b82f6 !important;
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #3b82f6;
+      }
+      
+      /* Estilo cuando se pasa el cursor por encima */
+      .fc-event:hover {
+        filter: brightness(90%);
+      }
+      
+      /* Estilos para los radio buttons personalizados */
+      input[type="radio"].peer:checked + div {
+        border-width: 2px;
+      }
+    </style>
 @endsection

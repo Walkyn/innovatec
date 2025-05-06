@@ -105,6 +105,9 @@ Route::middleware('auth')->group(function () {
 
     // Calendar
     Route::get('calendar', [CalendarController::class, 'index'])->middleware('check.permissions:calendar,all')->name('calendar.index');
+    Route::post('/calendario/eventos', [CalendarController::class, 'store'])->name('calendar.store');
+    Route::put('/calendario/eventos/{evento}', [CalendarController::class, 'update'])->name('calendar.update');
+    Route::delete('/calendario/eventos/{evento}', [CalendarController::class, 'destroy'])->name('calendar.destroy');
 
     // Profile
     Route::controller(ProfileController::class)->group(function () {
