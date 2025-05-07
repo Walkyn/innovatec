@@ -18,7 +18,7 @@ class EventoSoporte extends Model
         'fecha_inicio',
         'fecha_fin',
         'descripcion',
-        'cliente_id',
+        'cliente_nombre',
         'tecnico_id',
         'todo_dia'
     ];

@@ -1,7 +1,7 @@
 <div class="fixed top-0 py-24 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
     id="eventModal">
     <!-- Fondo oscuro -->
-    <div class="fixed inset-0 bg-gray-400/50 backdrop-blur modal-close-btn"></div>
+    <div class="fixed inset-0 bg-gray-800/75 backdrop-blur modal-close-btn"></div>
 
     <!-- Contenedor del modal -->
     <div class="relative w-full max-w-[700px] mx-auto bg-white rounded-3xl shadow-lg dark:bg-gray-900 p-6 lg:p-11">
@@ -86,8 +86,8 @@
                                     <span class="text-sm text-yellow-600 dark:text-yellow-400">Visitar</span>
                                 </label>
                                 
-                                <!-- Solucionado (Verde) -->
-                                <label class="flex items-center gap-2 cursor-pointer">
+                                <!-- Solucionado (Verde) - Esta opción solo se mostrará al editar -->
+                                <label id="opcion-solucionado" class="flex items-center gap-2 cursor-pointer" style="display: none;">
                                     <div class="relative">
                                         <input type="radio" name="estado" value="solucionado" id="modalSolucionado" class="peer sr-only" />
                                         <div class="w-5 h-5 border-2 border-green-500 rounded-full"></div>
@@ -105,6 +105,17 @@
                                     </div>
                                     <span class="text-sm text-blue-600 dark:text-blue-400">Para Cobrar</span>
                                 </label>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <div>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                    Nombre del Cliente
+                                </label>
+                                <input id="event-client" name="cliente_nombre" type="text"
+                                    class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                    placeholder="Nombre del cliente para este servicio" />
                             </div>
                         </div>
 
@@ -139,15 +150,15 @@
                 </div>
                 <div class="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
                     <button type="button"
-                        class="btn modal-close-btn bg-danger-subtle text-danger flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                        class="btn modal-close-btn flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
                         Cerrar
                     </button>
                     <button type="button" id="update-btn"
-                        class="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        class="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700 sm:w-auto">
                         Actualizar Cambios
                     </button>
                     <button type="button" id="add-btn"
-                        class="btn btn-primary btn-add-event flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                        class="btn btn-primary btn-add-event flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto">
                         Agregar Evento
                     </button>
                 </div>
@@ -160,7 +171,7 @@
 <div class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
     id="successModal">
     <!-- Fondo oscuro -->
-    <div class="fixed inset-0 bg-gray-400/50 backdrop-blur"></div>
+    <div class="fixed inset-0 bg-gray-800/75 backdrop-blur"></div>
 
     <!-- Contenedor del modal de éxito -->
     <div class="relative w-full max-w-md mx-auto mt-32 bg-white rounded-3xl shadow-lg dark:bg-gray-900 p-6">
@@ -217,7 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cerrar el modal de éxito al hacer clic en el botón
     closeSuccessModal.addEventListener('click', function() {
         successModal.classList.add('hidden');
-        window.location.reload(); // Recarga solo cuando el usuario hace clic en "Entendido"
+        
+        // Eliminar el parámetro 'event' de la URL antes de recargar
+        const url = new URL(window.location);
+        url.searchParams.delete('event');
+        window.history.replaceState({}, '', url);
+        
+        // Recargar la página sin el parámetro de evento
+        window.location.href = url.toString();
     });
     
     // Procesar la creación de un nuevo evento

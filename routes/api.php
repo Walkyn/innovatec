@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\CalendarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,7 @@ use App\Http\Controllers\LocationController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-location', [LocationController::class, 'updateLocation']);
+    Route::get('/eventos/hoy', [App\Http\Controllers\CalendarController::class, 'getEventosHoy']);
 });
 
 Route::middleware([

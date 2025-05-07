@@ -5,12 +5,81 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\EventoSoporte;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class CalendarController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('calendar.index');
+        // Establecer el locale de Carbon a español
+        Carbon::setLocale('es');
+        
+        // Obtener el mes y año de la solicitud, o usar el actual
+        $month = $request->query('month', now()->month);
+        $year = $request->query('year', now()->year);
+        
+        // Validar los parámetros
+        $month = min(max(1, (int) $month), 12);
+        $year = min(max(2000, (int) $year), 2100);
+        
+        // Crear una fecha con el mes y año solicitados
+        $date = Carbon::createFromDate($year, $month, 1)->locale('es');
+        
+        // Obtener todos los eventos de soporte para el mes seleccionado
+        // Extendemos un poco el rango para incluir eventos que comienzan antes pero terminan en el mes actual
+        // o comienzan en el mes actual pero terminan después
+        $startDate = $date->copy()->startOfMonth()->subWeek();
+        $endDate = $date->copy()->endOfMonth()->addWeek();
+        
+        $eventos = EventoSoporte::where('tecnico_id', Auth::id())
+            ->where(function($query) use ($startDate, $endDate) {
+                $query->where(function($q) use ($startDate, $endDate) {
+                    // Eventos que comienzan en el rango
+                    $q->whereBetween('fecha_inicio', [$startDate, $endDate]);
+                })->orWhere(function($q) use ($startDate, $endDate) {
+                    // Eventos que terminan en el rango
+                    $q->whereBetween('fecha_fin', [$startDate, $endDate]);
+                })->orWhere(function($q) use ($startDate, $endDate) {
+                    // Eventos que comienzan antes y terminan después del rango (abarcan todo el mes)
+                    $q->where('fecha_inicio', '<', $startDate)
+                      ->where('fecha_fin', '>', $endDate);
+                });
+            })
+            ->orderBy('fecha_inicio')
+            ->get();
+        
+        // Verificar si se solicitó abrir un evento específico
+        $eventoSeleccionado = null;
+        $shouldOpenModal = $request->has('openEvent') && $request->has('event');
+
+        if ($shouldOpenModal && $request->has('event')) {
+            $eventoId = $request->query('event');
+            $eventoSeleccionado = EventoSoporte::where('id', $eventoId)
+                ->where('tecnico_id', Auth::id())
+                ->first();
+            
+            // Si el evento es de otro mes, redireccionar a ese mes
+            if ($eventoSeleccionado) {
+                $mesEvento = Carbon::parse($eventoSeleccionado->fecha_inicio)->month;
+                $añoEvento = Carbon::parse($eventoSeleccionado->fecha_inicio)->year;
+                
+                if ($mesEvento != $month || $añoEvento != $year) {
+                    return redirect()->route('calendar.index', [
+                        'month' => $mesEvento,
+                        'year' => $añoEvento,
+                        'event' => $eventoId,
+                        'openEvent' => 'true'
+                    ]);
+                }
+            }
+        }
+        
+        // Verifica si hay algún parámetro en la URL que esté forzando la apertura del modal
+        // Por ejemplo, si hay un parámetro como '?openModal=true'
+        $openModal = $request->query('openModal', false);
+        
+        // Pasar el mes y año actuales y el evento seleccionado a la vista
+        return view('calendar.index', compact('eventos', 'month', 'year', 'date', 'eventoSeleccionado', 'shouldOpenModal'));
     }
 
     public function store(Request $request)
@@ -21,7 +90,7 @@ class CalendarController extends Controller
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'descripcion' => 'nullable|string',
-            'cliente_id' => 'nullable|exists:clientes,id',
+            'cliente_nombre' => 'nullable|string|max:255',
             'todo_dia' => 'boolean'
         ]);
 
@@ -32,7 +101,7 @@ class CalendarController extends Controller
             'fecha_fin' => $validated['fecha_fin'] ?? null,
             'descripcion' => $validated['descripcion'] ?? null,
             'tecnico_id' => Auth::id(),
-            'cliente_id' => $validated['cliente_id'] ?? null,
+            'cliente_nombre' => $validated['cliente_nombre'] ?? null,
             'todo_dia' => $validated['todo_dia'] ?? true,
         ]);
 
@@ -59,7 +128,7 @@ class CalendarController extends Controller
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'descripcion' => 'nullable|string',
-            'cliente_id' => 'nullable|exists:clientes,id',
+            'cliente_nombre' => 'nullable|string|max:255',
             'todo_dia' => 'boolean'
         ]);
 
@@ -86,6 +155,28 @@ class CalendarController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function getEvento(EventoSoporte $evento)
+    {
+        // Verificar que el técnico es dueño del evento
+        if ($evento->tecnico_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'evento' => [
+                'id' => $evento->id,
+                'titulo' => $evento->titulo,
+                'descripcion' => $evento->descripcion,
+                'estado' => $evento->estado,
+                'fecha_inicio' => $evento->fecha_inicio->format('Y-m-d'),
+                'fecha_fin' => $evento->fecha_fin ? $evento->fecha_fin->format('Y-m-d') : null,
+                'cliente_nombre' => $evento->cliente_nombre,
+                'todo_dia' => $evento->todo_dia,
+            ]
+        ]);
+    }
+
     // Mapear estados a los valores que usa el calendario
     protected function mapEstadoToCalendar($estado)
     {
@@ -96,5 +187,37 @@ class CalendarController extends Controller
             case 'cobrar': return 'Primary';
             default: return 'Danger';
         }
+    }
+
+    /**
+     * Obtiene los eventos programados para el día actual.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getEventosHoy()
+    {
+        // Establecer el locale de Carbon a español
+        Carbon::setLocale('es');
+        
+        // Obtener la fecha actual
+        $today = Carbon::today();
+        
+        // Buscar eventos que ocurran hoy
+        $eventos = EventoSoporte::where('tecnico_id', Auth::id())
+            ->where(function($query) use ($today) {
+                $query->whereDate('fecha_inicio', '=', $today)
+                    ->orWhere(function($q) use ($today) {
+                        // Eventos que abarcan hoy (comenzaron antes y terminan después)
+                        $q->whereDate('fecha_inicio', '<=', $today)
+                          ->whereDate('fecha_fin', '>=', $today);
+                    });
+            })
+            ->orderBy('fecha_inicio')
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'eventos' => $eventos
+        ]);
     }
 }

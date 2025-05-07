@@ -701,3 +701,10 @@ Route::get('/obtener-pagos', function () {
 })->middleware('auth');
 
 Route::resource('ips', IpController::class);
+
+// API para obtener datos de un evento
+Route::get('/api/eventos/{evento}', [CalendarController::class, 'getEvento'])->name('api.eventos.show');
+
+Route::get('/calendario/eventos/hoy', [App\Http\Controllers\CalendarController::class, 'getEventosHoy'])
+    ->middleware('auth')
+    ->name('calendar.events.today');
