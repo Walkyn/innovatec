@@ -36,7 +36,7 @@
             <!-- Encabezado -->
             <div class="flex items-center gap-2 mb-6">
                 <div class="hidden md:flex w-30 h-20 rounded-lg bg-gray-50 items-center justify-center">
-                    <img src="{{ $configuracion->logo ? asset('storage/logos/' . $configuracion->logo) : asset('images/logo/logo.png') }}"
+                    <img src="{{ $configuracion->logo ? asset('storage/logos/' . $configuracion->logo) : asset('images/user/profile.png') }}"
                         alt="Logo Empresa" class="w-30 h-20 object-contain">
                 </div>
 

@@ -22,50 +22,93 @@
                 <label for="search" class="sr-only">Search</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3">
-                        @if(request('search'))
-                            <a href="{{ route('clients.index') }}" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
+                        @if (request('search'))
+                            <a href="{{ route('clients.index') }}"
+                                class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 cursor-pointer">
                                 <i class="fas fa-times"></i>
                             </a>
                         @else
                             <div class="pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                                 </svg>
                             </div>
                         @endif
                     </div>
                     <input type="search" id="search" name="search"
                         class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Buscar por nombre, apellido o identificación..." value="{{ request('search') }}" required />
+                        placeholder="Buscar por nombre, apellido o identificación..." value="{{ request('search') }}"
+                        required />
                     <button type="submit"
                         class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
                 </div>
             </form>
             <!-- Item Buscador End -->
 
-            <!-- Campo de Estado Servicio -->
+            <!-- Campo de Estado -->
             <div class="w-full md:w-1/3">
                 <div class="relative">
                     <form action="{{ route('clients.index') }}" method="GET" class="w-full">
-                        @if(request('search'))
+                        @if (request('search'))
                             <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if (request('pueblo_id'))
+                            <input type="hidden" name="pueblo_id" value="{{ request('pueblo_id') }}">
                         @endif
                         <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-white dark:bg-form-input">
                             <select name="estado"
                                 class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3.5 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                :class="isOptionSelected && 'text-black dark:text-white'" 
+                                :class="isOptionSelected && 'text-black dark:text-white'"
                                 @change="isOptionSelected = true; $el.form.submit()">
-                                <option value="" class="text-body">Todos los estados</option>
-                                <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }} class="text-body">Activo</option>
-                                <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }} class="text-body">Inactivo</option>
-                                <option value="suspendido" {{ request('estado') == 'suspendido' ? 'selected' : '' }} class="text-body">Suspendido</option>
+                                <option value="">Todos los clientes</option>
+                                <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>Activo
+                                </option>
+                                <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>
+                                    Inactivo</option>
+                                <option value="suspendido" {{ request('estado') == 'suspendido' ? 'selected' : '' }}>
+                                    Suspendido</option>
                             </select>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <!-- Campo de Pueblo -->
+            <div class="w-full md:w-1/3">
+                <div class="relative">
+                    <form action="{{ route('clients.index') }}" method="GET" class="w-full">
+                        @if (request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if (request('estado'))
+                            <input type="hidden" name="estado" value="{{ request('estado') }}">
+                        @endif
+                        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-white dark:bg-form-input">
+                            <select name="pueblo_id"
+                                class="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3.5 pl-5 pr-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                :class="isOptionSelected && 'text-black dark:text-white'"
+                                @change="isOptionSelected = true; $el.form.submit()">
+                                <option value="">Todas las zonas</option>
+                                @foreach ($regiones as $region)
+                                    @foreach ($region->provincias as $provincia)
+                                        @foreach ($provincia->distritos as $distrito)
+                                            @foreach ($distrito->pueblos as $pueblo)
+                                                <option value="{{ $pueblo->id }}"
+                                                    {{ request('pueblo_id') == $pueblo->id ? 'selected' : '' }}>
+                                                    {{ $pueblo->nombre }} ({{ $distrito->nombre }})
+                                                </option>
+                                            @endforeach
+                                        @endforeach
+                                    @endforeach
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
         <div class="w-full overflow-hidden rounded-lg shadow-xs">
             <div class="w-full overflow-x-auto">
@@ -115,7 +158,8 @@
                                     {{ $cliente->created_at ? $cliente->created_at->format('d/m/Y') : '-' }}
                                 </td>
                                 <td class="px-4 py-3 text-sm whitespace-nowrap">
-                                    <a href="tel:{{ $cliente->telefono }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                    <a href="tel:{{ $cliente->telefono }}"
+                                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                         {{ $cliente->telefono }}
                                     </a>
                                 </td>
@@ -135,14 +179,14 @@
 
                                     <span
                                         class="px-2 py-1 font-semibold leading-tight rounded-full {{ $estadoClase[$cliente->estado_cliente] ?? 'text-gray-700 bg-gray-100' }} flex items-center gap-1 whitespace-nowrap w-fit">
-                                        <i class="fas {{ $cliente->estado_cliente === 'activo' ? 'fa-check-circle' : ($cliente->estado_cliente === 'inactivo' ? 'fa-minus-circle' : 'fa-times-circle') }} text-xs"></i>
+                                        <i
+                                            class="fas {{ $cliente->estado_cliente === 'activo' ? 'fa-check-circle' : ($cliente->estado_cliente === 'inactivo' ? 'fa-minus-circle' : 'fa-times-circle') }} text-xs"></i>
                                         <span class="text-xs">{{ ucfirst($cliente->estado_cliente) }}</span>
                                     </span>
                                 </td>
 
                                 <td class="px-4 py-3 text-sm text-center">
-                                    <button type="button" 
-                                        data-modal-target="meses-modal"
+                                    <button type="button" data-modal-target="meses-modal"
                                         onclick="verDetallesCliente({{ $cliente->id }})"
                                         class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                         <i class="fas fa-eye"></i>
@@ -202,7 +246,8 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
-                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">¿Está seguro de eliminar este cliente?
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">¿Está seguro de eliminar este
+                    cliente?
                     <p class="text-base text-gray-500 dark:text-gray-400">
                         Se perderá toda su información.
                     </p>
@@ -228,47 +273,47 @@
 
     function confirmarEliminacionCliente() {
         if (clienteIdAEliminar === null) return;
-        
+
         fetch(`/clients/${clienteIdAEliminar}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else {
-                return response.json().then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        Swal.fire({
-                            title: "Error",
-                            text: data.errorDetails,
-                            icon: "error",
-                            customClass: {
-                                confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
-                            },
-                            buttonsStyling: false
-                        });
-                    }
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.json().then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            Swal.fire({
+                                title: "Error",
+                                text: data.errorDetails,
+                                icon: "error",
+                                customClass: {
+                                    confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: "Error",
+                    text: "Hubo un problema al eliminar el cliente.",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
+                    },
+                    buttonsStyling: false
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: "Error",
-                text: "Hubo un problema al eliminar el cliente.",
-                icon: "error",
-                customClass: {
-                    confirmButton: "bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-400"
-                },
-                buttonsStyling: false
             });
-        });
     }
 
     function verDetallesCliente(clienteId) {
@@ -290,28 +335,34 @@
             .then(data => {
                 if (data.success) {
                     const cliente = data.cliente;
-                    
+
                     // Actualizar la información del cliente en el modal
                     // Actualizar las iniciales en el avatar
-                    document.querySelector('#meses-modal .text-2xl').textContent = 
+                    document.querySelector('#meses-modal .text-2xl').textContent =
                         `${cliente.nombres.charAt(0)}${cliente.apellidos.charAt(0)}`;
-                    
+
                     // Actualizar el nombre completo
-                    document.querySelector('#meses-modal [data-field="nombre"]').textContent = 
+                    document.querySelector('#meses-modal [data-field="nombre"]').textContent =
                         `${cliente.nombres} ${cliente.apellidos}`;
-                    
+
                     // Actualizar información de contacto
-                    document.querySelector('#meses-modal [data-field="identificacion"]').textContent = cliente.identificacion;
+                    document.querySelector('#meses-modal [data-field="identificacion"]').textContent = cliente
+                        .identificacion;
                     document.querySelector('#meses-modal [data-field="telefono"]').textContent = cliente.telefono;
-                    document.querySelector('#meses-modal [data-field="gps"]').textContent = cliente.gps || 'No especificado';
-                    
+                    document.querySelector('#meses-modal [data-field="gps"]').textContent = cliente.gps ||
+                        'No especificado';
+
                     // Actualizar información de ubicación
-                    document.querySelector('#meses-modal [data-field="region"]').textContent = cliente.region || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="provincia"]').textContent = cliente.provincia || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="distrito"]').textContent = cliente.distrito || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo || 'No especificado';
+                    document.querySelector('#meses-modal [data-field="region"]').textContent = cliente.region ||
+                        'No especificado';
+                    document.querySelector('#meses-modal [data-field="provincia"]').textContent = cliente
+                        .provincia || 'No especificado';
+                    document.querySelector('#meses-modal [data-field="distrito"]').textContent = cliente.distrito ||
+                        'No especificado';
+                    document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo ||
+                        'No especificado';
                     document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
-                    
+
                     // === ESTADO DEL CLIENTE (perfil/avatar) ===
                     const estadoCliente = cliente.estado_cliente;
                     const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
@@ -342,7 +393,8 @@
                             estadoPerfilTexto = 'Estado desconocido';
                     }
                     if (estadoIndicator) {
-                        estadoIndicator.className = `absolute bottom-0 right-0 w-5 h-5 ${indicatorBg} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+                        estadoIndicator.className =
+                            `absolute bottom-0 right-0 w-5 h-5 ${indicatorBg} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
                         estadoIndicator.querySelector('i').className = `fas ${indicatorIcon} text-white text-xs`;
                     }
                     if (estadoPerfil) {
@@ -358,7 +410,8 @@
                     const estadoMostrar = cliente.estado_mostrar;
 
                     document.querySelector('#meses-modal [data-field="servicio"]').textContent =
-                        servicioMostrar ? (planMostrar ? `${servicioMostrar} ${planMostrar}` : servicioMostrar) : 'Sin servicio';
+                        servicioMostrar ? (planMostrar ? `${servicioMostrar} ${planMostrar}` : servicioMostrar) :
+                        'Sin servicio';
 
                     document.querySelector('#meses-modal [data-field="precio"]').textContent =
                         precioMostrar ? `S/. ${Number(precioMostrar).toFixed(2)}` : 'S/. 0.00';
@@ -367,7 +420,8 @@
                     const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
                     const estadoIconPlan = document.querySelector('#meses-modal [data-field="estado-icon"]');
                     const estadoIconContainer = estadoIconPlan.parentElement;
-                    const estadoIndicatorPlan = document.querySelector('#meses-modal [data-field="estado-indicator-plan"]');
+                    const estadoIndicatorPlan = document.querySelector(
+                        '#meses-modal [data-field="estado-indicator-plan"]');
 
                     let estadoTexto = '';
                     let estadoColor = '';
@@ -411,7 +465,8 @@
                     }
                     if (estadoIconPlan && estadoIconContainer) {
                         estadoIconPlan.className = `fas ${icono} ${iconoColor}`;
-                        estadoIconContainer.className = `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${bgIcono}`;
+                        estadoIconContainer.className =
+                            `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${bgIcono}`;
                     }
                     if (estadoIndicatorPlan) {
                         // Indicador pequeño en el avatar
@@ -434,13 +489,16 @@
                                 indicatorBgPlan = 'bg-gray-400';
                                 indicatorIconPlan = 'fa-question-circle';
                         }
-                        estadoIndicatorPlan.className = `absolute bottom-0 right-0 w-5 h-5 ${indicatorBgPlan} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
-                        estadoIndicatorPlan.querySelector('i').className = `fas ${indicatorIconPlan} text-white text-xs`;
+                        estadoIndicatorPlan.className =
+                            `absolute bottom-0 right-0 w-5 h-5 ${indicatorBgPlan} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+                        estadoIndicatorPlan.querySelector('i').className =
+                            `fas ${indicatorIconPlan} text-white text-xs`;
                     }
 
                     // Actualizar fecha de inicio y fecha de instalación
                     const fechaInicioElement = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
-                    const fechaInstalacionElement = document.querySelector('#meses-modal [data-field="fecha-instalacion"]');
+                    const fechaInstalacionElement = document.querySelector(
+                        '#meses-modal [data-field="fecha-instalacion"]');
 
                     if (fechaInicioElement) {
                         let fechaFormateada = 'No especificada';
@@ -454,7 +512,8 @@
                                 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
                             ];
                             const mesNombre = meses[parseInt(mes, 10) - 1];
-                            fechaFormateada = `Cliente registrado el ${parseInt(dia, 10)} de ${mesNombre} de ${anio}`;
+                            fechaFormateada =
+                                `Cliente registrado el ${parseInt(dia, 10)} de ${mesNombre} de ${anio}`;
                         }
                         fechaInicioElement.innerHTML = `
                             <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>

@@ -91,6 +91,11 @@ class PanelController extends Controller
     public function cambiarPassword()
     {
         $cliente = \App\Models\Cliente::find(session('cliente_id'));
+        
+        if (!$cliente) {
+            return redirect()->route('login-cliente');
+        }
+        
         $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
         
         return view('panel.cambiar-password', [
@@ -116,11 +121,16 @@ class PanelController extends Controller
 
     public function showChangePassword()
     {
-        $user = auth()->user();
-        $initials = strtoupper(substr($user->nombres, 0, 1) . substr($user->apellidos, 0, 1));
+        $cliente = \App\Models\Cliente::find(session('cliente_id'));
+        
+        if (!$cliente) {
+            return redirect()->route('login-cliente');
+        }
+        
+        $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
         
         return view('panel.cambiar-password', [
-            'user' => $user,
+            'user' => $cliente,
             'initials' => $initials
         ]);
     }

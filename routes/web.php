@@ -652,7 +652,7 @@ Route::middleware(['auth.cliente'])->group(function () {
     Route::get('/comprobantes', [PanelController::class, 'comprobantes'])->name('panel.comprobantes');
     Route::get('/meses-pendientes', [PanelController::class, 'mesesPendientes'])->name('panel.meses-pendientes');
     Route::get('/mensajes', [PanelController::class, 'mensajes'])->name('panel.mensajes');
-    Route::get('/cambiar-password', [PanelController::class, 'cambiarPassword'])->name('panel.cambiar-password');
+    Route::get('/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
     Route::post('/panel/cerrar-sesion', [PanelController::class, 'logout'])->name('panel.cerrar-sesion');
     Route::get('/historial-servicios', [PanelController::class, 'historialServicios'])->name('panel.historial-servicios');
     Route::get('/panel/comprobante/{id}/detalle', [PanelController::class, 'verDetalleComprobante'])
@@ -669,8 +669,6 @@ Route::middleware(['auth.cliente'])->group(function () {
 
     // Ruta para eliminar pago
     Route::delete('/panel/eliminar-pago/{id}', [PagoController::class, 'eliminarPago'])->name('panel.eliminar-pago');
-
-    Route::get('/panel/cambiar-password', [PanelController::class, 'showChangePassword'])->name('panel.cambiar-password');
 
     Route::post('/panel/actualizar-pago', [MessageController::class, 'actualizarPago'])->name('panel.actualizar-pago');
 });

@@ -16,7 +16,8 @@ class ClientController extends Controller
         $query = Cliente::with(['contratos' => function($query) {
             $query->latest();
         }]);
-
+    
+        // Filtro por búsqueda
         if ($request->has('search')) {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
@@ -26,13 +27,20 @@ class ClientController extends Controller
                   ->orWhereRaw("CONCAT(nombres, ' ', apellidos) LIKE ?", ["%{$searchTerm}%"]);
             });
         }
-
+    
+        // Filtro por estado (se mantiene aunque se apliquen otros filtros)
         if ($request->filled('estado')) {
             $query->where('estado_cliente', $request->estado);
         }
-
+    
+        // Filtro por pueblo (se mantiene aunque se apliquen otros filtros)
+        if ($request->filled('pueblo_id')) {
+            $query->where('pueblo_id', $request->pueblo_id);
+        }
+    
         $clientes = $query->paginate(8);
         $regiones = Region::with('provincias.distritos.pueblos')->get();
+        
         return view('clients.index', compact('clientes', 'regiones'));
     }
 
