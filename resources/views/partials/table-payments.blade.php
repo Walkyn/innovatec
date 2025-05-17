@@ -301,12 +301,12 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center space-x-2 text-sm">
-                                            <!-- Botón Imprimir -->
-                                            <button
+                                            <!-- Botón Imprimir Ticket (Enlace a la previsualización) -->
+                                            <a href="{{ route('payments.ticket', $cobranza->id) }}" target="_blank"
                                                 class="flex transition-all items-center justify-center px-2 py-1 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 focus:outline-none focus:ring-1 focus:ring-green-300 focus:ring-offset-1 dark:text-green-200 dark:bg-green-900 dark:border-green-700 dark:hover:bg-green-800 dark:focus:ring-green-600"
-                                                aria-label="Imprimir">
+                                                aria-label="Imprimir Ticket">
                                                 <i class="fas fa-print"></i>
-                                            </button>
+                                            </a>
 
                                             <!-- Botón Exportar a PDF -->
                                             <a href="{{ route('payments.pdf', $cobranza->id) }}" target="_blank"

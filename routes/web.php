@@ -34,6 +34,8 @@ use Carbon\Carbon;
 use App\Http\Controllers\PagoController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\IpController;
+use App\Http\Controllers\TicketController;
+
 // Rutas de autenticación
 Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
@@ -146,6 +148,7 @@ Route::middleware('auth')->group(function () {
         Route::get('payments/{id}/pdf', [PaymentPDFController::class, 'generatePDF'])
             ->middleware('check.permissions:payments,all')
             ->name('payments.pdf');
+        Route::get('payments/{id}/ticket', [TicketController::class, 'generateTicket'])->name('payments.ticket');
     });
 
     // Services
