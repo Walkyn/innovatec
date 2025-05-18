@@ -60,7 +60,7 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            margin-bottom: 10px;
+            margin-bottom: 0px;
             border-radius: 4px;
             overflow: hidden;
         }
@@ -68,7 +68,6 @@
             padding: 4px 2px;
             text-align: left;
             word-break: break-word;
-            border-bottom: 1px solid #e5e7eb;
         }
         .items-table th {
             font-weight: 600;
@@ -84,7 +83,6 @@
             background-color: #fff;
         }
         .items-table tr:last-child td {
-            border-bottom: none;
         }
         .items-table th:nth-child(1), .items-table td:nth-child(1) { 
             width: 5%; 
@@ -104,11 +102,11 @@
             padding-right: 4px;
         }
         .items-table tbody tr:hover td {
-            background-color: #f9fafb;
+            background-color: transparent !important;
         }
         .totals {
             text-align: right;
-            margin-top: 5px;
+            margin-top: 0px;
         }
         .totals p {
             margin: 2px 0;
@@ -201,7 +199,7 @@
                  border-bottom: 1px solid #374151 !important;
              }
              .items-table td {
-                 border-bottom: 1px solid #e5e7eb !important;
+                 border-bottom: none !important;
              }
              .items-table tbody tr:hover td {
                  background-color: transparent !important;
@@ -240,9 +238,7 @@
             <p><strong>Dirección:</strong> {{ $cobranza->cliente->direccion ?? 'N/A' }}</p>
         </div>
 
-         <div class="divider"></div>
          <p style="text-align:center; margin-bottom: 5px; font-weight: bold;">DETALLES DE SERVICIOS</p>
-         <div class="divider"></div>
 
         <table class="items-table">
             <thead>
@@ -275,27 +271,20 @@
             </tbody>
         </table>
 
-         <div class="divider"></div>
+         <div style="border-top: 1.5px solid #000;"></div>
 
         <div class="totals">
-             <p style="font-size: 14px;"><strong>Total:</strong> S/. {{ number_format($cobranza->monto_total, 2) }}</p>
+             <p style="font-size: 12px; padding-right: 4px; font-weight: bold;">Total: S/. {{ number_format($cobranza->monto_total, 2) }}</p>
         </div>
-
-         <div class="divider"></div>
 
          <div class="glosa">
              <p style="font-weight: bold;">Glosa:</p>
              <p>{{ $cobranza->glosa ?? 'Sin notas adicionales.' }}</p>
          </div>
 
-
-
         <div class="qr-code">
-             <p>Escanear para ver ticket</p>
              <img src="{{ $qrCodeBase64 ?? '' }}" alt="QR Code Ticket">
          </div>
-
-
 
         <div class="footer">
             @if($configuracion)

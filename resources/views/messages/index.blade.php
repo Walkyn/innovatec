@@ -101,7 +101,7 @@
                     </div>
                 
                     <!-- Área de detalle del pago seleccionado -->
-                    <div id="detalle-pago" class="hidden md:flex flex-1 flex-col bg-gray-50 dark:bg-boxdark-2">
+                    <div id="detalle-pago" class="hidden md:flex flex-1 flex-col bg-gray-50 dark:bg-boxdark-2 opacity-0 transition-opacity duration-300 ease-in-out">
                         <div class="flex items-center justify-center h-full text-gray-400">
                             Selecciona un pago para ver los detalles.
                         </div>
@@ -205,41 +205,57 @@
         
         // Función para manejar cambios de vista en móviles y escritorio
         function toggleVistaMobile(mostrarDetalle) {
+            const transitionDuration = 300; // Duración en milisegundos, coincide con Tailwind duration-300
+
             // En escritorio (md y superior): siempre mostrar ambos paneles
             if (window.innerWidth >= 768) {
-                // Forzar visibilidad del sidebar en escritorio
-                sidebarClientes.style.display = 'block';
-                sidebarClientes.classList.remove('hidden', 'opacity-0');
-                
-                // Mostrar área de detalles
-                detallePago.classList.remove('hidden');
-                detallePago.classList.add('flex');
-                
-                // Ocultar botón volver
+                sidebarClientes.classList.remove('hidden');
+                sidebarClientes.style.display = 'block'; // Asegurar display block
+
+                // Asegurar que el detalle esté visible y con opacidad total
+                detallePago.classList.remove('hidden', 'opacity-0');
+                detallePago.classList.add('flex', 'opacity-100');
+                detallePago.style.display = 'flex'; // Asegurar display flex
+
                 btnVolver.classList.add('hidden');
                 return;
             }
-            
+
             // En móvil
             if (mostrarDetalle) {
-                // Ocultar sidebar y mostrar detalle
-                sidebarClientes.style.display = 'none';
+                // Ocultar sidebar
                 sidebarClientes.classList.add('hidden');
-                
-                detallePago.style.display = 'flex';
-                detallePago.classList.remove('hidden');
-                detallePago.classList.add('flex');
-                
+                sidebarClientes.style.display = 'none'; // Asegurar display none
+
+                // Mostrar detalle con transición
+                detallePago.classList.remove('hidden'); // Remover hidden primero
+                detallePago.classList.add('flex'); // Asegurar flexbox layout
+                detallePago.style.display = 'flex'; // Asegurar display flex
+
+                // Pequeño retraso para que el navegador reconozca el cambio de display antes de la opacidad
+                // Esto es a veces necesario para que la transición funcione desde 0 opacidad
+                requestAnimationFrame(() => {
+                    detallePago.classList.remove('opacity-0');
+                    detallePago.classList.add('opacity-100');
+                });
+
                 btnVolver.classList.remove('hidden');
             } else {
-                // Mostrar sidebar y ocultar detalle
-                sidebarClientes.style.display = 'block';
+                // Ocultar detalle con transición
+                detallePago.classList.remove('opacity-100');
+                detallePago.classList.add('opacity-0');
+
+                // Ocultar completamente después de la transición
+                setTimeout(() => {
+                    detallePago.classList.add('hidden');
+                    detallePago.classList.remove('flex'); // Limpiar clase flex si ya no se usa
+                    detallePago.style.display = 'none'; // Asegurar display none
+                }, transitionDuration); // Esperar a que termine la transición
+
+                // Mostrar sidebar
                 sidebarClientes.classList.remove('hidden');
-                
-                detallePago.style.display = 'none';
-                detallePago.classList.add('hidden');
-                detallePago.classList.remove('flex');
-                
+                 sidebarClientes.style.display = 'block'; // Asegurar display block
+
                 btnVolver.classList.add('hidden');
             }
         }
@@ -250,43 +266,54 @@
             sidebarClientes.classList.remove('hidden');
             detallePago.classList.remove('hidden');
             detallePago.classList.add('flex');
+             // Asegurar opacidad en desktop si no estaba ya
+            detallePago.classList.remove('opacity-0');
+            detallePago.classList.add('opacity-100');
         } else {
             // En móvil, mostrar solo el sidebar inicialmente
             sidebarClientes.classList.remove('hidden');
             detallePago.classList.add('hidden');
             detallePago.classList.remove('flex');
+             // Asegurar opacidad 0 inicialmente en móvil
+            detallePago.classList.add('opacity-0');
+            detallePago.classList.remove('opacity-100');
         }
 
         // Manejar cambio de tamaño de ventana
         window.addEventListener('resize', function() {
             if (window.innerWidth >= 768) {
                 // En escritorio: FORZAR visibilidad de ambos paneles
-                sidebarClientes.style.display = 'block';
-                sidebarClientes.classList.remove('hidden', 'opacity-0');
-                
-                detallePago.classList.remove('hidden');
-                detallePago.classList.add('flex');
-                
+                sidebarClientes.classList.remove('hidden');
+                sidebarClientes.style.display = 'block'; // Asegurar display block
+
+                detallePago.classList.remove('hidden', 'opacity-0');
+                detallePago.classList.add('flex', 'opacity-100');
+                 detallePago.style.display = 'flex'; // Asegurar display flex
+
                 btnVolver.classList.add('hidden');
             } else {
-                // En móvil: mantener estado actual pero con estilo correcto
-                const detalleEstaVisible = detallePago.querySelector('.flex-col.h-full') !== null;
-                
+                // En móvil: ajustar estilos según el estado actual (si está visible o no)
+                const detalleEstaVisible = !detallePago.classList.contains('hidden'); // Comprobar si no tiene la clase hidden
+
                 if (detalleEstaVisible) {
-                    sidebarClientes.style.display = 'none';
+                    // Si ya estaba visible, asegurar estado móvil correcto
                     sidebarClientes.classList.add('hidden');
-                    
-                    detallePago.style.display = 'flex';
+                    sidebarClientes.style.display = 'none'; // Asegurar display none
+
                     detallePago.classList.remove('hidden');
-                    
+                    detallePago.classList.add('flex', 'opacity-100'); // Asegurar flex y opacidad
+                    detallePago.style.display = 'flex'; // Asegurar display flex
+
                     btnVolver.classList.remove('hidden');
                 } else {
-                    sidebarClientes.style.display = 'block';
+                    // Si estaba oculto, asegurar estado móvil correcto
                     sidebarClientes.classList.remove('hidden');
-                    
-                    detallePago.style.display = 'none';
-                    detallePago.classList.add('hidden');
-                    
+                    sidebarClientes.style.display = 'block'; // Asegurar display block
+
+                    detallePago.classList.add('hidden', 'opacity-0'); // Asegurar hidden y opacidad 0
+                    detallePago.classList.remove('flex', 'opacity-100');
+                    detallePago.style.display = 'none'; // Asegurar display none
+
                     btnVolver.classList.add('hidden');
                 }
             }
@@ -478,9 +505,22 @@
                                     <svg class="w-4 h-4 text-blue-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
                                     </svg>
-                                    <a href="/storage/${pago.comprobante_path}" target="_blank" class="text-blue-600 dark:text-blue-400 text-sm">Ver comprobante</a>
+                                    <a href="#" onclick="verComprobante('${pago.comprobante_path}', event)" class="text-blue-600 dark:text-blue-400 text-sm">Ver comprobante</a>
                                 </div>
-                                <img src="/storage/${pago.comprobante_path}" alt="Comprobante" class="max-w-xs rounded shadow-sm">
+                                <div class="relative">
+                                    <img src="/storage/${pago.comprobante_path}"
+                                         alt="Comprobante"
+                                         class="max-w-xs rounded shadow-sm"
+                                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');">
+                                    <div class="hidden items-center justify-center bg-gray-100 dark:bg-gray-800 rounded shadow-sm p-4 max-w-xs">
+                                        <div class="text-center">
+                                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <p class="text-gray-500 dark:text-gray-400 text-sm">No hay comprobante disponible</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         `;
                     }

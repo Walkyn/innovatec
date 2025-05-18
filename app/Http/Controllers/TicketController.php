@@ -23,7 +23,7 @@ class TicketController extends Controller
         ])->findOrFail($id);
 
         $configuracion = ConfiguracionEmpresa::first();
-        $ticketUrl = route('payments.ticket', $cobranza->id);
+        $ticketUrl = route('ticket.public.show', ['id' => $cobranza->id]);
 
         $qrCode = new QrCode($ticketUrl);
         $writer = new PngWriter();
@@ -37,6 +37,32 @@ class TicketController extends Controller
         $logoUrl = ($configuracion && $configuracion->logo)
                    ? asset('storage/logos/' . $configuracion->logo)
                    : null;
+
+        return view('tickets.payment', compact('cobranza', 'logoUrl', 'configuracion', 'qrCodeBase64'));
+    }
+
+    public function showPublicTicket($id)
+    {
+        $cobranza = Cobranza::with([
+            'cliente',
+            'cobranzaContratoServicios.contratoServicio.servicio',
+            'cobranzaContratoServicios.contratoServicio.plan',
+            'cobranzaContratoServicios.mes'
+        ])->findOrFail($id);
+
+        $configuracion = ConfiguracionEmpresa::first();
+        $logoUrl = ($configuracion && $configuracion->logo)
+                   ? asset('storage/logos/' . $configuracion->logo)
+                   : null;
+
+        $ticketUrl = route('ticket.public.show', ['id' => $cobranza->id]);
+        $qrCode = new QrCode($ticketUrl);
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode, null, null, [
+             'size' => 80,
+             'margin' => 1,
+        ]);
+        $qrCodeBase64 = $result->getDataUri();
 
         return view('tickets.payment', compact('cobranza', 'logoUrl', 'configuracion', 'qrCodeBase64'));
     }

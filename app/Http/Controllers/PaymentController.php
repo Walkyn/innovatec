@@ -216,17 +216,6 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
-    /**
-     * Anula un cobro existente.
-     */
     public function anular($id)
     {
         try {

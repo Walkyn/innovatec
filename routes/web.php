@@ -709,3 +709,7 @@ Route::get('/api/eventos/{evento}', [CalendarController::class, 'getEvento'])->n
 Route::get('/calendario/eventos/hoy', [App\Http\Controllers\CalendarController::class, 'getEventosHoy'])
     ->middleware('auth')
     ->name('calendar.events.today');
+
+// Ruta pública para ver tickets
+Route::get('/comprobante/{id}', [TicketController::class, 'showPublicTicket'])
+    ->name('ticket.public.show');

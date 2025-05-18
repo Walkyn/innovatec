@@ -121,21 +121,23 @@
                             <ul id="clientList"
                                 class="divide-y divide-gray-200 dark:divide-gray-700 max-h-60 overflow-y-auto mx-2">
                                 @foreach ($clientes as $cliente)
-                                    <li class="flex items-center p-2 text-sm text-gray-700 dark:text-gray-200 client-item"
-                                        data-id="{{ $cliente->id }}" data-nombres="{{ $cliente->nombres }}"
-                                        data-apellidos="{{ $cliente->apellidos }}"
-                                        data-identificacion="{{ $cliente->identificacion }}"
-                                        data-telefono="{{ $cliente->telefono }}">
-                                        <div class="flex items-center space-x-2">
-                                            <input type="radio" name="clienteSeleccionado"
-                                                value="{{ $cliente->id }}"
-                                                class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500">
-                                            <span
-                                                class="text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer">
-                                                {{ $cliente->nombres }} {{ $cliente->apellidos }}
-                                            </span>
-                                        </div>
-                                    </li>
+                                    @if($cliente->estado_cliente === 'activo')
+                                        <li class="flex items-center p-2 text-sm text-gray-700 dark:text-gray-200 client-item"
+                                            data-id="{{ $cliente->id }}" 
+                                            data-nombres="{{ $cliente->nombres }}"
+                                            data-apellidos="{{ $cliente->apellidos }}"
+                                            data-identificacion="{{ $cliente->identificacion }}"
+                                            data-telefono="{{ $cliente->telefono }}">
+                                            <div class="flex items-center space-x-2">
+                                                <input type="radio" name="clienteSeleccionado"
+                                                    value="{{ $cliente->id }}"
+                                                    class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500">
+                                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer">
+                                                    {{ $cliente->nombres }} {{ $cliente->apellidos }}
+                                                </span>
+                                            </div>
+                                        </li>
+                                    @endif
                                 @endforeach
 
                             </ul>
