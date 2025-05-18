@@ -42,18 +42,17 @@
                     <!-- Sidebar con clientes agrupados -->
                     <div id="sidebar-clientes" class="w-full md:w-1/3 bg-white dark:bg-boxdark border-r border-gray-200 dark:border-strokedark">
                         <div class="p-6">
-                            <h1 class="text-xl font-semibold text-black dark:text-white flex justify-between">
+                            <h1 class="text-lg font-semibold text-black dark:text-white flex justify-between">
                                 Pagos por revisar
                                 @php
                                     $pagosPorCliente = $pagos->groupBy(function($pago) {
                                         return $pago['cliente']['id'] ?? 'desconocido';
                                     });
-                                    // Contar clientes con al menos un pago pendiente
                                     $clientesConPagosPendientes = $pagosPorCliente->filter(function($pagosCliente) {
                                         return $pagosCliente->where('estado', 'en_revision')->count() > 0;
                                     })->count();
                                 @endphp
-                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 text-sm px-2 py-1 rounded-md">{{ $clientesConPagosPendientes }} pendientes</span>
+                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 text-sm px-2 py-1 rounded-md">{{ $clientesConPagosPendientes }}</span>
                             </h1>
                         </div>
                         <div class="overflow-y-auto p-4">
