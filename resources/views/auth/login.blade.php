@@ -16,7 +16,7 @@
                         <div class="px-26 py-17.5 text-center">
                             <a class="mb-4 justify-center flex items-center gap-2" href="#">
                                 <img class="h-18"
-                                    src="{{ $configuracion->logo ? asset('storage/logos/' . $configuracion->logo) : asset('images/logo/logo.png') }}"
+                                    src="{{ isset($configuracion) && $configuracion->logo ? asset('storage/logos/' . $configuracion->logo) : asset('images/logo/logo.png') }}"
                                     alt="Logo">
                             </a>
 
@@ -25,7 +25,7 @@
                             </p>
 
                             <span class="mt-6 inline-block">
-                                <img src="./images/illustration/illustration-03.svg" alt="illustration" />
+                                <img src="{{ asset('./images/illustration/illustration-03.svg') }}" alt="illustration" />
                             </span>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                                     <label class="mb-2.5 block font-medium text-black dark:text-white">Email</label>
                                     <div class="relative">
                                         <input type="email" name="email" placeholder="Introduce tu correo electrónico"
-                                            class="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                                            class="w-full rounded-lg border {{ $errors->has('email') ? 'border-red-500 dark:border-red-500' : 'border-stroke dark:border-form-strokedark' }} bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:bg-form-input dark:focus:border-primary"
                                             value="{{ old('email') }}" />
                                         <span class="absolute right-4 top-3.5">
                                             <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22"
@@ -63,16 +63,16 @@
                                             </svg>
                                         </span>
                                     </div>
-                                    @if ($errors->has('email'))
-                                        <p class="text-red-500 mt-2 text-xs italic">{{ $errors->first('email') }}</p>
-                                    @endif
+                                    @error('email')
+                                        <p class="text-red-500 mt-2 text-xs italic">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-4">
                                     <label class="mb-2.5 block font-medium text-black dark:text-white">Contraseña</label>
                                     <div class="relative">
                                         <input type="password" name="password" placeholder="Introduce tu contraseña"
-                                            class="w-full rounded-lg border border-stroke bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
+                                            class="w-full rounded-lg border {{ $errors->has('password') ? 'border-red-500 dark:border-red-500' : 'border-stroke dark:border-form-strokedark' }} bg-transparent py-3 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:bg-form-input dark:focus:border-primary" />
 
                                         <span class="absolute right-4 top-3.5">
                                             <svg class="fill-current" width="22" height="22" viewBox="0 0 22 22"
@@ -88,9 +88,9 @@
                                             </svg>
                                         </span>
                                     </div>
-                                    @if ($errors->has('password'))
-                                        <p class="text-red-500 mt-2 text-xs italic">{{ $errors->first('password') }}</p>
-                                    @endif
+                                    @error('password')
+                                        <p class="text-red-500 mt-2 text-xs italic">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-5">

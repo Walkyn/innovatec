@@ -226,11 +226,11 @@
                     </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4">
-                        <div class="flex flex-wrap -mx-3 mb-6">
-                            <!-- Datos del Cliente -->
-                            <div class="w-full md:w-2/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="cliente-nombre">
+                        <!-- Primera fila - Nombre y Identificación -->
+                        <div class="flex flex-col md:flex-row -mx-3 mb-4">
+                            <!-- Nombres y Apellidos -->
+                            <div class="w-full px-3 mb-4 md:mb-0 md:w-2/3">
+                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-nombre">
                                     Nombres y Apellidos
                                 </label>
                                 <div class="relative">
@@ -242,11 +242,10 @@
                                         disabled />
                                 </div>
                             </div>
-
+                    
                             <!-- Identificación -->
-                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="cliente-identificacion">
+                            <div class="w-full px-3 md:w-1/3">
+                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-identificacion">
                                     Identificación
                                 </label>
                                 <div class="relative">
@@ -258,12 +257,12 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="flex flex-wrap -mx-3 mb-6">
+                    
+                        <!-- Segunda fila - Tipo de pago, Teléfono y Estado -->
+                        <div class="flex flex-col md:flex-row -mx-3 mb-4">
                             <!-- Tipo de Pago -->
-                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="tipo-pago">
+                            <div class="w-full px-3 mb-4 md:mb-0 md:w-1/3">
+                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="tipo-pago">
                                     Tipo de Pago
                                 </label>
                                 <div class="relative">
@@ -275,11 +274,10 @@
                                         disabled />
                                 </div>
                             </div>
-
+                    
                             <!-- Teléfono -->
-                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="cliente-telefono">
+                            <div class="w-full px-3 mb-4 md:mb-0 md:w-1/3">
+                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-telefono">
                                     Teléfono
                                 </label>
                                 <div class="relative">
@@ -290,11 +288,10 @@
                                         id="cliente-telefono" disabled>
                                 </div>
                             </div>
-
+                    
                             <!-- Estado del Cobro -->
-                            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                    for="estado-cobro">
+                            <div class="w-full px-3 md:w-1/3">
+                                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="estado-cobro">
                                     Estado del Cobro
                                 </label>
                                 <div class="relative">
@@ -304,11 +301,10 @@
                                 </div>
                             </div>
                         </div>
-
+                    
                         <!-- Glosa -->
                         <div class="w-full mb-6">
-                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2"
-                                for="glosa">
+                            <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="glosa">
                                 Glosa
                             </label>
                             <div class="relative">
@@ -320,11 +316,11 @@
                                     disabled rows="2"></textarea>
                             </div>
                         </div>
-
+                    
                         <!-- Tabla de detalles -->
                         <div class="w-full overflow-hidden rounded-lg shadow-xs">
                             <div class="w-full overflow-x-auto">
-                                <table class="w-full whitespace-no-wrap">
+                                <table class="w-full whitespace-nowrap">
                                     <thead>
                                         <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                             <th class="px-4 py-3">Item</th>
@@ -338,10 +334,11 @@
                                     </tbody>
                                 </table>
                             </div>
+                            
                             <!-- Total -->
                             <div class="px-4 py-3 text-xs font-semibold tracking-wide uppercase border-t dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                <div class="flex justify-between items-center">
-                                    <div>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                                    <div class="mb-2 md:mb-0">
                                         <span class="text-gray-600 dark:text-gray-400">FECHA DE COBRO:</span>
                                         <span id="fecha-cobro" class="text-gray-800 dark:text-gray-200 ml-2"></span>
                                     </div>
