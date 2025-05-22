@@ -38,9 +38,9 @@
                             @include('partials.alerts')
                             <!-- ====== Alerts End -->
                             <span
-                                class="text-2xl font-bold text-gray-900 dark:text-white">{{ $configuracion->nombre ?? 'Business Manager' }}</span>
+                                class="text-2xl font-bold text-gray-900 dark:text-white">{{ $configuracion->nombre ?? 'Business Manager Peru' }}</span>
 
-                            <h2 class="mt-8 mb-4 text-lg font-bold text-black dark:text-white sm:text-title-lg">
+                            <h2 class="mt-8 mb-4 text-md font-bold text-black dark:text-white sm:text-title-md">
                                 Iniciar Sesión
                             </h2>
 

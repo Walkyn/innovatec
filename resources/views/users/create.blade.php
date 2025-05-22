@@ -55,13 +55,13 @@
                                 Registrar usuario
                             </h2>
 
-                            <form action="{{ route('users.store') }}" method="POST">
+                            <form action="{{ route('users.store') }}" method="POST" id="userForm">
                                 @csrf
                                 <div class="flex flex-col md:flex-row gap-4 mb-4">
                                     <div class="w-full md:w-1/2">
                                         <label class="mb-2.5 block font-medium text-black dark:text-white">Nombre</label>
                                         <div class="relative">
-                                            <input type="text" name="name" placeholder="Nombres completos"
+                                            <input type="text" name="name" id="name" placeholder="Nombres completos"
                                                 value="{{ old('name') }}"
                                                 class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary" />
                                             <span class="absolute right-4 top-4">
@@ -77,6 +77,7 @@
                                                     </g>
                                                 </svg>
                                             </span>
+                                            <p id="nameError" class="text-red-500 mt-2 text-xs italic hidden"></p>
                                             @error('name')
                                                 <p class="text-red-500 mt-2 text-xs italic">{{ $message }}</p>
                                             @enderror
@@ -584,6 +585,104 @@
                     phoneDisplay.value = phoneInput.value;
                 }
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('userForm');
+            
+            // Función para limpiar todos los mensajes de error
+            function clearAllErrors() {
+                // Limpiar mensajes de error existentes
+                const existingErrors = document.querySelectorAll('.error-message');
+                existingErrors.forEach(error => error.remove());
+                
+                // Limpiar clases de error de los inputs
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.classList.remove('border-red-500');
+                });
+                
+                // Limpiar mensajes de error específicos
+                const errorElements = document.querySelectorAll('[id$="Error"]');
+                errorElements.forEach(el => {
+                    el.classList.add('hidden');
+                    el.textContent = '';
+                });
+            }
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Limpiar todos los errores anteriores
+                clearAllErrors();
+                
+                let hasErrors = false;
+                
+                // Validar nombre
+                const name = document.getElementById('name');
+                if (!name.value.trim()) {
+                    document.getElementById('nameError').textContent = 'Por favor ingrese su nombre';
+                    document.getElementById('nameError').classList.remove('hidden');
+                    name.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar email
+                const email = document.querySelector('input[name="email"]');
+                if (!email.value.trim()) {
+                    const emailError = document.createElement('p');
+                    emailError.className = 'text-red-500 mt-2 text-xs italic error-message';
+                    emailError.textContent = 'Por favor ingrese su correo electrónico';
+                    email.parentNode.appendChild(emailError);
+                    email.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar teléfono
+                const phoneDisplay = document.getElementById('phone_display');
+                if (!phoneDisplay.value.trim()) {
+                    document.getElementById('phone-error').textContent = 'Por favor ingrese su número de teléfono';
+                    document.getElementById('phone-error').classList.remove('hidden');
+                    phoneDisplay.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar contraseña
+                const password = document.getElementById('password');
+                if (!password.value.trim()) {
+                    document.getElementById('passwordError').textContent = 'Por favor ingrese una contraseña';
+                    document.getElementById('passwordError').classList.remove('hidden');
+                    password.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar confirmación de contraseña
+                const passwordConfirmation = document.getElementById('password_confirmation');
+                if (!passwordConfirmation.value.trim()) {
+                    const confirmError = document.createElement('p');
+                    confirmError.className = 'text-red-500 mt-2 text-xs italic error-message';
+                    confirmError.textContent = 'Por favor confirme su contraseña';
+                    passwordConfirmation.parentNode.appendChild(confirmError);
+                    passwordConfirmation.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar rol
+                const role = document.querySelector('input[name="role"]:checked');
+                if (!role) {
+                    const roleError = document.createElement('p');
+                    roleError.className = 'text-red-500 mt-2 text-xs italic error-message';
+                    roleError.textContent = 'Por favor seleccione un rol';
+                    document.querySelector('.space-y-4').appendChild(roleError);
+                    hasErrors = true;
+                }
+                
+                if (!hasErrors) {
+                    form.submit();
+                }
+            });
         });
     </script>
 @endsection

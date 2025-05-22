@@ -52,7 +52,7 @@
                                 Editar Usuario
                             </h2>
 
-                            <form action="{{ route('users.update', $user->id) }}" method="POST">
+                            <form action="{{ route('users.update', $user->id) }}" method="POST" id="userForm">
                                 @csrf
                                 @method('PUT')
                                 <div class="flex flex-col md:flex-row gap-4 mb-4">
@@ -554,6 +554,86 @@
                     }
                 }
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('userForm');
+            
+            // Función para limpiar todos los mensajes de error
+            function clearAllErrors() {
+                // Limpiar mensajes de error existentes
+                const existingErrors = document.querySelectorAll('.error-message');
+                existingErrors.forEach(error => error.remove());
+                
+                // Limpiar clases de error de los inputs
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.classList.remove('border-red-500');
+                });
+                
+                // Limpiar mensajes de error específicos
+                const errorElements = document.querySelectorAll('[id$="Error"]');
+                errorElements.forEach(el => {
+                    el.classList.add('hidden');
+                    el.textContent = '';
+                });
+            }
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Limpiar todos los errores anteriores
+                clearAllErrors();
+                
+                let hasErrors = false;
+                
+                // Validar nombre
+                const name = document.querySelector('input[name="name"]');
+                if (!name.value.trim()) {
+                    const nameError = document.createElement('p');
+                    nameError.className = 'text-red-500 mt-2 text-xs italic error-message';
+                    nameError.textContent = 'Por favor ingrese el nombre';
+                    name.parentNode.appendChild(nameError);
+                    name.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar email
+                const email = document.querySelector('input[name="email"]');
+                if (!email.value.trim()) {
+                    const emailError = document.createElement('p');
+                    emailError.className = 'text-red-500 mt-2 text-xs italic error-message';
+                    emailError.textContent = 'Por favor ingrese el correo electrónico';
+                    email.parentNode.appendChild(emailError);
+                    email.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar teléfono
+                const phoneDisplay = document.getElementById('phone_display_edit');
+                if (!phoneDisplay.value.trim()) {
+                    document.getElementById('phone-error-edit').textContent = 'Por favor ingrese el número de teléfono';
+                    document.getElementById('phone-error-edit').classList.remove('hidden');
+                    phoneDisplay.classList.add('border-red-500');
+                    hasErrors = true;
+                }
+                
+                // Validar rol
+                const role = document.querySelector('input[name="role"]:checked');
+                if (!role) {
+                    const roleError = document.createElement('p');
+                    roleError.className = 'text-red-500 mt-2 text-xs italic error-message';
+                    roleError.textContent = 'Por favor seleccione un rol';
+                    document.querySelector('.space-y-4').appendChild(roleError);
+                    hasErrors = true;
+                }
+                
+                if (!hasErrors) {
+                    form.submit();
+                }
+            });
         });
     </script>
 @endsection

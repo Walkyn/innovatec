@@ -61,13 +61,60 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## Requisitos del Sistema
+## 📋 Requisitos del Sistema
 
-- PHP 8.2 o superior
-- Laragon (recomendado) o entorno equivalente (XAMPP, WAMP)
-- Composer 2.5 o superior
-- MySQL 8.0 o superior
-- Node.js 22+ (para compilación de assets)
+- PHP 8.2 o superior  
+- Composer 2.5 o superior  
+- MySQL 8.0 o superior  
+- Node.js 22+ (para la compilación de assets)  
+- Entorno de desarrollo local recomendado: Laragon (también compatible con XAMPP, WAMP)
+
+## ⚙️ Instalación del Proyecto
+
+1. Clonar el repositorio o descargar el código.
+
+2. Instalar dependencias de backend:  
+   composer install
+
+3. Instalar dependencias de frontend (si aplica):  
+   npm install  
+   npm run dev
+
+4. Copiar el archivo de entorno y generar la clave de la aplicación:  
+   cp .env.example .env  
+   php artisan key:generate
+
+5. Modificar el archivo `.env` con los datos de conexión a tu base de datos, por ejemplo:
+   DB_CONNECTION=mysql  
+   DB_HOST=127.0.0.1  
+   DB_PORT=3306  
+   DB_DATABASE=nombre_de_tu_base  
+   DB_USERNAME=tu_usuario  
+   DB_PASSWORD=tu_contraseña
+
+6. Ejecutar las migraciones:  
+   php artisan migrate
+
+7. Ejecutar el seeder de la base de datos:  
+   php artisan db:seed
+
+8. Crear el enlace simbólico para los archivos de almacenamiento:  
+   php artisan storage:link
+
+9. Levantar el servidor (si no usas Laragon):  
+   php artisan serve
+
+## 🔑 Acceso al Sistema
+
+- Correo: admin@gmail.com  
+- Contraseña: 12345678
+
+## 🌐 Consideraciones
+
+- Si estás usando Laragon, asegúrate de colocar el proyecto en la carpeta `C:\laragon\www\` o la que tengas configurada.
+- Si usas XAMPP/WAMP, ubica el proyecto en `htdocs` o la ruta equivalente.
+- Si vas a subirlo a un servidor de hosting, asegúrate de configurar correctamente la ruta pública (`/public`) como raíz del sitio.
+
 
 ## License
 
