@@ -5,7 +5,7 @@
 
     <!--Start Content -->
     <div class="relative p-4 w-full max-h-full mx-auto">
-        <!-- Toast notification centrado con fondos de color por tipo -->
+        <!-- Toast notification -->
         <div x-data="{ 
             show: false,
             message: '',
@@ -754,7 +754,7 @@
                         <div x-show="!selectedMethod" x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 transform scale-95"
                             x-transition:enter-end="opacity-100 transform scale-100"
-                            class="absolute inset-0 bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                            class="absolute inset-0 bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-center sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4">
                             <div class="mb-2">
                                 <svg class="w-12 h-12 text-gray-400 mx-auto" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -784,7 +784,7 @@
                                     'bg-[#742284]': medio.tipo_pago === 'YAPE',
                                     'bg-[#6AB4E0]': medio.tipo_pago === 'PLIN',
                                 }"
-                                class="absolute inset-0 rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4 w-full">
+                                class="absolute inset-0 rounded-xl p-4 text-white shadow-md sm:w-1/2 md:w-1/2 lg:w-1/2 xl:w-1/4">
                                 <div class="flex items-center justify-between mb-4">
                                     <p class="text-lg font-semibold" x-text="medio.nombre_tipo_pago || medio.tipo_pago"></p>
                                     <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">

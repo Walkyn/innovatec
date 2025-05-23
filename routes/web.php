@@ -347,7 +347,7 @@ Route::middleware('auth')->group(function () {
             'monto_proporcional' => $montoProporcional,
             'mes_inicio_id' => $mesInicioId
         ]);
-    })->middleware('check.permissions:manage,all');
+    });
 
     // Esta es la función que proporciona los servicios para el modal de pagos
     Route::get('/contratos/{id}/servicios', function ($id) {
@@ -466,27 +466,27 @@ Route::middleware('auth')->group(function () {
     // Rutas de ubicación protegidas
     Route::get('/provincias/{regionId}', function ($regionId) {
         return response()->json(Provincia::where('region_id', $regionId)->get());
-    })->middleware('check.permissions:manage,all');
+    });
 
     Route::get('/distritos/{provinciaId}', function ($provinciaId) {
         return response()->json(Distrito::where('provincia_id', $provinciaId)->get());
-    })->middleware('check.permissions:manage,all');
+    });
 
     Route::get('/pueblos/{distritoId}', function ($distritoId) {
         return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
-    })->middleware('check.permissions:manage,all');
+    });
 
     Route::get('/regiones/{regionId}/provincias', function ($regionId) {
         return response()->json(Provincia::where('region_id', $regionId)->get());
-    })->middleware('check.permissions:manage,all');
+    });
 
     Route::get('/provincias/{provinciaId}/distritos', function ($provinciaId) {
         return response()->json(Distrito::where('provincia_id', $provinciaId)->get());
-    })->middleware('check.permissions:manage,all');
+    });
 
     Route::get('/distritos/{distritoId}/pueblos', function ($distritoId) {
         return response()->json(Pueblo::where('distrito_id', $distritoId)->get());
-    })->middleware('check.permissions:manage,all');
+    });
 
     Route::post('/api/update-location', [LocationController::class, 'updateLocation'])->name('api.update-location');
 

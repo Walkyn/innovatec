@@ -12,7 +12,6 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <title>@yield('title')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
@@ -1361,6 +1360,7 @@ Constrain images and videos to the parent width and preserve their intrinsic asp
             animation: dots 1.5s infinite;
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="text-gray-800 font-inter">

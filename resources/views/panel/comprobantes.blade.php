@@ -229,7 +229,7 @@
                         <!-- Primera fila - Nombre y Identificación -->
                         <div class="flex flex-col md:flex-row -mx-3 mb-4">
                             <!-- Nombres y Apellidos -->
-                            <div class="w-full px-3 mb-4 md:mb-0 md:w-2/3">
+                            <div class="px-3 mb-4 md:mb-0 md:w-2/3">
                                 <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-nombre">
                                     Nombres y Apellidos
                                 </label>
@@ -244,7 +244,7 @@
                             </div>
                     
                             <!-- Identificación -->
-                            <div class="w-full px-3 md:w-1/3">
+                            <div class="px-3 md:w-1/3">
                                 <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2" for="cliente-identificacion">
                                     Identificación
                                 </label>
