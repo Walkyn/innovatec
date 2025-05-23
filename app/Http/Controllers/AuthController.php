@@ -6,11 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Session;
 use App\Models\HistorySession;
-// use hisorange\BrowserDetect\Parser as Browser; // hisorange/browser-detect a veces puede dar problemas de dependencias
 use WhichBrowser\Parser;
 use App\Models\ConfiguracionEmpresa;
-use Illuminate\Validation\ValidationException; // Importar la excepción de validación
-use Illuminate\Support\Facades\Route; // Importar el Facade Route si lo usas para verificar rutas
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Route;
 
 class AuthController extends Controller
 {
@@ -22,101 +21,66 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Usamos try-catch para capturar ValidationException
-        // aunque $request->validate() ya lo maneja, puede ayudar a debug
         try {
             $request->validate([
                 'email' => 'required|email',
                 'password' => 'required',
             ], [
-                // Mensajes personalizados si quieres anular los de resources/lang/es/validation.php
                 'email.required' => 'El correo electrónico es obligatorio.',
                 'email.email' => 'El formato del correo electrónico no es válido.',
                 'password.required' => 'La contraseña es obligatoria.',
             ]);
-
-            // Si la validación pasa, intentamos autenticar
-            $credentials = $request->only('email', 'password');
-
-            if (Auth::attempt($credentials)) {
+    
+    
+            if (Auth::attempt($request->only('email', 'password'))) {
                 $user = Auth::user();
-                
-                // Registrar la sesión exitosa
-                // Asegúrate de que esta función NO LANZA un error relacionado con traducciones o tipos inválidos
+    
                 $this->registerSuccessfulLogin($request, $user);
+                $request->session()->flash('login_successful', true);
 
-                // Establecer la variable de sesión para mostrar el modal de ubicación
-                // Corregir el uso de flash en la sesión
-                $request->session()->flash('login_successful', true); 
-                // Si necesitas que persista más allá de la siguiente petición, usa put:
-                // $request->session()->put('login_successful', true);
-
-
-                // Verificar si el usuario es administrador o empleado
                 if ($user->id_rol === 1) {
                     return redirect()->route('home.index');
                 } else {
                     $modulos = $user->modulos;
-
+    
                     if ($modulos->isEmpty()) {
                         Auth::logout();
-                         // Asegúrate de que la ruta 'forbidden' existe
                         return redirect()->route('forbidden');
                     }
-
-                    // Redirigir al primer módulo que tenga asignado
-                    // Asegúrate de que el modelo User tenga la relación 'modulos'
-                    // y que cada módulo tenga el atributo 'nombre_modulo'
+    
                     $primerModulo = $modulos->first();
-
+    
                     if ($primerModulo->nombre_modulo === 'manage') {
                         return redirect()->route('services.index');
                     }
-
-                    // Redirigir al módulo correspondiente si la ruta existe
-                     if (Route::has($primerModulo->nombre_modulo . '.index')) {
-                         return redirect()->route($primerModulo->nombre_modulo . '.index');
-                     } else {
-                         // Fallback si la ruta del primer módulo no existe
-                         return redirect()->route('home.index');
-                     }
+    
+                    if (Route::has($primerModulo->nombre_modulo . '.index')) {
+                        return redirect()->route($primerModulo->nombre_modulo . '.index');
+                    }
+    
+                    return redirect()->route('home.index');
                 }
             }
-
-            // Si Auth::attempt falla (credenciales incorrectas)
-            // Registrar intento fallido de login si el email existe
-            // Asegúrate de que esta función NO LANZA un error relacionado con traducciones o tipos inválidos
+    
             $this->registerFailedLoginAttempt($request);
-
-            // Redirigir de vuelta con un error general para la alerta
-            // Usamos una clave diferente, por ejemplo 'general_error', para que no pise los errores de validación
-            // y también agregamos los errores de validación al mismo redirect si es necesario,
-            // pero en este punto ($request->validate() ya pasó o fue capturado) solo necesitamos el error de credenciales.
-            // Asignaremos este error a una clave específica ('login_error') o lo manejaremos en la alerta.
-            // Si quieres que aparezca en tu alerta existente que usa 'errorDetails':
-             return redirect()->route('login')->with([
-                 'errorDetails' => 'Credenciales incorrectas, por favor intenta otra vez',
-             ])->withInput(); // Mantener los datos ingresados
-
+    
+            return redirect()->route('login')->with([
+                'errorDetails' => 'Credenciales incorrectas, por favor intenta otra vez',
+            ])->withInput();
+    
         } catch (ValidationException $e) {
-            // Si la validación falla (campos vacíos, email inválido, etc.)
-            // Laravel ya redirigió con los errores ($e->errors()) y el input anterior.
-            // No necesitas hacer nada más aquí si confías en el manejo automático de Laravel.
-            // Sin embargo, si el error del traductor ocurre *dentro* de $request->validate(),
-            // este catch no lo capturará porque el TypeError es a nivel de PHP antes de la excepción de Laravel.
-            // La solución principal sigue siendo limpiar caché y verificar archivos de idioma/config.
-
-            // Si AUN ASÍ quieres intentar redirigir manualmente con los errores, podrías hacerlo así:
-             return redirect()->back()
-                 ->withErrors($e->errors()) // Pasar los mensajes de error específicos del validador
-                 ->withInput(); // Mantener los datos ingresados
-
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
         } catch (\Exception $e) {
-            // Capturar otros errores inesperados
-            \Log::error("Error durante el login: " . $e->getMessage(), ['exception' => $e]);
-            // Redirigir con un error general
+            // Depuración
+            dd([
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString()
+            ]);
+    
             return redirect()->route('login')
-                ->with(['errorDetails' => 'Ha ocurrido un error inesperado al intentar iniciar sesión.']) // Usar la misma clave para la alerta general
+                ->with(['errorDetails' => 'Ha ocurrido un error inesperado al intentar iniciar sesión.'])
                 ->withInput();
         }
     }

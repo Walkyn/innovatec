@@ -131,6 +131,14 @@
 
                                 <!-- Selección de Rol -->
                                 <div x-data="app">
+                                    <div class="bg-yellow-100 p-4 mb-4">
+                                        <h4 class="font-bold">DEBUG INFO:</h4>
+                                        <p>User ID Rol: {{ $user->id_rol }}</p>
+                                        <p>User Rol: {{ $user->rol }}</p>
+                                        <p>User Role Alpine: {{ $user->role_alpine }}</p>
+                                        <p>Checked Admin: {{ $user->role_alpine === 'admin' ? 'true' : 'false' }}</p>
+                                        <p>Checked Empleado: {{ $user->role_alpine === 'empleado' ? 'true' : 'false' }}</p>
+                                    </div>
                                     <div
                                         class="rounded-sm border mb-4 border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                                         <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">
@@ -147,8 +155,8 @@
                                                     <div class="relative">
                                                         <input type="radio" name="role" value="admin"
                                                             class="sr-only" @click="selectedRole = 'admin'"
-                                                            :checked="selectedRole === 'admin' ||
-                                                                {{ $user->id_rol === 1 ? 'true' : 'false' }}" />
+                                                            :checked="selectedRole === 'admin' || '{{ $user->role_alpine }}'
+                                                            === 'admin'">
                                                         <div
                                                             class="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]">
                                                         </div>
@@ -176,8 +184,8 @@
                                                     <div class="relative">
                                                         <input type="radio" name="role" value="empleado"
                                                             class="sr-only" @click="selectedRole = 'empleado'"
-                                                            :checked="selectedRole === 'empleado' ||
-                                                                {{ $user->id_rol === 2 ? 'true' : 'false' }}" />
+                                                            :checked="selectedRole === 'empleado' || '{{ $user->role_alpine }}'
+                                                            === 'empleado'">
                                                         <div
                                                             class="block h-8 w-14 rounded-full bg-meta-9 dark:bg-[#5A616B]">
                                                         </div>
@@ -223,7 +231,8 @@
                                                     <label :for="'checkbox' + module.id"
                                                         class="flex cursor-pointer select-none items-center text-sm font-medium">
                                                         <div class="relative">
-                                                            <input type="hidden" :name="'modules[' + index + '][id]'" :value="module.id" />
+                                                            <input type="hidden" :name="'modules[' + index + '][id]'"
+                                                                :value="module.id" />
                                                             <input type="checkbox" :id="'checkbox' + module.id"
                                                                 class="sr-only" x-model="module.active"
                                                                 :name="'modules[' + index + '][active]'"
@@ -276,8 +285,8 @@
                                 <div class="flex flex-col sm:flex-row gap-4">
                                     <input type="submit" value="Actualizar Usuario"
                                         class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90" />
-                                    
-                                    <a href="{{ route('users.index') }}" 
+
+                                    <a href="{{ route('users.index') }}"
                                         class="w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-4 text-center font-medium text-gray-700 transition hover:bg-gray-100">
                                         Cancelar
                                     </a>
@@ -291,15 +300,19 @@
         </div>
     </main>
     <!-- ===== Main Content End ===== -->
-    
+
 @endsection
 
 <!-- ===== Scritps ===== -->
 @section('scripts')
+
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('app', () => ({
-                selectedRole: '{{ $user->id_rol === 1 ? 'admin' : 'empleado' }}',
+                selectedRole: '{{ $user->role_alpine }}',
+                init() {
+                    console.log('Initial selectedRole:', this.selectedRole);
+                },
                 modules: {!! json_encode(
                     $allModulos->map(function ($modulo) use ($userModulos, $userPermisos, $moduloTranslations) {
                         return [
@@ -330,7 +343,6 @@
                 toggleModule(module) {
                     module.active = !module.active;
                     if (!module.active) {
-                        // Limpiar todas las acciones cuando se desmarca el módulo
                         module.actions = {
                             'eliminar': false,
                             'actualizar': false,
@@ -449,21 +461,24 @@
                     };
 
                     const countryName = countryNames[countryCode] || 'este país';
-                    
+
                     // Obtener el número sin el código de país
                     let phoneNumberOnly = phoneDisplay.value.replace(/\D/g, "");
                     // Remover el código de país del número
                     if (iti.getSelectedCountryData().dialCode) {
-                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + iti.getSelectedCountryData().dialCode), '');
+                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + iti.getSelectedCountryData()
+                            .dialCode), '');
                     }
-                    
+
                     const actualLength = phoneNumberOnly.length;
-                    
+
                     if (actualLength < requiredLength) {
-                        phoneError.textContent = `Por favor, ingrese ${requiredLength} dígitos para ${countryName}. Te faltan ${requiredLength - actualLength} dígitos.`;
+                        phoneError.textContent =
+                            `Por favor, ingrese ${requiredLength} dígitos para ${countryName}. Te faltan ${requiredLength - actualLength} dígitos.`;
                         phoneError.classList.remove('hidden');
                     } else if (actualLength > requiredLength) {
-                        phoneError.textContent = `El número telefónico para ${countryName} debe tener ${requiredLength} dígitos. Tienes ${actualLength - requiredLength} dígitos extra.`;
+                        phoneError.textContent =
+                            `El número telefónico para ${countryName} debe tener ${requiredLength} dígitos. Tienes ${actualLength - requiredLength} dígitos extra.`;
                         phoneError.classList.remove('hidden');
                     } else {
                         phoneError.classList.add('hidden');
@@ -478,16 +493,18 @@
                     // Obtener el número sin el código de país
                     let phoneNumberOnly = phoneDisplay.value.replace(/\D/g, "");
                     if (countryData.dialCode) {
-                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + countryData.dialCode), '');
+                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + countryData.dialCode),
+                            '');
                     }
-                    
+
                     const actualLength = phoneNumberOnly.length;
 
                     // Limitar la longitud sin contar el código de país
                     if (actualLength > digitLimit) {
                         phoneNumberOnly = phoneNumberOnly.slice(0, digitLimit);
                         // Reconstruir el número con el código de país
-                        phoneDisplay.value = "+" + countryData.dialCode + " " + formatPhoneNumber(phoneNumberOnly);
+                        phoneDisplay.value = "+" + countryData.dialCode + " " + formatPhoneNumber(
+                            phoneNumberOnly);
                     }
 
                     updateValidationMessage(countryCode, actualLength, digitLimit);
@@ -507,15 +524,16 @@
                     const countryData = iti.getSelectedCountryData();
                     const countryCode = countryData.iso2;
                     const digitLimit = limitDigitsByCountry(countryCode);
-                    
+
                     // Obtener el número sin el código de país
                     let phoneNumberOnly = phoneDisplay.value.replace(/\D/g, "");
                     if (countryData.dialCode) {
-                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + countryData.dialCode), '');
+                        phoneNumberOnly = phoneNumberOnly.replace(new RegExp('^' + countryData.dialCode),
+                            '');
                     }
-                    
+
                     const actualLength = phoneNumberOnly.length;
-                    
+
                     updateValidationMessage(countryCode, actualLength, digitLimit);
                 });
 
@@ -536,15 +554,15 @@
                 if (phoneInput.value) {
                     iti.setNumber(phoneInput.value);
                     phoneDisplay.value = phoneInput.value;
-                    
+
                     // Validar el número inicial
                     const countryData = iti.getSelectedCountryData();
                     const countryCode = countryData.iso2;
                     const currentLength = phoneDisplay.value.replace(/\D/g, "").length;
                     const digitLimit = limitDigitsByCountry(countryCode);
-                    
+
                     updateValidationMessage(countryCode, currentLength, digitLimit);
-                    
+
                     if (iti.isValidNumber()) {
                         phoneDisplay.classList.remove('border-red-500');
                         phoneDisplay.classList.add('border-green-500');
@@ -560,19 +578,19 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('userForm');
-            
+
             // Función para limpiar todos los mensajes de error
             function clearAllErrors() {
                 // Limpiar mensajes de error existentes
                 const existingErrors = document.querySelectorAll('.error-message');
                 existingErrors.forEach(error => error.remove());
-                
+
                 // Limpiar clases de error de los inputs
                 const inputs = form.querySelectorAll('input');
                 inputs.forEach(input => {
                     input.classList.remove('border-red-500');
                 });
-                
+
                 // Limpiar mensajes de error específicos
                 const errorElements = document.querySelectorAll('[id$="Error"]');
                 errorElements.forEach(el => {
@@ -580,15 +598,15 @@
                     el.textContent = '';
                 });
             }
-            
+
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
-                
+
                 // Limpiar todos los errores anteriores
                 clearAllErrors();
-                
+
                 let hasErrors = false;
-                
+
                 // Validar nombre
                 const name = document.querySelector('input[name="name"]');
                 if (!name.value.trim()) {
@@ -599,7 +617,7 @@
                     name.classList.add('border-red-500');
                     hasErrors = true;
                 }
-                
+
                 // Validar email
                 const email = document.querySelector('input[name="email"]');
                 if (!email.value.trim()) {
@@ -610,16 +628,17 @@
                     email.classList.add('border-red-500');
                     hasErrors = true;
                 }
-                
+
                 // Validar teléfono
                 const phoneDisplay = document.getElementById('phone_display_edit');
                 if (!phoneDisplay.value.trim()) {
-                    document.getElementById('phone-error-edit').textContent = 'Por favor ingrese el número de teléfono';
+                    document.getElementById('phone-error-edit').textContent =
+                        'Por favor ingrese el número de teléfono';
                     document.getElementById('phone-error-edit').classList.remove('hidden');
                     phoneDisplay.classList.add('border-red-500');
                     hasErrors = true;
                 }
-                
+
                 // Validar rol
                 const role = document.querySelector('input[name="role"]:checked');
                 if (!role) {
@@ -629,7 +648,7 @@
                     document.querySelector('.space-y-4').appendChild(roleError);
                     hasErrors = true;
                 }
-                
+
                 if (!hasErrors) {
                     form.submit();
                 }

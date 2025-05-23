@@ -129,14 +129,12 @@ class UserController extends Controller
             ->where('u.id', $id)
             ->get();
 
-        // Si el usuario no tiene permisos, devolver error 404
         if ($userData->isEmpty()) {
             abort(404, 'Usuario no encontrado.');
         }
 
         $allModulos = Modulo::all();
 
-        // Traducciones de módulos
         $moduloTranslations = [
             'home' => 'Inicio',
             'clients' => 'Clientes',
@@ -150,14 +148,14 @@ class UserController extends Controller
             'users' => 'Usuarios'
         ];
 
-        // Organizar datos para la vista
         $user = (object) [
             'id' => $userData->first()->user_id,
             'name' => $userData->first()->user_name,
             'email' => $userData->first()->email,
             'phone' => $userData->first()->phone,
             'id_rol' => $userData->first()->id_rol,
-            'rol' => $userData->first()->nombre_rol
+            'rol' => $userData->first()->nombre_rol,
+            'role_alpine' => $userData->first()->id_rol == 1 ? 'admin' : 'empleado'
         ];
 
         $userModulos = $userData->pluck('id_modulo')->toArray();
@@ -220,7 +218,6 @@ class UserController extends Controller
             if ($request->role === 'admin') {
                 $modules = Modulo::all();
                 foreach ($modules as $module) {
-                    // Guardar en usuario_modulo
                     DB::table('usuario_modulo')->insert([
                         'id_usuario' => $user->id,
                         'id_modulo' => $module->id_modulo,
@@ -228,7 +225,6 @@ class UserController extends Controller
                         'updated_at' => now(),
                     ]);
 
-                    // Guardar en permisos
                     Permiso::create([
                         'id_usuario' => $user->id,
                         'id_modulo' => $module->id_modulo,
@@ -243,13 +239,11 @@ class UserController extends Controller
                 $modules = $request->input('modules', []);
 
                 foreach ($modules as $module) {
-                    // Solo procesar módulos que estén activos
                     if (isset($module['active']) && $module['active']) {
                         $modulo = Modulo::find($module['id']);
                         if ($modulo) {
                             $actions = $module['actions'] ?? [];
 
-                            // Guardar en usuario_modulo
                             DB::table('usuario_modulo')->insert([
                                 'id_usuario' => $user->id,
                                 'id_modulo' => $modulo->id_modulo,
@@ -257,7 +251,6 @@ class UserController extends Controller
                                 'updated_at' => now(),
                             ]);
 
-                            // Guardar en permisos
                             Permiso::create([
                                 'id_usuario' => $user->id,
                                 'id_modulo' => $modulo->id_modulo,
@@ -404,7 +397,7 @@ class UserController extends Controller
 
         try {
             $cliente = \App\Models\Cliente::findOrFail($request->cliente_id);
-            
+
             // Actualizar la contraseña
             $cliente->clave_acceso = Hash::make($request->password);
             $cliente->save();
@@ -413,7 +406,6 @@ class UserController extends Controller
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Contraseña restablecida correctamente'
             ]);
-            
         } catch (\Exception $e) {
             return redirect()->back()->with([
                 'errorMessage' => 'Error',
@@ -436,8 +428,8 @@ class UserController extends Controller
 
         try {
             $cliente = \App\Models\Cliente::where('identificacion', $request->identificacion)
-                             ->where('estado_cliente', 'activo')
-                             ->first();
+                ->where('estado_cliente', 'activo')
+                ->first();
 
             if (!$cliente) {
                 return redirect()->route('password.reset-cliente')
@@ -448,7 +440,7 @@ class UserController extends Controller
             }
 
             $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
-            
+
             return view('users.reset-password-cliente', [
                 'user' => $cliente,
                 'initials' => $initials
@@ -473,8 +465,8 @@ class UserController extends Controller
 
         try {
             $cliente = \App\Models\Cliente::where('identificacion', $request->identificacion)
-                             ->where('estado_cliente', 'activo')
-                             ->first();
+                ->where('estado_cliente', 'activo')
+                ->first();
 
             if (!$cliente) {
                 return redirect()->route('password.reset-cliente')
@@ -485,7 +477,7 @@ class UserController extends Controller
             }
 
             $initials = strtoupper(substr($cliente->nombres, 0, 1) . substr($cliente->apellidos, 0, 1));
-            
+
             return view('users.reset-password-cliente', [
                 'user' => $cliente,
                 'initials' => $initials
