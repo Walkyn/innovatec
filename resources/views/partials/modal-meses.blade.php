@@ -188,8 +188,8 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Plan y detalles -->
+                                
+                                <!-- Detalles -->
                                 <div class="w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-3">
@@ -198,26 +198,8 @@
                                                 <i class="fas fa-wifi text-green-500 dark:text-green-300"></i>
                                             </div>
                                             <div>
-                                                <div class="flex items-center space-x-1">
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400"
-                                                        data-field="servicio">
-                                                        --</p>
-                                                </div>
-                                                <p class="text-lg font-bold text-gray-800 dark:text-white"
-                                                    data-field="precio">--</p>
-                                            </div>
-                                        </div>
-                                        <div class="h-12 w-px bg-gray-200 dark:bg-gray-600"></div>
-                                        <div class="flex items-center space-x-3">
-                                            <div
-                                                class="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                                <i class="fas fa-check-circle text-green-500 dark:text-green-300"
-                                                    data-field="estado-icon"></i>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm text-gray-500 dark:text-gray-400">Estado</p>
-                                                <p class="text-sm font-semibold text-green-600 dark:text-green-400"
-                                                    data-field="estado">--</p>
+                                                <p class="text-lg font-bold text-gray-500 dark:text-white">Servicios
+                                                    Contratos</p>
                                             </div>
                                         </div>
                                     </div>

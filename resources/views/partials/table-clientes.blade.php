@@ -398,9 +398,7 @@
                         estadoIndicator.querySelector('i').className = `fas ${indicatorIcon} text-white text-xs`;
                     }
                     if (estadoPerfil) {
-                        // Puedes mostrar el texto de estado aquí si lo deseas, o dejar la fecha de alta
-                        // estadoPerfil.textContent = estadoPerfilTexto;
-                        // O dejar la fecha de alta como ya tienes
+
                     }
 
                     // === ESTADO DEL SERVICIO/PLAN (sección plan) ===
@@ -503,8 +501,8 @@
                     if (fechaInicioElement) {
                         let fechaFormateada = 'No especificada';
                         if (cliente.created_at) {
-                            // Si viene como "2022-07-06" o "2022-07-06T00:00:00.000000Z"
-                            let fechaStr = cliente.created_at.split('T')[0]; // "2022-07-06"
+
+                            let fechaStr = cliente.created_at.split('T')[0];
                             const [anio, mes, dia] = fechaStr.split('-');
                             // Mes en español
                             const meses = [
@@ -524,8 +522,7 @@
                     if (fechaInstalacionElement) {
                         let fechaInstalacionFormateada = 'No especificada';
                         if (cliente.created_at) {
-                            // Si viene como "2022-07-06" o "2022-07-06T03:55:51.000000Z"
-                            let fechaStr = cliente.created_at.split('T')[0]; // "2022-07-06"
+                            let fechaStr = cliente.created_at.split('T')[0];
                             const [anio, mes, dia] = fechaStr.split('-');
                             fechaInstalacionFormateada = `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${anio}`;
                         }

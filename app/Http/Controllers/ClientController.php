@@ -28,7 +28,6 @@ class ClientController extends Controller
             });
         }
     
-        // Filtro por estado (se mantiene aunque se apliquen otros filtros)
         if ($request->filled('estado')) {
             $query->where('estado_cliente', $request->estado);
         }

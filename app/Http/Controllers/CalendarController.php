@@ -11,23 +11,17 @@ class CalendarController extends Controller
 {
     public function index(Request $request)
     {
-        // Establecer el locale de Carbon a español
         Carbon::setLocale('es');
         
-        // Obtener el mes y año de la solicitud, o usar el actual
         $month = $request->query('month', now()->month);
         $year = $request->query('year', now()->year);
         
         // Validar los parámetros
         $month = min(max(1, (int) $month), 12);
         $year = min(max(2000, (int) $year), 2100);
-        
-        // Crear una fecha con el mes y año solicitados
+
         $date = Carbon::createFromDate($year, $month, 1)->locale('es');
-        
-        // Obtener todos los eventos de soporte para el mes seleccionado
-        // Extendemos un poco el rango para incluir eventos que comienzan antes pero terminan en el mes actual
-        // o comienzan en el mes actual pero terminan después
+
         $startDate = $date->copy()->startOfMonth()->subWeek();
         $endDate = $date->copy()->endOfMonth()->addWeek();
         
@@ -73,9 +67,7 @@ class CalendarController extends Controller
                 }
             }
         }
-        
-        // Verifica si hay algún parámetro en la URL que esté forzando la apertura del modal
-        // Por ejemplo, si hay un parámetro como '?openModal=true'
+
         $openModal = $request->query('openModal', false);
         
         // Pasar el mes y año actuales y el evento seleccionado a la vista

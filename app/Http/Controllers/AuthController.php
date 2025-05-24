@@ -87,7 +87,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Registrar el cierre de sesión
         $this->registerLogout($request);
         
         Auth::logout();
@@ -97,9 +96,6 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    /**
-     * Registra un inicio de sesión exitoso
-     */
     protected function registerSuccessfulLogin(Request $request, $user)
     {
         $request->session()->start();
@@ -194,9 +190,6 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Registra el cierre de sesión
-     */
     protected function registerLogout(Request $request)
     {
         $sessionId = $request->session()->getId();
@@ -214,9 +207,6 @@ class AuthController extends Controller
             ?->update(['logout_at' => now()]);
     }
 
-    /**
-     * Obtiene la ubicación aproximada basada en la IP
-     */
     protected function getLocation($ip)
     {
         // Si es localhost o IP privada
@@ -261,7 +251,6 @@ class AuthController extends Controller
         $result = new Parser($request->header('User-Agent'));
         $deviceInfo = [];
 
-        // Obtener información del dispositivo
         if ($result->device->type) {
             $deviceInfo['type'] = ucfirst($result->device->type);
         }

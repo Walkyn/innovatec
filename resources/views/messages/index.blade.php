@@ -31,8 +31,10 @@
             <!-- ====== Table Section Start -->
             <div class="flex flex-col gap-10">
                 <!-- Botón de volver (solo visible en móviles) -->
-                <button id="btnVolver" class="md:hidden fixed top-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg shadow-lg flex items-center space-x-1 transition-all duration-300 transform scale-100 hover:scale-110 hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button id="btnVolver"
+                    class="md:hidden fixed top-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg shadow-lg flex items-center space-x-1 transition-all duration-300 transform scale-100 hover:scale-110 hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                     <span class="font-medium text-sm">Volver</span>
@@ -40,23 +42,27 @@
 
                 <div class="flex h-screen flex-col md:flex-row">
                     <!-- Sidebar con clientes agrupados -->
-                    <div id="sidebar-clientes" class="w-full md:w-1/3 bg-white dark:bg-boxdark border-r border-gray-200 dark:border-strokedark">
+                    <div id="sidebar-clientes"
+                        class="w-full md:w-1/3 bg-white dark:bg-boxdark border-r border-gray-200 dark:border-strokedark">
                         <div class="p-6">
                             <h1 class="text-lg font-semibold text-black dark:text-white flex justify-between">
                                 Pagos por revisar
                                 @php
-                                    $pagosPorCliente = $pagos->groupBy(function($pago) {
+                                    $pagosPorCliente = $pagos->groupBy(function ($pago) {
                                         return $pago['cliente']['id'] ?? 'desconocido';
                                     });
-                                    $clientesConPagosPendientes = $pagosPorCliente->filter(function($pagosCliente) {
-                                        return $pagosCliente->where('estado', 'en_revision')->count() > 0;
-                                    })->count();
+                                    $clientesConPagosPendientes = $pagosPorCliente
+                                        ->filter(function ($pagosCliente) {
+                                            return $pagosCliente->where('estado', 'en_revision')->count() > 0;
+                                        })
+                                        ->count();
                                 @endphp
-                                <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 text-sm px-2 py-1 rounded-md">{{ $clientesConPagosPendientes }}</span>
+                                <span
+                                    class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 text-sm px-2 py-1 rounded-md">{{ $clientesConPagosPendientes }}</span>
                             </h1>
                         </div>
                         <div class="overflow-y-auto p-4">
-                            @foreach($pagosPorCliente as $clienteId => $pagosCliente)
+                            @foreach ($pagosPorCliente as $clienteId => $pagosCliente)
                                 @php
                                     $cliente = $pagosCliente->first()['cliente'] ?? null;
                                     $totalPagos = $pagosCliente->count();
@@ -70,23 +76,31 @@
                                     data-cliente-id="{{ $clienteId }}">
                                     <div class="relative">
                                         @php
-                                            $iniciales = $cliente ? strtoupper(substr($cliente['nombres'],0,1) . substr($cliente['apellidos'],0,1)) : '?';
+                                            $iniciales = $cliente
+                                                ? strtoupper(
+                                                    substr($cliente['nombres'], 0, 1) .
+                                                        substr($cliente['apellidos'], 0, 1),
+                                                )
+                                                : '?';
                                         @endphp
-                                        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
                                             {{ $iniciales }}
                                         </div>
                                     </div>
                                     <div class="ml-3 flex-1">
                                         <p class="font-semibold text-black dark:text-white flex justify-between">
                                             {{ $cliente ? $cliente['nombres'] . ' ' . $cliente['apellidos'] : 'Cliente no encontrado' }}
-                                            @if($pagosPendientes > 0)
-                                            <span class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
-                                                {{ $pagosPendientes }}
-                                            </span>
+                                            @if ($pagosPendientes > 0)
+                                                <span
+                                                    class="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                    {{ $pagosPendientes }}
+                                                </span>
                                             @else
-                                            <span class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
-                                                0
-                                            </span>
+                                                <span
+                                                    class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                    0
+                                                </span>
                                             @endif
                                         </p>
                                         <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
@@ -99,9 +113,10 @@
                             @endforeach
                         </div>
                     </div>
-                
+
                     <!-- Área de detalle del pago seleccionado -->
-                    <div id="detalle-pago" class="hidden md:flex flex-1 flex-col bg-gray-50 dark:bg-boxdark-2 opacity-0 transition-opacity duration-300 ease-in-out">
+                    <div id="detalle-pago"
+                        class="hidden md:flex flex-1 flex-col bg-gray-50 dark:bg-boxdark-2 opacity-0 transition-opacity duration-300 ease-in-out">
                         <div class="flex items-center justify-center h-full text-gray-400">
                             Selecciona un pago para ver los detalles.
                         </div>
@@ -121,7 +136,8 @@
     <div class="bg-white p-5 rounded shadow max-w-xs w-full text-center">
         <p class="text-green-600 font-semibold mb-2">¡Pago actualizado!</p>
         <p class="text-gray-600 text-sm mb-4">Los cambios se guardaron correctamente.</p>
-        <button id="cerrarModalExito" class="px-4 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm font-medium">
+        <button id="cerrarModalExito"
+            class="px-4 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-sm font-medium">
             Aceptar
         </button>
     </div>
@@ -133,30 +149,32 @@
         const detallePago = document.getElementById('detalle-pago');
         const sidebarClientes = document.getElementById('sidebar-clientes');
         const btnVolver = document.getElementById('btnVolver');
-        
+
         // Recuperar el cliente temporal después de una actualización
         const clienteTemporal = localStorage.getItem('temp_cliente_actualizado');
-        
+
         // Configuramos la delegación de eventos para los formularios
         document.addEventListener('click', function(e) {
             if (e.target && e.target.closest('.actualizar-form button[type="submit"]')) {
                 const form = e.target.closest('.actualizar-form');
                 if (form) {
                     e.preventDefault();
-                    
+
                     const formData = new FormData(form);
                     const pagoId = formData.get('pago_id');
                     const nuevoEstado = formData.get('estado');
                     const observaciones = formData.get('observaciones');
-                    
+
                     // Guardamos el cliente actual en localStorage antes de enviar
-                    const clienteActual = form.closest('.flex-col.h-full').querySelector('.cliente-item')?.getAttribute('data-cliente-id') || 
-                                         document.querySelector('.cliente-item.bg-gray-100')?.getAttribute('data-cliente-id');
-                    
+                    const clienteActual = form.closest('.flex-col.h-full').querySelector(
+                            '.cliente-item')?.getAttribute('data-cliente-id') ||
+                        document.querySelector('.cliente-item.bg-gray-100')?.getAttribute(
+                            'data-cliente-id');
+
                     if (clienteActual) {
                         localStorage.setItem('temp_cliente_actualizado', clienteActual);
                     }
-                    
+
                     // Enviamos el formulario a través de fetch
                     const data = {
                         pago_id: pagoId,
@@ -164,45 +182,45 @@
                         observaciones: observaciones,
                         _token: '{{ csrf_token() }}'
                     };
-                    
+
                     fetch("{{ route('panel.actualizar-pago') }}", {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Mostrar el modal de éxito
-                            const modal = document.getElementById('modalExito');
-                            modal.classList.remove('hidden');
-                            modal.style.display = 'flex';
-                            modal.style.alignItems = 'center';
-                            modal.style.justifyContent = 'center';
-                            
-                            // Al cerrar el modal, recargamos la página
-                            document.getElementById('cerrarModalExito').onclick = function() {
-                                modal.classList.add('hidden');
-                                modal.style.display = 'none';
-                                // Recargar la página para mostrar los cambios en la base de datos
-                                window.location.reload();
-                            };
-                        } else {
-                            alert(data.message || 'Error al actualizar el pago');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Error al procesar la solicitud');
-                    });
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Mostrar el modal de éxito
+                                const modal = document.getElementById('modalExito');
+                                modal.classList.remove('hidden');
+                                modal.style.display = 'flex';
+                                modal.style.alignItems = 'center';
+                                modal.style.justifyContent = 'center';
+
+                                // Al cerrar el modal, recargamos la página
+                                document.getElementById('cerrarModalExito').onclick = function() {
+                                    modal.classList.add('hidden');
+                                    modal.style.display = 'none';
+                                    // Recargar la página para mostrar los cambios en la base de datos
+                                    window.location.reload();
+                                };
+                            } else {
+                                alert(data.message || 'Error al actualizar el pago');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error al procesar la solicitud');
+                        });
                 }
             }
         });
-        
+
         // Función para manejar cambios de vista en móviles y escritorio
         function toggleVistaMobile(mostrarDetalle) {
             const transitionDuration = 300; // Duración en milisegundos, coincide con Tailwind duration-300
@@ -254,19 +272,19 @@
 
                 // Mostrar sidebar
                 sidebarClientes.classList.remove('hidden');
-                 sidebarClientes.style.display = 'block'; // Asegurar display block
+                sidebarClientes.style.display = 'block'; // Asegurar display block
 
                 btnVolver.classList.add('hidden');
             }
         }
-        
+
         // Verificar estado al cargar la página
         if (window.innerWidth >= 768) {
             // Asegurar que ambos paneles sean visibles en desktop
             sidebarClientes.classList.remove('hidden');
             detallePago.classList.remove('hidden');
             detallePago.classList.add('flex');
-             // Asegurar opacidad en desktop si no estaba ya
+            // Asegurar opacidad en desktop si no estaba ya
             detallePago.classList.remove('opacity-0');
             detallePago.classList.add('opacity-100');
         } else {
@@ -274,7 +292,7 @@
             sidebarClientes.classList.remove('hidden');
             detallePago.classList.add('hidden');
             detallePago.classList.remove('flex');
-             // Asegurar opacidad 0 inicialmente en móvil
+            // Asegurar opacidad 0 inicialmente en móvil
             detallePago.classList.add('opacity-0');
             detallePago.classList.remove('opacity-100');
         }
@@ -288,12 +306,13 @@
 
                 detallePago.classList.remove('hidden', 'opacity-0');
                 detallePago.classList.add('flex', 'opacity-100');
-                 detallePago.style.display = 'flex'; // Asegurar display flex
+                detallePago.style.display = 'flex'; // Asegurar display flex
 
                 btnVolver.classList.add('hidden');
             } else {
                 // En móvil: ajustar estilos según el estado actual (si está visible o no)
-                const detalleEstaVisible = !detallePago.classList.contains('hidden'); // Comprobar si no tiene la clase hidden
+                const detalleEstaVisible = !detallePago.classList.contains(
+                'hidden'); // Comprobar si no tiene la clase hidden
 
                 if (detalleEstaVisible) {
                     // Si ya estaba visible, asegurar estado móvil correcto
@@ -318,7 +337,7 @@
                 }
             }
         });
-        
+
         // Botón para volver al listado en móviles
         btnVolver.addEventListener('click', function() {
             toggleVistaMobile(false);
@@ -337,7 +356,7 @@
 
         // Ordenar pagos por fecha (más recientes primero)
         Object.keys(pagosPorCliente).forEach(clienteId => {
-            pagosPorCliente[clienteId].sort((a, b) => 
+            pagosPorCliente[clienteId].sort((a, b) =>
                 new Date(b.created_at) - new Date(a.created_at)
             );
         });
@@ -348,20 +367,21 @@
                 const clienteId = this.getAttribute('data-cliente-id');
                 const pagosCliente = pagosPorCliente[clienteId] || [];
                 const cliente = pagosCliente.length > 0 ? pagosCliente[0].cliente : null;
-                
+
                 if (!cliente) return;
 
                 // Mostrar vista de detalles en móvil
                 toggleVistaMobile(true);
 
                 // Seleccionar y resaltar el cliente activo
-                document.querySelectorAll('.cliente-item').forEach(i => 
+                document.querySelectorAll('.cliente-item').forEach(i =>
                     i.classList.remove('bg-gray-100', 'dark:bg-meta-4')
                 );
                 this.classList.add('bg-gray-100', 'dark:bg-meta-4');
 
                 // Calcular pagos pendientes
-                const pagosPendientes = pagosCliente.filter(pago => pago.estado === 'en_revision').length;
+                const pagosPendientes = pagosCliente.filter(pago => pago.estado ===
+                    'en_revision').length;
 
                 // Crear el historial de pagos como un chat
                 let historialHTML = `
@@ -403,37 +423,37 @@
 
                 // Generar cada pago como un "mensaje" en el chat
                 pagosCliente.forEach(pago => {
-                    const estados = [
-                        {
-                            valor: 'en_revision', 
-                            texto: 'En revisión', 
+                    const estados = [{
+                            valor: 'en_revision',
+                            texto: 'En revisión',
                             icono: '<i class="fas fa-clock"></i>',
-                            bgClaro: 'bg-yellow-100', 
-                            bgOscuro: 'dark:bg-yellow-900/50', 
-                            textClaro: 'text-yellow-600', 
+                            bgClaro: 'bg-yellow-100',
+                            bgOscuro: 'dark:bg-yellow-900/50',
+                            textClaro: 'text-yellow-600',
                             textOscuro: 'dark:text-yellow-300'
                         },
                         {
-                            valor: 'Aprobado', 
-                            texto: 'Aprobado', 
+                            valor: 'Aprobado',
+                            texto: 'Aprobado',
                             icono: '<i class="fas fa-check-circle"></i>',
-                            bgClaro: 'bg-emerald-100', 
-                            bgOscuro: 'dark:bg-emerald-900/50', 
-                            textClaro: 'text-emerald-600', 
+                            bgClaro: 'bg-emerald-100',
+                            bgOscuro: 'dark:bg-emerald-900/50',
+                            textClaro: 'text-emerald-600',
                             textOscuro: 'dark:text-emerald-300'
                         },
                         {
-                            valor: 'Rechazado', 
-                            texto: 'Rechazado', 
+                            valor: 'Rechazado',
+                            texto: 'Rechazado',
                             icono: '<i class="fas fa-times-circle"></i>',
-                            bgClaro: 'bg-rose-100', 
-                            bgOscuro: 'dark:bg-rose-900/50', 
-                            textClaro: 'text-rose-600', 
+                            bgClaro: 'bg-rose-100',
+                            bgOscuro: 'dark:bg-rose-900/50',
+                            textClaro: 'text-rose-600',
                             textOscuro: 'dark:text-rose-300'
                         }
                     ];
-                    const estado = estados.find(e => e.valor === pago.estado) || estados[0];
-                    
+                    const estado = estados.find(e => e.valor === pago.estado) ||
+                        estados[0];
+
                     // Obtener detalles de servicios
                     let detallesHtml = '';
                     try {
@@ -502,10 +522,12 @@
                         comprobanteHtml = `
                             <div class="mt-2 p-2 border border-gray-200 dark:border-gray-700 rounded">
                                 <div class="flex items-center mb-2">
-                                    <svg class="w-4 h-4 text-blue-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <a href="/storage/${pago.comprobante_path}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 text-sm">
+                                    <svg class="w-4 h-4 text-blue-500 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
                                     </svg>
-                                    <a href="#" onclick="verComprobante('${pago.comprobante_path}', event)" class="text-blue-600 dark:text-blue-400 text-sm">Ver comprobante</a>
+                                    Ver comprobante
+                                </a>
                                 </div>
                                 <div class="relative">
                                     <img src="/storage/${pago.comprobante_path}"
@@ -606,11 +628,12 @@
                 }
             });
         });
-        
+
         if (clienteTemporal) {
             localStorage.removeItem('temp_cliente_actualizado');
-            
-            const elementoCliente = document.querySelector(`.cliente-item[data-cliente-id="${clienteTemporal}"]`);
+
+            const elementoCliente = document.querySelector(
+                `.cliente-item[data-cliente-id="${clienteTemporal}"]`);
             if (elementoCliente) {
                 setTimeout(() => {
                     elementoCliente.click();
@@ -619,9 +642,3 @@
         }
     });
 </script>
-
-
-
-
-
-
