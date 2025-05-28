@@ -119,7 +119,7 @@
                                 <i class="fa fa-align-left text-gray-500 dark:text-gray-400"></i>
                             </div>
                             <textarea id="ver-input-observaciones" name="ver-input-observaciones" rows="3"
-                                class="block p-2.5 w-full text-sm border border-gray-100 text-gray-900 rounded border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
+                                class="block p-2.5 w-full text-sm border-gray-100 text-gray-900 rounded border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 pl-8 resize-none"
                                 disabled></textarea>
                         </div>
                     </div>
@@ -142,7 +142,6 @@
                                             class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                             <th class="px-4 py-3">Item</th>
                                             <th class="px-4 py-3">Servicio</th>
-                                            <th class="px-4 py-3">Plan</th>
                                             <th class="px-4 py-3">IP</th>
                                             <th class="px-4 py-3 whitespace-nowrap">Fecha</th>
                                             <th class="px-4 py-3">Estado</th>
@@ -236,9 +235,8 @@
                                                             }
 
                                                             row.innerHTML = `
-                                                                <td class="px-4 py-3">${index + 1}</td>
-                                                                <td class="px-4 py-3">${detalle.nombre}</td>
-                                                                <td class="px-4 py-3 text-sm">${detalle.plan || "N/A"}</td>
+                                                                <td class="px-4 py-3 text-sm">${index + 1}</td>
+                                                                <td class="px-4 py-3 text-sm whitespace-nowrap">${detalle.nombre} - ${detalle.plan || "N/A"}</td>
                                                                 <td class="px-4 py-3 text-sm"></td>
                                                                 <td class="px-4 py-3 text-sm whitespace-nowrap">
                                                                     <span class="${detalle.estado === 'suspendido' ? 'text-red-700' : ''}">
@@ -257,7 +255,7 @@
                                                             `;
 
                                                             // Reemplazar el td vacío con el td que contiene el enlace
-                                                            row.children[3].replaceWith(ipCell);
+                                                            row.children[2].replaceWith(ipCell);
 
                                                             tbody.appendChild(row);
                                                         });

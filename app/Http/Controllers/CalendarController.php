@@ -19,22 +19,19 @@ class CalendarController extends Controller
         // Validar los parámetros
         $month = min(max(1, (int) $month), 12);
         $year = min(max(2000, (int) $year), 2100);
-
+    
         $date = Carbon::createFromDate($year, $month, 1)->locale('es');
-
+    
         $startDate = $date->copy()->startOfMonth()->subWeek();
         $endDate = $date->copy()->endOfMonth()->addWeek();
         
-        $eventos = EventoSoporte::where('tecnico_id', Auth::id())
-            ->where(function($query) use ($startDate, $endDate) {
+        // Obtener todos los eventos sin filtrar
+        $eventos = EventoSoporte::where(function($query) use ($startDate, $endDate) {
                 $query->where(function($q) use ($startDate, $endDate) {
-                    // Eventos que comienzan en el rango
                     $q->whereBetween('fecha_inicio', [$startDate, $endDate]);
                 })->orWhere(function($q) use ($startDate, $endDate) {
-                    // Eventos que terminan en el rango
                     $q->whereBetween('fecha_fin', [$startDate, $endDate]);
                 })->orWhere(function($q) use ($startDate, $endDate) {
-                    // Eventos que comienzan antes y terminan después del rango (abarcan todo el mes)
                     $q->where('fecha_inicio', '<', $startDate)
                       ->where('fecha_fin', '>', $endDate);
                 });
@@ -45,14 +42,11 @@ class CalendarController extends Controller
         // Verificar si se solicitó abrir un evento específico
         $eventoSeleccionado = null;
         $shouldOpenModal = $request->has('openEvent') && $request->has('event');
-
+    
         if ($shouldOpenModal && $request->has('event')) {
             $eventoId = $request->query('event');
-            $eventoSeleccionado = EventoSoporte::where('id', $eventoId)
-                ->where('tecnico_id', Auth::id())
-                ->first();
-            
-            // Si el evento es de otro mes, redireccionar a ese mes
+            $eventoSeleccionado = EventoSoporte::where('id', $eventoId)->first();
+
             if ($eventoSeleccionado) {
                 $mesEvento = Carbon::parse($eventoSeleccionado->fecha_inicio)->month;
                 $añoEvento = Carbon::parse($eventoSeleccionado->fecha_inicio)->year;
@@ -67,7 +61,7 @@ class CalendarController extends Controller
                 }
             }
         }
-
+    
         $openModal = $request->query('openModal', false);
         
         // Pasar el mes y año actuales y el evento seleccionado a la vista
@@ -149,11 +143,6 @@ class CalendarController extends Controller
 
     public function getEvento(EventoSoporte $evento)
     {
-        // Verificar que el técnico es dueño del evento
-        if ($evento->tecnico_id !== Auth::id()) {
-            return response()->json(['success' => false, 'message' => 'No autorizado'], 403);
-        }
-        
         return response()->json([
             'success' => true,
             'evento' => [
@@ -165,6 +154,7 @@ class CalendarController extends Controller
                 'fecha_fin' => $evento->fecha_fin ? $evento->fecha_fin->format('Y-m-d') : null,
                 'cliente_nombre' => $evento->cliente_nombre,
                 'todo_dia' => $evento->todo_dia,
+                'tecnico_id' => $evento->tecnico_id
             ]
         ]);
     }

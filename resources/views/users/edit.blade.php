@@ -131,14 +131,6 @@
 
                                 <!-- Selección de Rol -->
                                 <div x-data="app">
-                                    <div class="bg-yellow-100 p-4 mb-4">
-                                        <h4 class="font-bold">DEBUG INFO:</h4>
-                                        <p>User ID Rol: {{ $user->id_rol }}</p>
-                                        <p>User Rol: {{ $user->rol }}</p>
-                                        <p>User Role Alpine: {{ $user->role_alpine }}</p>
-                                        <p>Checked Admin: {{ $user->role_alpine === 'admin' ? 'true' : 'false' }}</p>
-                                        <p>Checked Empleado: {{ $user->role_alpine === 'empleado' ? 'true' : 'false' }}</p>
-                                    </div>
                                     <div
                                         class="rounded-sm border mb-4 border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                                         <div class="border-b border-stroke px-6.5 py-4 dark:border-strokedark">

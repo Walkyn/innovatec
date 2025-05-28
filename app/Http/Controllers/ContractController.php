@@ -18,7 +18,7 @@ class ContractController extends Controller
     {
         $clientes = Cliente::where('estado_cliente', 'activo')->get();
         $categorias = Categoria::with('servicios.planes')->get();
-        
+
         $search = $request->input('search');
         $estado = $request->input('estado');
         $query = Contrato::with(['cliente', 'servicios', 'contratoServicios']);
@@ -26,14 +26,14 @@ class ContractController extends Controller
         if ($search) {
             // Extraer el número después del prefijo CTR- si existe
             $searchId = preg_replace('/^CTR-0*/', '', $search);
-            
-            $query->where(function($q) use ($search, $searchId) {
+
+            $query->where(function ($q) use ($search, $searchId) {
                 $q->where('id', 'LIKE', '%' . $searchId . '%')
-                  ->orWhereHas('cliente', function($query) use ($search) {
-                      $query->where(DB::raw("CONCAT(nombres, ' ', apellidos)"), 'LIKE', '%' . $search . '%')
+                    ->orWhereHas('cliente', function ($query) use ($search) {
+                        $query->where(DB::raw("CONCAT(nombres, ' ', apellidos)"), 'LIKE', '%' . $search . '%')
                             ->orWhere('nombres', 'LIKE', '%' . $search . '%')
                             ->orWhere('apellidos', 'LIKE', '%' . $search . '%');
-                  });
+                    });
             });
         }
 
@@ -42,14 +42,14 @@ class ContractController extends Controller
         }
 
         $contratos = $query->orderBy('created_at', 'desc')->paginate(7);
-    
+
         foreach ($contratos as $contrato) {
             $contrato->detalles_servicios = $contrato->contratoServicios->map(function ($contratoServicio) {
                 $fecha = $contratoServicio->fecha_servicio;
                 $fechaObj = $fecha ? \Carbon\Carbon::parse($fecha) : null;
                 $fechaSuspension = $contratoServicio->fecha_suspension_servicio;
                 $fechaSuspensionObj = $fechaSuspension ? \Carbon\Carbon::parse($fechaSuspension) : null;
-                
+
                 return [
                     'nombre' => $contratoServicio->servicio->nombre,
                     'plan' => $contratoServicio->plan ? $contratoServicio->plan->nombre : 'N/A',
@@ -68,10 +68,9 @@ class ContractController extends Controller
                     return $contratoServicio->plan ? $contratoServicio->plan->precio : 0;
                 });
         }
-    
+
         return view('contracts.index', compact('clientes', 'categorias', 'contratos', 'estado'));
     }
-
 
     public function update(Request $request, $id)
     {
@@ -99,7 +98,7 @@ class ContractController extends Controller
 
             // Decodificar detalles JSON
             $detalles = json_decode($validated['detalles_json'], true);
-            
+
             if (!is_array($detalles)) {
                 throw new \Exception('Formato inválido para detalles del contrato');
             }
@@ -108,9 +107,9 @@ class ContractController extends Controller
             if (isset($detalles['serviciosAEliminar']) && is_array($detalles['serviciosAEliminar'])) {
                 foreach ($detalles['serviciosAEliminar'] as $servicioId) {
                     $servicio = ContratoServicio::where('id', $servicioId)
-                                              ->where('contrato_id', $id)
-                                              ->first();
-                    
+                        ->where('contrato_id', $id)
+                        ->first();
+
                     if ($servicio) {
                         $servicio->delete();
                     }
@@ -126,20 +125,22 @@ class ContractController extends Controller
                 if (isset($detalle['id'])) {
                     // Actualizar servicio existente
                     $servicioExistente = ContratoServicio::where('id', $detalle['id'])
-                                                       ->where('contrato_id', $id)
-                                                       ->first();
+                        ->where('contrato_id', $id)
+                        ->first();
 
                     if ($servicioExistente) {
                         // Si el servicio ya está suspendido en la BD, no permitir cambiar a activo
-                        if ($servicioExistente->estado_servicio_cliente === 'suspendido' && 
-                            $detalle['estado'] === 'activo') {
+                        if (
+                            $servicioExistente->estado_servicio_cliente === 'suspendido' &&
+                            $detalle['estado'] === 'activo'
+                        ) {
                             continue; // Saltar este servicio
                         }
 
                         if ($detalle['estado'] === 'suspendido') {
                             // Solo actualizar la fecha si no existe una previa
-                            $fechaSuspension = $servicioExistente->fecha_suspension_servicio ? 
-                                $servicioExistente->fecha_suspension_servicio : 
+                            $fechaSuspension = $servicioExistente->fecha_suspension_servicio ?
+                                $servicioExistente->fecha_suspension_servicio :
                                 now();
 
                             $servicioExistente->update([
@@ -176,7 +177,6 @@ class ContractController extends Controller
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Contrato actualizado con éxito'
             ]);
-
         } catch (ValidationException $e) {
             DB::rollBack();
             return redirect()->route('contracts.index')
@@ -190,7 +190,7 @@ class ContractController extends Controller
                 ->with('errorDetails', 'Error inesperado: ' . $e->getMessage());
         }
     }
-    
+
     public function obtenerPrecioPlan($contratoId, $servicioId)
     {
         $contrato = Contrato::with(['contratoServicios.plan'])
@@ -226,7 +226,7 @@ class ContractController extends Controller
     public function store(Request $request)
     {
         DB::beginTransaction();
-    
+
         try {
             // Validación de los datos
             $validatedData = $request->validate([
@@ -242,8 +242,10 @@ class ContractController extends Controller
                 'observaciones' => 'nullable|string|max:500',
                 'ip_servicio' => 'nullable|array',
                 'ip_servicio.*' => 'nullable|string|max:20',
+                'fecha_servicio' => 'required|array',
+                'fecha_servicio.*' => 'nullable|date',
             ]);
-    
+
             // Creación del contrato
             $contrato = Contrato::create([
                 'cliente_id' => $request->cliente_id,
@@ -252,7 +254,7 @@ class ContractController extends Controller
                 'observaciones' => $request->observaciones,
                 'fecha_suspension_contrato' => $request->estado === 'suspendido' ? now() : null
             ]);
-    
+
             // Asignación de servicios, planes, categorías y IP
             foreach ($request->servicio_id as $index => $servicio_id) {
                 ContratoServicio::create([
@@ -261,13 +263,13 @@ class ContractController extends Controller
                     'plan_id' => $request->plan_id[$index],
                     'categoria_id' => $request->categoria_id[$index],
                     'ip_servicio' => $request->ip_servicio[$index],
-                    'fecha_servicio' => now(),
+                    'fecha_servicio' => $request->fecha_servicio[$index] ?? now(),
                     'estado_servicio_cliente' => $request->estado,
                 ]);
             }
-    
+
             DB::commit();
-    
+
             return redirect()->route('contracts.index')->with([
                 'successMessage' => 'Éxito',
                 'successDetails' => 'Contrato registrado con éxito'

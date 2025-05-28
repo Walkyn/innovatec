@@ -318,8 +318,6 @@
                         console.error('Error al obtener el evento:', error);
                     });
             @endif
-            
-            // No hay más código aquí que pueda abrir el modal automáticamente
         });
         
         // Función para abrir el modal para crear un nuevo evento - No debería ejecutarse automáticamente

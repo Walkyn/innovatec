@@ -27,12 +27,12 @@
                     Programa o edita actividades de soporte técnico para mantener el seguimiento
                 </p>
             </div>
-            
+
             <form id="eventoForm" method="POST" action="/calendario/eventos">
                 @csrf
                 <input type="hidden" name="_method" id="eventoMethod" value="POST">
                 <input type="hidden" name="evento_id" id="eventoId" value="">
-                
+
                 <div class="mt-8 modal-body">
                     <div>
                         <div>
@@ -44,8 +44,8 @@
                                     class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                             </div>
                         </div>
-                        
-                        <!-- Campo de Descripción (NUEVO) -->
+
+                        <!-- Campo de Descripción -->
                         <div class="mt-6">
                             <div>
                                 <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -56,52 +56,65 @@
                                     placeholder="Detalles adicionales sobre este evento..."></textarea>
                             </div>
                         </div>
-                        
+
                         <div class="mt-6">
                             <div>
                                 <label class="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-400">
                                     Estado del Soporte
                                 </label>
                             </div>
-                            
+
                             <!-- Contenedor de opciones de estado -->
                             <div class="flex flex-wrap gap-4 items-center">
                                 <!-- Pendiente (Rojo) -->
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <div class="relative">
-                                        <input type="radio" name="estado" value="pendiente" id="modalPendiente" class="peer sr-only" checked />
+                                        <input type="radio" name="estado" value="pendiente" id="modalPendiente"
+                                            class="peer sr-only" checked />
                                         <div class="w-5 h-5 border-2 border-red-500 rounded-full"></div>
-                                        <div class="absolute hidden w-3 h-3 bg-red-500 rounded-full top-1 left-1 peer-checked:block"></div>
+                                        <div
+                                            class="absolute hidden w-3 h-3 bg-red-500 rounded-full top-1 left-1 peer-checked:block">
+                                        </div>
                                     </div>
                                     <span class="text-sm text-red-600 dark:text-red-400">Pendiente</span>
                                 </label>
-                                
+
                                 <!-- Visitar (Naranja) -->
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <div class="relative">
-                                        <input type="radio" name="estado" value="visitar" id="modalVisitar" class="peer sr-only" />
+                                        <input type="radio" name="estado" value="visitar" id="modalVisitar"
+                                            class="peer sr-only" />
                                         <div class="w-5 h-5 border-2 border-yellow-500 rounded-full"></div>
-                                        <div class="absolute hidden w-3 h-3 bg-yellow-500 rounded-full top-1 left-1 peer-checked:block"></div>
+                                        <div
+                                            class="absolute hidden w-3 h-3 bg-yellow-500 rounded-full top-1 left-1 peer-checked:block">
+                                        </div>
                                     </div>
                                     <span class="text-sm text-yellow-600 dark:text-yellow-400">Visitar</span>
                                 </label>
-                                
+
                                 <!-- Solucionado (Verde) - Esta opción solo se mostrará al editar -->
-                                <label id="opcion-solucionado" class="flex items-center gap-2 cursor-pointer" style="display: none;">
+                                <label id="opcion-solucionado" class="flex items-center gap-2 cursor-pointer"
+                                    style="display: none;">
                                     <div class="relative">
-                                        <input type="radio" name="estado" value="solucionado" id="modalSolucionado" class="peer sr-only" />
+                                        <input type="radio" name="estado" value="solucionado" id="modalSolucionado"
+                                            class="peer sr-only" />
                                         <div class="w-5 h-5 border-2 border-green-500 rounded-full"></div>
-                                        <div class="absolute hidden w-3 h-3 bg-green-500 rounded-full top-1 left-1 peer-checked:block"></div>
+                                        <div
+                                            class="absolute hidden w-3 h-3 bg-green-500 rounded-full top-1 left-1 peer-checked:block">
+                                        </div>
                                     </div>
                                     <span class="text-sm text-green-600 dark:text-green-400">Solucionado</span>
                                 </label>
-                                
+
                                 <!-- Para Cobrar (Azul) -->
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <div class="relative">
-                                        <input type="radio" name="estado" value="cobrar" id="modalCobrar" class="peer sr-only" />
+                                        <input type="radio" name="estado" value="cobrar" id="modalCobrar"
+                                            class="peer sr-only" />
                                         <div class="w-5 h-5 border-2 border-blue-500 rounded-full"></div>
-                                        <div class="absolute hidden w-3 h-3 bg-blue-500 rounded-full top-1 left-1 peer-checked:block"></div>
+                                        <div
+                                            class="absolute hidden w-3 h-3 bg-blue-500 rounded-full top-1 left-1 peer-checked:block">
+                                        </div>
                                     </div>
                                     <span class="text-sm text-blue-600 dark:text-blue-400">Para Cobrar</span>
                                 </label>
@@ -119,32 +132,34 @@
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Fecha de Inicio
-                                </label>
-                                <div class="relative">
-                                    <input id="event-start-date" name="fecha_inicio" type="date" required
-                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                                        onclick="this.showPicker()" />
+                        <div class="flex gap-6 mt-6">
+                            <div class="mt-6  w-1/2">
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Fecha de Inicio
+                                    </label>
+                                    <div class="relative">
+                                        <input id="event-start-date" name="fecha_inicio" type="date" required
+                                            class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                            onclick="this.showPicker()" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6  w-1/2">
+                                <div>
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Fecha de Finalización
+                                    </label>
+                                    <div class="relative">
+                                        <input id="event-end-date" name="fecha_fin" type="date"
+                                            class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                            onclick="this.showPicker()" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Fecha de Finalización
-                                </label>
-                                <div class="relative">
-                                    <input id="event-end-date" name="fecha_fin" type="date"
-                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                                        onclick="this.showPicker()" />
-                                </div>
-                            </div>
-                        </div>
-                        
                         <input type="hidden" name="todo_dia" value="1">
                     </div>
                 </div>
@@ -182,19 +197,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            
+
             <!-- Título del Modal -->
             <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2" id="successModalTitle">
                 ¡Operación Exitosa!
             </h3>
-            
+
             <!-- Mensaje del Modal -->
             <div class="mt-4 mb-6">
                 <p class="text-sm text-gray-500 dark:text-gray-400" id="successModalMessage">
                     El evento ha sido guardado correctamente en el calendario.
                 </p>
             </div>
-            
+
             <!-- Botón para Cerrar el Modal -->
             <div class="mt-5">
                 <button type="button" id="closeSuccessModal"
@@ -207,154 +222,154 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('eventoForm');
-    const updateBtn = document.getElementById('update-btn');
-    const addBtn = document.getElementById('add-btn');
-    const successModal = document.getElementById('successModal');
-    const successModalTitle = document.getElementById('successModalTitle');
-    const successModalMessage = document.getElementById('successModalMessage');
-    const closeSuccessModal = document.getElementById('closeSuccessModal');
-    
-    // Función para mostrar el modal de éxito
-    function showSuccessModal(title, message) {
-        successModalTitle.textContent = title;
-        successModalMessage.textContent = message;
-        successModal.classList.remove('hidden');
-        
-        // Eliminamos el temporizador automático para que solo se cierre cuando el usuario haga clic
-    }
-    
-    // Cerrar el modal de éxito al hacer clic en el botón
-    closeSuccessModal.addEventListener('click', function() {
-        successModal.classList.add('hidden');
-        
-        // Eliminar el parámetro 'event' de la URL antes de recargar
-        const url = new URL(window.location);
-        url.searchParams.delete('event');
-        window.history.replaceState({}, '', url);
-        
-        // Recargar la página sin el parámetro de evento
-        window.location.href = url.toString();
-    });
-    
-    // Procesar la creación de un nuevo evento
-    addBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // Validaciones básicas
-        const title = document.getElementById('event-title').value;
-        const startDate = document.getElementById('event-start-date').value;
-        
-        if (!title) {
-            alert('Por favor ingrese un título para el evento');
-            return;
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('eventoForm');
+        const updateBtn = document.getElementById('update-btn');
+        const addBtn = document.getElementById('add-btn');
+        const successModal = document.getElementById('successModal');
+        const successModalTitle = document.getElementById('successModalTitle');
+        const successModalMessage = document.getElementById('successModalMessage');
+        const closeSuccessModal = document.getElementById('closeSuccessModal');
+
+        // Función para mostrar el modal de éxito
+        function showSuccessModal(title, message) {
+            successModalTitle.textContent = title;
+            successModalMessage.textContent = message;
+            successModal.classList.remove('hidden');
+
         }
-        
-        if (!startDate) {
-            alert('Por favor seleccione una fecha de inicio');
-            return;
-        }
-        
-        // Asegurar que la fecha de fin tenga valor
-        const fechaFin = document.getElementById('event-end-date');
-        if (!fechaFin.value) {
-            fechaFin.value = startDate;
-        }
-        
-        // Preparar los datos para enviar
-        const formData = new FormData(form);
-        
-        // Enviar mediante fetch
-        fetch('/calendario/eventos', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Respuesta:', data);
-            if (data.success) {
-                // Cerrar el modal de evento
-                document.getElementById('eventModal').style.display = 'none';
-                
-                // Mostrar modal de éxito
-                showSuccessModal('¡Evento Creado!', 'El evento ha sido agregado correctamente al calendario.');
-                
-                // Limpiar el formulario
-                form.reset();
-            } else {
-                alert('Error: ' + (data.message || 'No se pudo guardar el evento'));
+
+        // Cerrar el modal de éxito al hacer clic en el botón
+        closeSuccessModal.addEventListener('click', function() {
+            successModal.classList.add('hidden');
+
+            const url = new URL(window.location);
+            url.searchParams.delete('event');
+            window.history.replaceState({}, '', url);
+
+            // Recargar la página sin el parámetro de evento
+            window.location.href = url.toString();
+        });
+
+        // Procesar la creación de un nuevo evento
+        addBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Validaciones básicas
+            const title = document.getElementById('event-title').value;
+            const startDate = document.getElementById('event-start-date').value;
+
+            if (!title) {
+                alert('Por favor ingrese un título para el evento');
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al guardar el evento: ' + error.message);
+
+            if (!startDate) {
+                alert('Por favor seleccione una fecha de inicio');
+                return;
+            }
+
+            // Asegurar que la fecha de fin tenga valor
+            const fechaFin = document.getElementById('event-end-date');
+            if (!fechaFin.value) {
+                fechaFin.value = startDate;
+            }
+
+            // Preparar los datos para enviar
+            const formData = new FormData(form);
+
+            // Enviar mediante fetch
+            fetch('/calendario/eventos', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Respuesta:', data);
+                    if (data.success) {
+                        // Cerrar el modal de evento
+                        document.getElementById('eventModal').style.display = 'none';
+
+                        // Mostrar modal de éxito
+                        showSuccessModal('¡Evento Creado!',
+                            'El evento ha sido agregado correctamente al calendario.');
+
+                        // Limpiar el formulario
+                        form.reset();
+                    } else {
+                        alert('Error: ' + (data.message || 'No se pudo guardar el evento'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al guardar el evento: ' + error.message);
+                });
+        });
+
+        // Actualizar un evento existente
+        updateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const eventoId = document.getElementById('eventoId').value;
+
+            // Validaciones básicas
+            const title = document.getElementById('event-title').value;
+            const startDate = document.getElementById('event-start-date').value;
+
+            if (!title) {
+                alert('Por favor ingrese un título para el evento');
+                return;
+            }
+
+            if (!startDate) {
+                alert('Por favor seleccione una fecha de inicio');
+                return;
+            }
+
+            // Asegurar que la fecha de fin tenga valor
+            const fechaFin = document.getElementById('event-end-date');
+            if (!fechaFin.value) {
+                fechaFin.value = startDate;
+            }
+
+            // Preparar los datos para enviar
+            const formData = new FormData(form);
+            formData.append('_method', 'PUT'); // Para simular PUT
+
+            // Enviar mediante fetch
+            fetch(`/calendario/eventos/${eventoId}`, {
+                    method: 'POST', // Usando POST con _method=PUT
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Respuesta actualización:', data);
+                    if (data.success) {
+                        // Cerrar el modal de evento
+                        document.getElementById('eventModal').style.display = 'none';
+
+                        // Mostrar modal de éxito
+                        showSuccessModal('¡Evento Actualizado!',
+                            'El evento ha sido actualizado correctamente en el calendario.');
+
+                        // Limpiar el formulario
+                        form.reset();
+                    } else {
+                        alert('Error: ' + (data.message || 'No se pudo actualizar el evento'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al actualizar el evento: ' + error.message);
+                });
         });
     });
-    
-    // Actualizar un evento existente
-    updateBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const eventoId = document.getElementById('eventoId').value;
-        
-        // Validaciones básicas
-        const title = document.getElementById('event-title').value;
-        const startDate = document.getElementById('event-start-date').value;
-        
-        if (!title) {
-            alert('Por favor ingrese un título para el evento');
-            return;
-        }
-        
-        if (!startDate) {
-            alert('Por favor seleccione una fecha de inicio');
-            return;
-        }
-        
-        // Asegurar que la fecha de fin tenga valor
-        const fechaFin = document.getElementById('event-end-date');
-        if (!fechaFin.value) {
-            fechaFin.value = startDate;
-        }
-        
-        // Preparar los datos para enviar
-        const formData = new FormData(form);
-        formData.append('_method', 'PUT'); // Para simular PUT
-        
-        // Enviar mediante fetch
-        fetch(`/calendario/eventos/${eventoId}`, {
-            method: 'POST', // Usando POST con _method=PUT
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Respuesta actualización:', data);
-            if (data.success) {
-                // Cerrar el modal de evento
-                document.getElementById('eventModal').style.display = 'none';
-                
-                // Mostrar modal de éxito
-                showSuccessModal('¡Evento Actualizado!', 'El evento ha sido actualizado correctamente en el calendario.');
-                
-                // Limpiar el formulario
-                form.reset();
-            } else {
-                alert('Error: ' + (data.message || 'No se pudo actualizar el evento'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al actualizar el evento: ' + error.message);
-        });
-    });
-});
 </script>

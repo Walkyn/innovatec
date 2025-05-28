@@ -1,7 +1,7 @@
 <!-- Main modal -->
 <div id="contrato-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 py-20 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    @if (!auth()->user()->checkModuloAcceso('contracts', 'guardar'))
+    @if (!auth()->user()->checkModuloAcceso('manage', 'guardar'))
         <!-- Toast de error -->
         <div id="contrato-modal"
             class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800"
@@ -210,15 +210,15 @@
                         
                                 if (categoria && servicio && plan) {
                                     // Verificar si ya existe el mismo servicio y plan
-                                    const existeDuplicado = this.detalles.some(detalle => 
+                                    const existeDuplicado = this.detalles.some(detalle =>
                                         detalle.servicioId === servicio.id && detalle.planId === plan.id
                                     );
-
+                        
                                     if (existeDuplicado) {
                                         this.mostrarAlerta('Duplicado: servicio y plan ya agregados.');
                                         return;
                                     }
-
+                        
                                     const nuevoDetalle = {
                                         id: Date.now(),
                                         categoriaId: categoria.id,
@@ -229,7 +229,8 @@
                                         plan: plan.nombre,
                                         estado: this.estadoContrato,
                                         precio: this.precioPlan,
-                                        ip: this.ip
+                                        ip: this.ip,
+                                        fechaServicio: new Date().toISOString().split('T')[0]
                                     };
                         
                                     this.detalles.push(nuevoDetalle);
@@ -335,7 +336,8 @@
                                     <div
                                         class="bg-zinc-50 rounded-lg shadow-md border dark:border-gray-600 w-80 dark:bg-gray-700">
                                         <div class="p-3 border-b border-gray-200 dark:border-gray-600">
-                                            <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200">Dirección
+                                            <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200">
+                                                Dirección
                                                 IP</h2>
                                             <button type="button" @click="mostrarModalIp = false"
                                                 class="absolute top-2 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
@@ -391,7 +393,8 @@
                                     <label
                                         class="block uppercase tracking-wide text-gray-700 dark:text-gray-300 text-xs font-bold mb-2">Precio</label>
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <div
+                                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                             <span class="text-gray-500 dark:text-gray-400">S/</span>
                                         </div>
                                         <input x-model="precioPlan"
@@ -423,7 +426,8 @@
                                             disabled>
                                             <option value="activo">Activo</option>
                                         </select>
-                                        <input type="hidden" name="estado" x-model="estadoContrato" value="activo">
+                                        <input type="hidden" name="estado" x-model="estadoContrato"
+                                            value="activo">
                                     </div>
                                 </div>
                             </div>
@@ -437,7 +441,8 @@
                                         Observaciones
                                     </label>
                                     <div class="relative flex items-center">
-                                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <div
+                                            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                             <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
                                         </div>
                                         <input type="text" name="observaciones" x-model="observaciones"
@@ -459,7 +464,8 @@
                             <!-- Alerta Cliente -->
                             <div id="alert-cliente" x-data="{ showAlert: false }">
                                 <!-- Contenido del modal -->
-                                <div x-show="showAlert" x-transition:enter="transition transform ease-out duration-500"
+                                <div x-show="showAlert"
+                                    x-transition:enter="transition transform ease-out duration-500"
                                     x-transition:enter-start="translate-x-full opacity-0"
                                     x-transition:enter-end="translate-x-0 opacity-100"
                                     x-transition:leave="transition transform ease-in duration-500"
@@ -482,7 +488,8 @@
                             <!-- Alerta Datos-->
                             <div id="modal" x-data="{ showAlert: false }">
                                 <!-- Contenido del modal -->
-                                <div x-show="showAlert" x-transition:enter="transition transform ease-out duration-500"
+                                <div x-show="showAlert"
+                                    x-transition:enter="transition transform ease-out duration-500"
                                     x-transition:enter-start="translate-x-full opacity-0"
                                     x-transition:enter-end="translate-x-0 opacity-100"
                                     x-transition:leave="transition transform ease-in duration-500"
@@ -514,8 +521,8 @@
                                                         <th class="px-4 py-3">Acción</th>
                                                         <th class="px-4 py-3 hidden">Categoria</th>
                                                         <th class="px-4 py-3">Servicio</th>
-                                                        <th class="px-4 py-3">Plan</th>
                                                         <th class="px-4 py-3 whitespace-nowrap">Dirección IP</th>
+                                                        <th class="px-4 py-3">Fecha</th>
                                                         <th class="px-4 py-3">Estado</th>
                                                         <th class="px-4 py-3 text-right">Precio</th>
                                                     </tr>
@@ -541,11 +548,17 @@
                                                                 x-model="detalle.ip">
                                                             <input type="hidden" name="precio[]"
                                                                 x-model="detalle.precio">
+                                                            <input type="hidden" name="fecha_servicio[]"
+                                                                x-model="detalle.fechaServicio">
                                                             <!-- Campos visibles -->
-                                                            <td class="px-4 py-3 hidden" x-text="detalle.categoria"></td>
-                                                            <td class="px-4 py-3" x-text="detalle.servicio"></td>
-                                                            <td class="px-4 py-3" x-text="detalle.plan"></td>
+                                                            <td class="px-4 py-3 hidden" x-text="detalle.categoria">
+                                                            </td>
+                                                            <td class="px-4 py-3 whitespace-nowrap" x-text="detalle.servicio + ' - ' + detalle.plan"></td>
                                                             <td class="px-4 py-3" x-text="detalle.ip"></td>
+                                                            <td class="px-4 py-3">
+                                                                <input type="date" x-model="detalle.fechaServicio"
+                                                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-1 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                                            </td>
                                                             <td class="px-4 py-3 text-xs">
                                                                 <button type="button"
                                                                     class="px-2 py-1 font-semibold leading-tight rounded-full flex items-center gap-1 whitespace-nowrap text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100">
@@ -553,7 +566,9 @@
                                                                     <span>Activo</span>
                                                                 </button>
                                                             </td>
-                                                            <td class="px-4 py-3 text-right">S/ <span x-text="Number(detalle.precio).toFixed(2)"></span></td>
+                                                            <td class="px-4 py-3 text-right whitespace-nowrap">S/ <span
+                                                                    x-text="Number(detalle.precio).toFixed(2)"></span>
+                                                            </td>
                                                         </tr>
                                                     </template>
                                                 </tbody>
@@ -563,7 +578,7 @@
                                             class="grid px-4 py-3 text-xs font-semibold tracking-wide rounded-b text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                                             <span
                                                 class="col-span-5 sm:col-span-4 sm:col-start-6 flex justify-end text-right text-sm font-semibold text-gray-600 dark:text-gray-400">
-                                                Total: S/  <span x-text="Number(total).toFixed(2)"></span>
+                                                Total: S/ <span x-text="Number(total).toFixed(2)"></span>
                                             </span>
                                         </div>
                                     </div>
