@@ -13,33 +13,33 @@ class ClientController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Cliente::with(['contratos' => function($query) {
+        $query = Cliente::with(['contratos' => function ($query) {
             $query->latest();
         }]);
-    
+
         // Filtro por búsqueda
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('nombres', 'like', "%{$searchTerm}%")
-                  ->orWhere('apellidos', 'like', "%{$searchTerm}%")
-                  ->orWhere('identificacion', 'like', "%{$searchTerm}%")
-                  ->orWhereRaw("CONCAT(nombres, ' ', apellidos) LIKE ?", ["%{$searchTerm}%"]);
+                    ->orWhere('apellidos', 'like', "%{$searchTerm}%")
+                    ->orWhere('identificacion', 'like', "%{$searchTerm}%")
+                    ->orWhereRaw("CONCAT(nombres, ' ', apellidos) LIKE ?", ["%{$searchTerm}%"]);
             });
         }
-    
+
         if ($request->filled('estado')) {
             $query->where('estado_cliente', $request->estado);
         }
-    
+
         // Filtro por pueblo (se mantiene aunque se apliquen otros filtros)
         if ($request->filled('pueblo_id')) {
             $query->where('pueblo_id', $request->pueblo_id);
         }
-    
+
         $clientes = $query->paginate(8);
         $regiones = Region::with('provincias.distritos.pueblos')->get();
-        
+
         return view('clients.index', compact('clientes', 'regiones'));
     }
 
@@ -299,7 +299,7 @@ class ClientController extends Controller
     public function getDetails($id)
     {
         try {
-            $cliente = Cliente::with(['region', 'provincia', 'distrito', 'pueblo', 'contratos' => function($query) {
+            $cliente = Cliente::with(['region', 'provincia', 'distrito', 'pueblo', 'contratos' => function ($query) {
                 $query->where('estado_contrato', 'activo');
             }])->findOrFail($id);
 
@@ -309,7 +309,7 @@ class ClientController extends Controller
 
             if ($contratoActivo) {
                 $contratoServicio = $contratoActivo->contratoServicios()
-                    ->with(['servicio' => function($query) {
+                    ->with(['servicio' => function ($query) {
                         $query->where('estado_servicio', 'activo');
                     }, 'plan'])
                     ->first();
@@ -336,22 +336,10 @@ class ClientController extends Controller
                     'direccion' => $cliente->direccion,
                     'estado_cliente' => $cliente->estado_cliente,
                     'created_at' => $cliente->created_at ? $cliente->created_at->toIso8601String() : null,
-                    'contrato_activo' => $contratoActivo ? [
-                        'id' => $contratoActivo->id,
-                        'numero' => $contratoActivo->numero,
-                        'fecha_inicio' => $contratoActivo->fecha_inicio ? date('d/m/Y', strtotime($contratoActivo->fecha_inicio)) : null,
-                        'fecha_instalacion' => $cliente->created_at ? date('d/m/Y', strtotime($cliente->created_at)) : null
-                    ] : null,
-                    'servicio_activo' => $servicioActivo ? [
-                        'id' => $servicioActivo->id,
-                        'nombre' => $servicioActivo->nombre,
-                        'descripcion' => $servicioActivo->descripcion
-                    ] : null,
-                    'plan_activo' => $planActivo ? [
-                        'id' => $planActivo->id,
-                        'nombre' => $planActivo->nombre,
-                        'precio' => $planActivo->precio
-                    ] : null
+                    'servicio_mostrar' => $servicioActivo ? $servicioActivo->nombre : null,
+                    'plan_mostrar' => $planActivo ? $planActivo->nombre : null,
+                    'precio_mostrar' => $planActivo ? $planActivo->precio : null,
+                    'estado_mostrar' => $contratoActivo ? 'activo' : ($cliente->contratos->count() > 0 ? 'inactivo' : 'sin servicio')
                 ]
             ]);
         } catch (\Exception $e) {

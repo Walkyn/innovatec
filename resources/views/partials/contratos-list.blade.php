@@ -56,7 +56,7 @@
                 <div class="mb-4 last:mb-0">
                     <!-- Cabecera de servicio minimalista -->
                     <button
-                        @click="openServiceId = (openServiceId === {{ $cs->id }} ? null : {{ $cs->id }})"
+                        @click="openServiceId = (openServiceId == {{ $cs->id }} ? null : {{ $cs->id }})"
                         class="w-full text-sm flex items-center justify-between py-2 border-b border-gray-200 text-left transition-colors hover:text-gray-900 dark:border-gray-600">
                         
                         <div class="flex flex-wrap items-center gap-2">
@@ -98,7 +98,7 @@
                         </div>
 
                         <!-- Flecha del acordeón -->
-                        <svg :class="openServiceId === {{ $cs->id }} ? 'transform rotate-180' : ''"
+                        <svg :class="openServiceId == {{ $cs->id }} ? 'transform rotate-180' : ''"
                              class="w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform"
                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -107,7 +107,7 @@
                     </button>
 
                     <!-- Contenido de meses (colapsable) -->
-                    <div x-show="openServiceId === {{ $cs->id }}" x-transition class="mt-3">
+                    <div x-show="openServiceId == {{ $cs->id }}" x-transition class="mt-3">
                         @php
                             $anioInicio = $fechaInicio->year;
                             $anioActual = now()->year;
@@ -126,14 +126,14 @@
                                     foreach($mesesYear as $mesYear) {
                                         if (!$fechaSuspension || 
                                             ($year < $fechaSuspension->year) || 
-                                            ($year === $fechaSuspension->year && $mesYear->numero <= $mesSuspension)) {
+                                            ($year == $fechaSuspension->year && $mesYear->numero <= $mesSuspension)) {
                                             
                                             // Si el mes no aplica (antes de la instalación), lo ignoramos
-                                            if ($year === $anioInicio && $mesYear->numero < $fechaInicio->format('n')) {
+                                            if ($year == $anioInicio && $mesYear->numero < $fechaInicio->format('n')) {
                                                 continue;
                                             }
                                             // Si el mes es futuro, lo ignoramos
-                                            if ($year > now()->year || ($year === now()->year && $mesYear->numero > now()->month)) {
+                                            if ($year > now()->year || ($year == now()->year && $mesYear->numero > now()->month)) {
                                                 continue;
                                             }
 
@@ -145,7 +145,7 @@
                                                 ->where('estado_pago', 'pagado')
                                                 ->exists();
 
-                                            if ($year === now()->year && $mesYear->numero === now()->month) {
+                                            if ($year == now()->year && $mesYear->numero == now()->month) {
                                                 // Es el mes en curso
                                                 if (!$pagado) {
                                                     $tieneMesEnCursoNoPagado = true;
@@ -178,7 +178,7 @@
 
                                 <div class="mb-4">
                                     <button
-                                        @click="openYear = openYear === '{{ $cs->id }}-{{ $year }}' ? null : '{{ $cs->id }}-{{ $year }}'"
+                                        @click="openYear = openYear == '{{ $cs->id }}-{{ $year }}' ? null : '{{ $cs->id }}-{{ $year }}'"
                                         class="w-full flex items-center justify-between px-4 py-2 {{ $bgColor }} rounded transition text-left dark:bg-gray-700 dark:hover:bg-gray-600">
                                         <span class="font-medium">
                                             Año {{ $year }}
@@ -186,17 +186,17 @@
                                                 <i class="fas {{ $icon }} ml-2 {{ $iconColor }}"></i>
                                             @endif
                                         </span>
-                                        <i :class="openYear === '{{ $cs->id }}-{{ $year }}' ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                        <i :class="openYear == '{{ $cs->id }}-{{ $year }}' ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
                                            class="{{ $iconColor }} dark:text-gray-400"></i>
                                     </button>
 
-                                    <div x-show="openYear === '{{ $cs->id }}-{{ $year }}'" x-transition class="mt-2">
+                                    <div x-show="openYear == '{{ $cs->id }}-{{ $year }}'" x-transition class="mt-2">
                                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                                             @foreach($mesesYear as $mesYear)
                                                 @php
                                                     $omitirMes = false;
                                                     if ($fechaSuspension) {
-                                                        if ($year === $fechaSuspension->year && $mesYear->numero > $mesSuspension) {
+                                                        if ($year == $fechaSuspension->year && $mesYear->numero > $mesSuspension) {
                                                             $omitirMes = true;
                                                         }
                                                         if ($year > $fechaSuspension->year) {
@@ -226,20 +226,20 @@
                                                         ->exists()) {
                                                         $estado = 'no_aplica';
                                                     // Si no hay registro, aplicamos las reglas automáticas
-                                                    } elseif ($year === $anioInicio && $mesYear->numero < $mesInicio) {
+                                                    } elseif ($year == $anioInicio && $mesYear->numero < $mesInicio) {
                                                         $estado = 'no_aplica';
-                                                    } elseif ($fechaSuspension && $year === $fechaSuspension->year && $mesYear->numero === $mesSuspension) {
+                                                    } elseif ($fechaSuspension && $year == $fechaSuspension->year && $mesYear->numero == $mesSuspension) {
                                                         $estado = now()->gte($fechaSuspension) ? 'pendiente' : 'en_curso';
-                                                    } elseif ($year === now()->year && $mesYear->numero === $mesActual) {
+                                                    } elseif ($year == now()->year && $mesYear->numero == $mesActual) {
                                                         $estado = 'en_curso';
-                                                    } elseif ($year > now()->year || ($year === now()->year && $mesYear->numero > $mesActual)) {
+                                                    } elseif ($year > now()->year || ($year == now()->year && $mesYear->numero > $mesActual)) {
                                                         $estado = 'futuro';
                                                     } else {
                                                         $estado = 'pendiente';
                                                     }
 
                                                     // 2) Cálculo de precioMostrar
-                                                    if ($year === $anioInicio && $mesYear->numero === $mesInicio) {
+                                                    if ($year == $anioInicio && $mesYear->numero == $mesInicio) {
                                                         // prorrateo primer mes
                                                         $ultimoDia = (int) $fechaFinMes->format('j');
                                                         $diaInstalacion = (int) $fechaInicio->format('j');
@@ -256,7 +256,7 @@
                                                                 $precioMostrar = ($cs->plan->precio / $diasTotales) * $diasServ;
                                                             }
                                                         }
-                                                    } elseif ($fechaSuspension && $year === $fechaSuspension->year && $mesYear->numero === $mesSuspension) {
+                                                    } elseif ($fechaSuspension && $year == $fechaSuspension->year && $mesYear->numero == $mesSuspension) {
                                                         // prorrateo mes de suspensión
                                                         $diasTotales = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
                                                         $diasHastaSusp = $fechaInicioMes->diffInDays($fechaSuspension) + 1;
@@ -288,8 +288,8 @@
                                                             $bgClasses = 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600';
                                                             $barClasses = 'bg-gray-300 dark:bg-gray-500';
                                                             $badgeClasses = 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-200';
-                                                            $label = $estado === 'no_aplica' ? 'No aplica' : 'Próximo';
-                                                            $icon = $estado === 'no_aplica' ? 'fas fa-ban' : 'fas fa-calendar';
+                                                            $label = $estado == 'no_aplica' ? 'No aplica' : 'Próximo';
+                                                            $icon = $estado == 'no_aplica' ? 'fas fa-ban' : 'fas fa-calendar';
                                                             break;
                                                         default: // pendiente
                                                             $bgClasses = 'bg-red-50 dark:bg-red-900/20 border-red-100';
@@ -302,7 +302,7 @@
                                                     // 4) Cálculo de progreso
                                                     if (in_array($estado, ['pagado','pendiente'])) {
                                                         $progressPercent = 100;
-                                                    } elseif ($estado === 'en_curso') {
+                                                    } elseif ($estado == 'en_curso') {
                                                         $totalDias = $fechaInicioMes->diffInDays($fechaFinMes) + 1;
                                                         if ($hoy->lt($fechaInicioMes)) {
                                                             $progressPercent = 0;
@@ -361,4 +361,4 @@
     <div class="text-center text-gray-500 dark:text-gray-400 py-4">
         No hay contratos registrados para este cliente.
     </div>
-@endforelse 
+@endforelse

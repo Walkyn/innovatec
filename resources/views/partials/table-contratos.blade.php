@@ -214,12 +214,12 @@
                     </tbody>
                 </table>
             </div>
+
+        </div>
             <!-- Paginación -->
             <div>
                 {{ $contratos->links() }}
             </div>
-        </div>
-
     </div>
 </main>
 

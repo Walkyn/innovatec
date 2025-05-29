@@ -188,7 +188,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Detalles -->
                                 <div class="w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                                     <div class="flex items-center justify-between">
@@ -207,8 +207,8 @@
                             </div>
 
                             <!-- Sección de Meses -->
-                            <div class="py-6" x-data="{ 
-                                open: true, 
+                            <div class="py-6" x-data="{
+                                open: true,
                                 openServiceId: null,
                                 openYear: null,
                                 toggleYear(serviceId, year) {
@@ -242,9 +242,9 @@
         Alpine.data('mesesModal', () => ({
             telefono: '',
             gpsCoordinates: '',
+
             init() {
-                // Ya no necesitamos escuchar el evento open-meses-modal
-                // porque abrimos el modal directamente desde verDetallesCliente
+                // Inicialización
             },
 
             closeModal() {
@@ -254,167 +254,18 @@
             },
 
             getGoogleMapsUrl(coordinates) {
-                if (!coordinates || coordinates === '--') {
-                    return 'javascript:void(0)';
-                }
+                if (!coordinates || coordinates === '--') return '#';
 
-                // Limpiamos la cadena de coordenadas
-                coordinates = coordinates.trim();
-                
-                // Separamos por '/'
                 const [lat, lng] = coordinates.split('/').map(coord => coord.trim());
-                
-                // Verificamos que tengamos ambas coordenadas
-                if (!lat || !lng) {
-                    return 'javascript:void(0)';
-                }
+                if (!lat || !lng) return '#';
 
-                // Convertimos a números
                 const latitude = parseFloat(lat);
                 const longitude = parseFloat(lng);
 
-                // Verificamos que sean números válidos
-                if (isNaN(latitude) || isNaN(longitude)) {
-                    return 'javascript:void(0)';
-                }
+                if (isNaN(latitude) || isNaN(longitude)) return '#';
 
-                // Retornamos la URL de Google Maps
                 return `https://www.google.com/maps?q=${latitude},${longitude}`;
             }
         }));
     });
-
-    function mesesData() {
-        return {
-            contratoSeleccionado: '',
-            servicioSeleccionado: '',
-            anioSeleccionado: new Date().getFullYear(),
-            porcentajeCompletado: 0,
-            contratos: [{
-                    id: 1,
-                    numero: 'CON-001'
-                },
-                {
-                    id: 2,
-                    numero: 'CON-002'
-                },
-                {
-                    id: 3,
-                    numero: 'CON-003'
-                }
-            ],
-            servicios: [],
-            anios: Array.from({
-                length: 5
-            }, (_, i) => new Date().getFullYear() - i),
-            meses: [{
-                    nombre: 'Enero',
-                    estado: 'pagado',
-                    vencimiento: '05/01',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Febrero',
-                    estado: 'pendiente',
-                    vencimiento: '05/02',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Marzo',
-                    estado: 'falta',
-                    vencimiento: '05/03',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Abril',
-                    estado: 'pagado',
-                    vencimiento: '05/04',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Mayo',
-                    estado: 'no-aplica',
-                    vencimiento: '05/05',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Junio',
-                    estado: 'pagado',
-                    vencimiento: '05/06',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Julio',
-                    estado: 'pendiente',
-                    vencimiento: '05/07',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Agosto',
-                    estado: 'falta',
-                    vencimiento: '05/08',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Septiembre',
-                    estado: 'no-aplica',
-                    vencimiento: '05/09',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Octubre',
-                    estado: 'pagado',
-                    vencimiento: '05/10',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Noviembre',
-                    estado: 'pendiente',
-                    vencimiento: '05/11',
-                    monto: '50.00'
-                },
-                {
-                    nombre: 'Diciembre',
-                    estado: 'pagado',
-                    vencimiento: '05/12',
-                    monto: '50.00'
-                }
-            ],
-            cargarServicios() {
-                // Simulación de carga de servicios
-                this.servicios = [{
-                        id: 1,
-                        nombre: 'Internet Básico',
-                        fechaInicio: '2023-01-01'
-                    },
-                    {
-                        id: 2,
-                        nombre: 'Internet Premium',
-                        fechaInicio: '2023-06-01'
-                    },
-                    {
-                        id: 3,
-                        nombre: 'Internet Empresarial',
-                        fechaInicio: '2023-03-01'
-                    }
-                ];
-            },
-            ajustarAnio() {
-                const servicio = this.servicios.find(s => s.id === this.servicioSeleccionado);
-                if (servicio) {
-                    this.anioSeleccionado = new Date(servicio.fechaInicio).getFullYear();
-                    this.cargarMeses();
-                }
-            },
-            cargarMeses() {
-                // Simulación de carga de meses según el año seleccionado
-                this.actualizarPorcentajeCompletado();
-            },
-            actualizarPorcentajeCompletado() {
-                const totalMeses = this.meses.length;
-                const mesesCompletados = this.meses.filter(mes => mes.estado === 'pagado').length;
-                this.porcentajeCompletado = Math.round((mesesCompletados / totalMeses) * 100);
-            }
-        }
-    }
 </script>

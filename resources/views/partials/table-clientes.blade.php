@@ -319,7 +319,7 @@
     function verDetallesCliente(clienteId) {
         if (!clienteId) return;
 
-        // Primero abrimos el modal
+        // Abrir modal
         const modal = document.getElementById('meses-modal');
         if (modal) {
             const modalInstance = new Modal(modal, {
@@ -329,226 +329,103 @@
             modalInstance.show();
         }
 
-        // Cargar los detalles del cliente
+        // Cargar detalles del cliente
         fetch(`/clients/${clienteId}/details`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const cliente = data.cliente;
 
-                    // Actualizar la información del cliente en el modal
-                    // Actualizar las iniciales en el avatar
-                    document.querySelector('#meses-modal .text-2xl').textContent =
-                        `${cliente.nombres.charAt(0)}${cliente.apellidos.charAt(0)}`;
+                    // Actualizar información básica
+                    const updateField = (field, value, defaultValue = '--') => {
+                        const element = modal.querySelector(`[data-field="${field}"]`);
+                        if (element) element.textContent = value || defaultValue;
+                    };
 
-                    // Actualizar el nombre completo
-                    document.querySelector('#meses-modal [data-field="nombre"]').textContent =
-                        `${cliente.nombres} ${cliente.apellidos}`;
-
-                    // Actualizar información de contacto
-                    document.querySelector('#meses-modal [data-field="identificacion"]').textContent = cliente
-                        .identificacion;
-                    document.querySelector('#meses-modal [data-field="telefono"]').textContent = cliente.telefono;
-                    document.querySelector('#meses-modal [data-field="gps"]').textContent = cliente.gps ||
-                        'No especificado';
-
-                    // Actualizar información de ubicación
-                    document.querySelector('#meses-modal [data-field="region"]').textContent = cliente.region ||
-                        'No especificado';
-                    document.querySelector('#meses-modal [data-field="provincia"]').textContent = cliente
-                        .provincia || 'No especificado';
-                    document.querySelector('#meses-modal [data-field="distrito"]').textContent = cliente.distrito ||
-                        'No especificado';
-                    document.querySelector('#meses-modal [data-field="pueblo"]').textContent = cliente.pueblo ||
-                        'No especificado';
-                    document.querySelector('#meses-modal [data-field="direccion"]').textContent = cliente.direccion;
-
-                    // === ESTADO DEL CLIENTE (perfil/avatar) ===
-                    const estadoCliente = cliente.estado_cliente;
-                    const estadoIndicator = document.querySelector('#meses-modal [data-field="estado-indicator"]');
-                    const estadoPerfil = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
-
-                    let indicatorBg = '';
-                    let indicatorIcon = '';
-                    let estadoPerfilTexto = '';
-                    switch (estadoCliente) {
-                        case 'activo':
-                            indicatorBg = 'bg-green-500';
-                            indicatorIcon = 'fa-check-circle';
-                            estadoPerfilTexto = 'Cliente activo';
-                            break;
-                        case 'suspendido':
-                            indicatorBg = 'bg-yellow-500';
-                            indicatorIcon = 'fa-exclamation-circle';
-                            estadoPerfilTexto = 'Cliente suspendido';
-                            break;
-                        case 'inactivo':
-                            indicatorBg = 'bg-gray-400';
-                            indicatorIcon = 'fa-times-circle';
-                            estadoPerfilTexto = 'Cliente inactivo';
-                            break;
-                        default:
-                            indicatorBg = 'bg-gray-400';
-                            indicatorIcon = 'fa-question-circle';
-                            estadoPerfilTexto = 'Estado desconocido';
+                    // Avatar e iniciales
+                    const inicialesElement = modal.querySelector('[data-field="iniciales"]');
+                    if (inicialesElement) {
+                        inicialesElement.textContent =
+                            `${cliente.nombres.charAt(0)}${cliente.apellidos.charAt(0)}`;
                     }
+
+                    // Nombre completo
+                    updateField('nombre', `${cliente.nombres} ${cliente.apellidos}`);
+
+                    // Información de contacto
+                    updateField('identificacion', cliente.identificacion);
+                    updateField('telefono', cliente.telefono);
+                    updateField('gps', cliente.gps);
+                    updateField('region', cliente.region);
+                    updateField('provincia', cliente.provincia);
+                    updateField('distrito', cliente.distrito);
+                    updateField('pueblo', cliente.pueblo);
+                    updateField('direccion', cliente.direccion);
+
+                    // Estado del cliente
+                    const estadoIndicator = modal.querySelector('[data-field="estado-indicator"]');
                     if (estadoIndicator) {
-                        estadoIndicator.className =
-                            `absolute bottom-0 right-0 w-5 h-5 ${indicatorBg} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
-                        estadoIndicator.querySelector('i').className = `fas ${indicatorIcon} text-white text-xs`;
-                    }
-                    if (estadoPerfil) {
+                        let bgColor = '';
+                        let icon = '';
 
-                    }
-
-                    // === ESTADO DEL SERVICIO/PLAN (sección plan) ===
-                    const servicioMostrar = cliente.servicio_mostrar;
-                    const planMostrar = cliente.plan_mostrar;
-                    const precioMostrar = cliente.precio_mostrar;
-                    const estadoMostrar = cliente.estado_mostrar;
-
-                    document.querySelector('#meses-modal [data-field="servicio"]').textContent =
-                        servicioMostrar ? (planMostrar ? `${servicioMostrar} ${planMostrar}` : servicioMostrar) :
-                        'Sin servicio';
-
-                    document.querySelector('#meses-modal [data-field="precio"]').textContent =
-                        precioMostrar ? `S/. ${Number(precioMostrar).toFixed(2)}` : 'S/. 0.00';
-
-                    // Estado visual (badge, color, ícono)
-                    const estadoElement = document.querySelector('#meses-modal [data-field="estado"]');
-                    const estadoIconPlan = document.querySelector('#meses-modal [data-field="estado-icon"]');
-                    const estadoIconContainer = estadoIconPlan.parentElement;
-                    const estadoIndicatorPlan = document.querySelector(
-                        '#meses-modal [data-field="estado-indicator-plan"]');
-
-                    let estadoTexto = '';
-                    let estadoColor = '';
-                    let icono = '';
-                    let iconoColor = '';
-                    let bgIcono = '';
-
-                    switch (estadoMostrar) {
-                        case 'activo':
-                            estadoTexto = 'Activo';
-                            estadoColor = 'text-green-700 bg-green-100 dark:bg-green-700 dark:text-green-100';
-                            icono = 'fa-check-circle';
-                            iconoColor = 'text-green-500 dark:text-green-300';
-                            bgIcono = 'bg-green-100 dark:bg-green-900';
-                            break;
-                        case 'suspendido':
-                            estadoTexto = 'Suspendido';
-                            estadoColor = 'text-red-700 bg-red-100 dark:bg-red-700 dark:text-red-100';
-                            icono = 'fa-times-circle';
-                            iconoColor = 'text-red-500 dark:text-red-300';
-                            bgIcono = 'bg-red-100 dark:bg-red-900';
-                            break;
-                        case 'cancelado':
-                            estadoTexto = 'Cancelado';
-                            estadoColor = 'text-gray-600 dark:text-gray-400';
-                            icono = 'fa-times-circle';
-                            iconoColor = 'text-gray-500 dark:text-gray-300';
-                            bgIcono = 'bg-gray-100 dark:bg-gray-900';
-                            break;
-                        default:
-                            estadoTexto = 'Sin servicios';
-                            estadoColor = 'text-gray-400';
-                            icono = 'fa-question-circle';
-                            iconoColor = 'text-gray-400';
-                            bgIcono = 'bg-gray-100 dark:bg-gray-700';
-                    }
-
-                    if (estadoElement) {
-                        estadoElement.textContent = estadoTexto;
-                        estadoElement.className = `text-sm font-semibold ${estadoColor}`;
-                    }
-                    if (estadoIconPlan && estadoIconContainer) {
-                        estadoIconPlan.className = `fas ${icono} ${iconoColor}`;
-                        estadoIconContainer.className =
-                            `flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${bgIcono}`;
-                    }
-                    if (estadoIndicatorPlan) {
-                        // Indicador pequeño en el avatar
-                        let indicatorBgPlan = '';
-                        let indicatorIconPlan = '';
-                        switch (estadoMostrar) {
+                        switch (cliente.estado_cliente) {
                             case 'activo':
-                                indicatorBgPlan = 'bg-green-500';
-                                indicatorIconPlan = 'fa-check-circle';
+                                bgColor = 'bg-green-500';
+                                icon = 'fa-check-circle';
                                 break;
                             case 'suspendido':
-                                indicatorBgPlan = 'bg-red-500';
-                                indicatorIconPlan = 'fa-times-circle';
-                                break;
-                            case 'cancelado':
-                                indicatorBgPlan = 'bg-gray-500';
-                                indicatorIconPlan = 'fa-times-circle';
+                                bgColor = 'bg-yellow-500';
+                                icon = 'fa-exclamation-circle';
                                 break;
                             default:
-                                indicatorBgPlan = 'bg-gray-400';
-                                indicatorIconPlan = 'fa-question-circle';
+                                bgColor = 'bg-gray-400';
+                                icon = 'fa-question-circle';
                         }
-                        estadoIndicatorPlan.className =
-                            `absolute bottom-0 right-0 w-5 h-5 ${indicatorBgPlan} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
-                        estadoIndicatorPlan.querySelector('i').className =
-                            `fas ${indicatorIconPlan} text-white text-xs`;
+
+                        estadoIndicator.className =
+                            `absolute bottom-0 right-0 w-5 h-5 ${bgColor} rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center`;
+
+                        const iconElement = estadoIndicator.querySelector('i');
+                        if (iconElement) iconElement.className = `fas ${icon} text-white text-xs`;
                     }
 
-                    // Actualizar fecha de inicio y fecha de instalación
-                    const fechaInicioElement = document.querySelector('#meses-modal [data-field="fecha-inicio"]');
-                    const fechaInstalacionElement = document.querySelector(
-                        '#meses-modal [data-field="fecha-instalacion"]');
-
-                    if (fechaInicioElement) {
-                        let fechaFormateada = 'No especificada';
-                        if (cliente.created_at) {
-
-                            let fechaStr = cliente.created_at.split('T')[0];
-                            const [anio, mes, dia] = fechaStr.split('-');
-                            // Mes en español
-                            const meses = [
-                                'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-                                'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-                            ];
-                            const mesNombre = meses[parseInt(mes, 10) - 1];
-                            fechaFormateada =
-                                `Cliente registrado el ${parseInt(dia, 10)} de ${mesNombre} de ${anio}`;
-                        }
+                    // Fechas
+                    const fechaInicioElement = modal.querySelector('[data-field="fecha-inicio"]');
+                    if (fechaInicioElement && cliente.created_at) {
+                        const fecha = new Date(cliente.created_at);
                         fechaInicioElement.innerHTML = `
-                            <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                            ${fechaFormateada}
-                        `;
+                        <span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                        Cliente registrado el ${fecha.toLocaleDateString('es-ES', { 
+                            year: 'numeric', month: 'long', day: 'numeric' 
+                        })}
+                    `;
                     }
 
-                    if (fechaInstalacionElement) {
-                        let fechaInstalacionFormateada = 'No especificada';
-                        if (cliente.created_at) {
-                            let fechaStr = cliente.created_at.split('T')[0];
-                            const [anio, mes, dia] = fechaStr.split('-');
-                            fechaInstalacionFormateada = `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${anio}`;
-                        }
-                        fechaInstalacionElement.textContent = fechaInstalacionFormateada;
-                    }
+                    updateField('fecha-instalacion',
+                        cliente.created_at ? new Date(cliente.created_at).toLocaleDateString('es-ES') : '--');
 
-                    // Cargar los contratos
+                    // Cargar contratos
                     return fetch(`/clients/${clienteId}/contracts`);
                 }
-                throw new Error(data.errorDetails || 'Error al cargar los detalles del cliente');
+                throw new Error(data.errorDetails || 'Error al cargar detalles');
             })
             .then(response => response.json())
-            .then(contractsData => {
-                if (contractsData.success) {
-                    document.getElementById('modal-content').innerHTML = contractsData.html;
-                } else {
-                    throw new Error(contractsData.errorDetails || 'Error al cargar los contratos');
+            .then(data => {
+                const modalContent = document.getElementById('modal-content');
+                if (modalContent && data.success) {
+                    modalContent.innerHTML = data.html;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('modal-content').innerHTML = `
-                    <div class="text-center text-red-500 dark:text-red-400 py-4">
-                        Error al cargar la información: ${error.message}
+                const modalContent = document.getElementById('modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                    <div class="text-center text-red-500 py-4">
+                        Error al cargar información: ${error.message}
                     </div>
                 `;
+                }
             });
     }
 </script>
